@@ -1,0 +1,21 @@
+{
+  "name": "amberpencil",
+  "version": "1.0.0",
+  "description": "Amber pencil",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichinobuMaeda/amberpencil.git"
+  },
+  "author": "Michinobu Maeda",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/MichinobuMaeda/amberpencil/issues"
+  },
+  "homepage": "https://github.com/MichinobuMaeda/amberpencil#readme",
+  "devDependencies": {
+    "firebase-tools": "^10.0.1"
+  }
+}
