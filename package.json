@@ -10,7 +10,7 @@
     "url": "git+https://github.com/MichinobuMaeda/amberpencil.git"
   },
   "author": "Michinobu Maeda",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/MichinobuMaeda/amberpencil/issues"
   },
