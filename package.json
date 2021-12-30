@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Amber pencil",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui \"flutter run -d chrome\""
   },
   "repository": {
     "type": "git",

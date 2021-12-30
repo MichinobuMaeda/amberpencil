@@ -1,5 +1,9 @@
 # Create this project
 
+[README](../README.md)
+
+Prerequisites: [Development](./dev.md)
+
 <https://console.firebase.google.com/>
 - Add project
     - Project name: amberpencil
@@ -33,6 +37,7 @@ $ git commit -m "first commit"
 $ git branch -M main
 $ git remote add origin git@github.com:MichinobuMaeda/amberpencil.git
 $ git push -u origin main
+$ npm -g install firebase-tools
 $ firebase login
 $ firebase init functions
 === Project Setup
@@ -81,9 +86,7 @@ tion Emulator, Functions Emulator, Firestore Emulator, Storage Emulator
 ? Which port do you want to use for the Emulator UI (leave empty to use any available port)? 4040
 ? Would you like to download the emulators now? No
 
-$ cd functions
-$ yarn install
-$ cd ..
+$ yarn --cwd functions install
 
 $ git add .
 $ git commit -m "init firebase"
