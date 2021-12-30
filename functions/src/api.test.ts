@@ -3,7 +3,7 @@ import axios from "axios";
 import {
   sysSnapshot,
   mockFirebase,
-} from "./setupTests";
+} from "./testSetup";
 import * as setupModule from "./setup";
 import {
   setup,

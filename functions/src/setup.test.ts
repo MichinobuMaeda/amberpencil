@@ -12,7 +12,7 @@ import {
   mockQueryGet,
   mockFirebase,
   mockDoc,
-} from "./setupTests";
+} from "./testSetup";
 import * as users from "./users";
 import {
   getSys,

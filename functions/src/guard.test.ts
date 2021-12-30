@@ -8,7 +8,7 @@ import {
   mockDoc,
   mockGet,
   mockFirebase,
-} from "./setupTests";
+} from "./testSetup";
 import {
   validUser,
   adminUser,

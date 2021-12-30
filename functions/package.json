@@ -55,9 +55,9 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "rootDir": "src",
+    "coverageDirectory": "<rootDir>/../coverage",
     "coveragePathIgnorePatterns": [
-      "index.ts",
-      "setupTests.ts"
+      "testSetup.ts"
     ]
   },
   "private": true

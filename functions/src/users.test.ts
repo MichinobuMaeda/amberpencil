@@ -21,7 +21,7 @@ import {
   mockCreateCustomToken,
   DocSnap,
   DocRef,
-} from "./setupTests";
+} from "./testSetup";
 import {
   createAuthUser,
   setUserPassword,
