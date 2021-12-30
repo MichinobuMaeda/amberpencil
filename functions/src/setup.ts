@@ -100,17 +100,6 @@ export const install = async (
     updatedAt: ts,
   });
 
-  await serviceRef.doc("copyright").set({
-    text: `Copyright &copy; 2021 Michinobu Maeda.
-
-    The source code for this app is distributed under the MIT license.
-
-    <https://github.com/MichinobuMaeda/amberpencil>
-`,
-    createdAt: ts,
-    updatedAt: ts,
-  });
-
   await serviceRef.doc("policy").set({
     text: `### Heading 3
 

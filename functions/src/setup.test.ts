@@ -156,7 +156,7 @@ describe("updateData()", () => {
 });
 
 describe("install()", () => {
-  it("create sys, inv, copyright, policy," +
+  it("create sys, inv, policy," +
   " the primary account in testers group," +
   " the testers group with primary account," +
   " and returns document 'sys'.", async () => {
@@ -193,7 +193,6 @@ describe("install()", () => {
     expect(mockDoc.mock.calls).toEqual([
       ["sys"],
       ["inv"],
-      ["copyright"],
       ["policy"],
       ["testers"],
       ["sys"],
@@ -211,13 +210,6 @@ describe("install()", () => {
         {
           seed: expect.any(String),
           expiration: 3 * 24 * 3600 * 1000,
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date),
-        },
-      ],
-      [
-        {
-          text: expect.any(String),
           createdAt: expect.any(Date),
           updatedAt: expect.any(Date),
         },

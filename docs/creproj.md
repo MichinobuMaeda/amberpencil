@@ -70,7 +70,7 @@ $ firebase login
 $ firebase init
 === Project Setup
 ? Please select an option: Use an existing project
-? Select a default Firebase project for this directory: amber-case (amber-case)
+? Select a default Firebase project for this directory: amberpencile (amberpencil)
 === Functions Setup
 ? What language would you like to use to write Cloud Functions? TypeScript
 ? Do you want to use ESLint to catch probable bugs and enforce style? Yes
@@ -91,4 +91,12 @@ $ yarn --cwd functions install
 $ git add .
 $ git commit -m "init firebase"
 $ git push
+```
+
+<https://firebase.flutter.dev/docs/overview>
+
+```
+$ flutter pub add firebase_core
+$ dart pub global activate flutterfire_cli
+$ flutterfire configure
 ```
