@@ -36,3 +36,17 @@ const TextTheme textTheme = TextTheme(
   caption: TextStyle(fontSize: fontSizeBody),
   overline: TextStyle(fontSize: fontSizeBody * 0.9),
 );
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: primarySwatchLight,
+  fontFamily: fontFamilySansSerif,
+  textTheme: textTheme,
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: primarySwatchDark,
+  fontFamily: fontFamilySansSerif,
+  textTheme: textTheme,
+);

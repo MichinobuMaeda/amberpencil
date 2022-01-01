@@ -1,38 +1,112 @@
-import 'package:amberpencil/models/app_state_model.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/app_state_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'service_provider.dart';
+import 'accounts_service.dart';
 
-class AuthService {
-  AppStateModel? _appStateModel;
+class AuthData extends AccountData {
+  final String? uid;
+  final bool emailVerified;
+  AuthData()
+      : uid = null,
+        emailVerified = false,
+        super();
+  AuthData.fromUserDataAndSnapshot({
+    this.uid,
+    this.emailVerified = false,
+    required DocumentSnapshot<Map<String, dynamic>> snap,
+  }) : super.fromSnapshot(snap);
+  AuthData.fromAccountData({
+    this.uid,
+    this.emailVerified = false,
+    required AccountData accountData,
+  }) : super.from(accountData);
+}
+
+class AuthService extends ServiceProvider<AuthData> {
+  final FirebaseAuth auth;
+  final FirebaseFirestore db;
   User? _user;
+  String? _url;
 
-  void _listen() {
-    if (_appStateModel != null) {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        _user = user;
-        _appStateModel!.authChecked = true;
-        if (_user == null) {
-          _appStateModel!.uid = null;
-          _appStateModel!.verified = false;
-        } else {
-          _appStateModel!.uid = _user!.uid;
-          _appStateModel!.verified = _user!.emailVerified;
+  AuthService(this.auth, this.db) : super(AuthData()) {
+    auth.authStateChanges().listen((User? user) async {
+      if (user == null) {
+        if (_user != null) {
+          // Signed out.
+          _user = null;
+          notify(AuthData());
         }
-      });
+      } else if (_user?.uid == null) {
+        // Signed in.
+        await _getAccountDoc(user);
+      } else if (_user?.uid != user.uid) {
+        // Suspected to be a program error, unexpected state.
+        notify(AuthData());
+        await signOut();
+      }
+      // } else {
+      //   // _user?.uid == null && _user?.uid == user.uid
+      //   // I have nothing to do.
+      // }
+    });
+  }
+
+  Future<void> _getAccountDoc(User user) async {
+    final me = await db.collection('accounts').doc(user.uid).get();
+    if (_user?.uid == user.uid) {
+      return;
+    }
+    _user = user;
+    if (!me.exists || me.get('valid') == false || me.get('deletedAt') != null) {
+      _user = null;
+      await signOut();
+    } else {
+      notify(
+        AuthData.fromUserDataAndSnapshot(
+          uid: user.uid,
+          emailVerified: user.emailVerified,
+          snap: me,
+        ),
+      );
     }
   }
 
   Future<void> reload() async {
-    if (_user != null) {
-      await _user!.reload();
-      _appStateModel!.verified = _user!.emailVerified;
+    if (auth.currentUser != null) {
+      await auth.currentUser!.reload();
+      _user = auth.currentUser;
+      notify(AuthData.fromAccountData(
+        uid: data.uid,
+        emailVerified: _user!.emailVerified,
+        accountData: data,
+      ));
     }
   }
 
-  set appStateModel(AppStateModel appStateModel) {
-    if (_appStateModel == null) {
-      _appStateModel = appStateModel;
-      _listen();
-    }
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+  Future<void> sendSignInLinkToEmail(String email) async {
+    await auth.sendSignInLinkToEmail(
+      email: email,
+      actionCodeSettings: ActionCodeSettings(
+        url: _url!,
+        handleCodeInApp: true,
+      ),
+    );
+  }
+
+  Future<void> sendEmailVerification() async {
+    await _user!.sendEmailVerification();
+  }
+
+  Future<void> signOut() async {
+    await auth.signOut();
+  }
+
+  set url(String? url) {
+    _url = url;
   }
 }

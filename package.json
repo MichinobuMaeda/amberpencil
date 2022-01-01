@@ -4,7 +4,7 @@
   "description": "Amber pencil",
   "scripts": {
     "test:setup": "curl http://localhost:5001/amberpencil/asia-northeast1/api/setup",
-    "serve": "yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui \"yarn test:setup && flutter run -d chrome --web-port 5000\""
+    "start": "yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui \"yarn test:setup && flutter run -d chrome --web-port 5000\""
   },
   "repository": {
     "type": "git",

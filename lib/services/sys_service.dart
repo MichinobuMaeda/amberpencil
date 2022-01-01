@@ -1,31 +1,23 @@
-import 'package:amberpencil/models/app_state_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/app_state_model.dart';
+import 'service_provider.dart';
 
-class SysService {
-  AppStateModel? _appStateModel;
+class SysData {
+  final String? version;
+  final String? url;
+  SysData({this.version, this.url});
+}
 
-  void _listen() {
-    if (_appStateModel != null) {
-      FirebaseFirestore.instance
-          .collection('service')
-          .doc('sys')
-          .snapshots()
-          .listen(
-        (snap) {
-          if (snap.exists) {
-            _appStateModel!.version = snap.get('version');
-            _appStateModel!.url = snap.get('url');
-          }
-        },
+class SysService extends ServiceProvider<SysData> {
+  final FirebaseFirestore db;
+
+  SysService(this.db) : super(SysData()) {
+    db.collection('service').doc('sys').snapshots().listen((snap) {
+      notify(
+        SysData(
+          version: snap.exists ? snap.get('version') : null,
+          url: snap.exists ? snap.get('url') : null,
+        ),
       );
-    }
-  }
-
-  set appStateModel(AppStateModel appStateModel) {
-    if (_appStateModel == null) {
-      _appStateModel = appStateModel;
-      _listen();
-    }
+    });
   }
 }
