@@ -6,20 +6,21 @@ const Color colorSecondary = Colors.blueGrey;
 const Color colorDanger = Colors.redAccent;
 const Color colorActiveView = Colors.orangeAccent;
 
-const fontFamilySansSerif = null; // 'NotoSansJP';
-const fontFamilyMonoSpace = null; // 'RobotoMono';
+const fontFamilySansSerif = 'NotoSansJP';
+const fontFamilyMonoSpace = 'RobotoMono';
+
+const double fontSizeBody = 16.0;
 
 const double maxContentBodyWidth = 960.0;
-const double fontSizeBody = 16.0;
+const double buttonWidth = fontSizeBody * 7.5;
+const double buttonHeight = fontSizeBody * 3;
+
 const double fontSizeH1 = fontSizeBody * 2.4;
 const double fontSizeH2 = fontSizeBody * 1.6;
 const double fontSizeH3 = fontSizeBody * 1.3;
 const double fontSizeH4 = fontSizeBody * 1.1;
 const double fontSizeH5 = fontSizeBody * 1.05;
 const double fontSizeH6 = fontSizeBody * 1.0;
-
-const double buttonWidth = fontSizeBody * 7.5;
-const double buttonHeight = fontSizeBody * 3;
 
 const TextTheme textTheme = TextTheme(
   headline1: TextStyle(fontSize: fontSizeH1),

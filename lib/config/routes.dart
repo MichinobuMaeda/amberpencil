@@ -1,56 +1,85 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
-import '../screens/loading_screen.dart';
-import '../screens/app_info_screen.dart';
-import '../screens/sign_in_screen.dart';
-import '../screens/email_verify_screen.dart';
-import '../screens/preferences_screen.dart';
-import '../screens/unknown_screen.dart';
 
-// home: '/' <--> level1: '/name' <--> level2: '/name/id'
+enum ClientState { loading, guest, pending, authenticated }
 
-const homeRouteName = '';
-const loadingRouteName = 'loading';
-const signinRouteName = 'signin';
-const verifyRouteName = 'verify';
+const ClientState initialClientState = ClientState.loading;
 
-const unknownRouteName = 'unknown';
+enum RouteName { unknown, home, loading, signin, verify, info, prefs }
 
-// routes hide back button.
-const List<String> topRouteNames = [
-  homeRouteName,
-  loadingRouteName,
-  signinRouteName,
-  verifyRouteName,
-];
+const RouteName initialRouteName = RouteName.loading;
+const RouteName rootRouteName = RouteName.home;
+const RouteName unknownRouteName = RouteName.unknown;
 
-const infoRouteName = 'info';
-const prefsRouteName = 'prefs';
-
-const List<String> level1RouteNames = [
-  loadingRouteName,
-  signinRouteName,
-  verifyRouteName,
-  prefsRouteName,
-  infoRouteName,
-];
-
-const List<String> level2RouteNames = [];
-
-const List<String> routeNames = [
-  homeRouteName,
-  ...level1RouteNames,
-  ...level2RouteNames,
-];
-
-Map<String, StatelessWidget> routeNameMap = {};
-
-void initializeRouteNameMap() {
-  routeNameMap[homeRouteName] = const HomeScreen();
-  routeNameMap[loadingRouteName] = const LoadingScreen();
-  routeNameMap[signinRouteName] = const SignInScreen();
-  routeNameMap[verifyRouteName] = const EmailVerifyScreen();
-  routeNameMap[prefsRouteName] = const PreferencesScreen();
-  routeNameMap[infoRouteName] = const AppInfoScreen();
-  routeNameMap[unknownRouteName] = const UnknownScreen();
+extension ParseToString on RouteName {
+  String toShortString() {
+    return this == rootRouteName ? '' : toString().split('.').last;
+  }
 }
+
+// the top routes of each client state should require only name,
+// not require id.
+const Map<ClientState, List<RouteName>> autorizedRoutes = {
+  ClientState.loading: [
+    RouteName.loading,
+    RouteName.info,
+  ],
+  ClientState.guest: [
+    RouteName.signin,
+    RouteName.prefs,
+    RouteName.info,
+  ],
+  ClientState.pending: [
+    RouteName.verify,
+    RouteName.prefs,
+    RouteName.info,
+  ],
+  ClientState.authenticated: [
+    RouteName.home,
+    RouteName.prefs,
+    RouteName.info,
+  ],
+};
+
+class MenuItem {
+  final Icon icon;
+  final String label;
+  final RouteName route;
+  const MenuItem({
+    required this.icon,
+    required this.label,
+    required this.route,
+  });
+}
+
+const List<MenuItem> menuItems = [
+  MenuItem(
+    icon: Icon(Icons.autorenew),
+    label: 'ホーム',
+    route: RouteName.loading,
+  ),
+  MenuItem(
+    icon: Icon(Icons.login),
+    label: 'ログイン',
+    route: RouteName.signin,
+  ),
+  MenuItem(
+    icon: Icon(Icons.mark_email_read),
+    label: 'メールアドレスの確認',
+    route: RouteName.verify,
+  ),
+  MenuItem(
+    icon: Icon(Icons.home),
+    label: 'ホーム',
+    route: RouteName.home,
+  ),
+  MenuItem(
+    icon: Icon(Icons.settings),
+    label: '設定',
+    route: RouteName.prefs,
+  ),
+  MenuItem(
+    icon: Icon(Icons.info),
+    label: 'このアプリについて',
+    route: RouteName.info,
+  ),
+];

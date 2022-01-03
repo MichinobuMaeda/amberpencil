@@ -11,7 +11,7 @@ Future<void> useFirebaseEmulators(
   FirebaseFunctions functions,
   firebase_storage.FirebaseStorage storage,
 ) async {
-  if (version == "0.0.0+0") {
+  if (version == "for test") {
     debugPrint('Use emulators.');
     try {
       await auth.useAuthEmulator('localhost', 9099);

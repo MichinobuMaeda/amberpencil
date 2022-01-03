@@ -103,7 +103,10 @@ class AuthService extends ServiceProvider<AuthData> {
   }
 
   Future<void> signOut() async {
-    await auth.signOut();
+    await auth.currentUser?.reload();
+    if (auth.currentUser != null) {
+      await auth.signOut();
+    }
   }
 
   set url(String? url) {

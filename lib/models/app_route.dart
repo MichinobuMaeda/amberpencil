@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../config/routes.dart';
 
 class AppRoute {
-  final String name;
+  final RouteName name;
   final String? id;
 
   AppRoute({required this.name, this.id});
@@ -16,21 +16,21 @@ class AppRoute {
 
   @override
   String toString() => id == null
-      ? 'AppRoute(name: "$name")'
-      : 'AppRoute(name: "$name", id: "$id")';
+      ? 'AppRoute(name: "${name.toShortString()}")'
+      : 'AppRoute(name: "${name.toShortString()}", id: "$id")';
 
-  bool get top => topRouteNames.contains(name);
-
-  String get path => id == null ? '/$name' : '/$name"/$id';
+  String get path =>
+      id == null ? '/${name.toShortString()}' : '/${name.toShortString()}"/$id';
 
   factory AppRoute.fromPath(String? path) {
-    final uri = Uri.parse(path ?? '/$loadingRouteName');
+    final uri = Uri.parse(path ?? '/');
     return AppRoute(
       name: uri.pathSegments.isEmpty
-          ? homeRouteName
-          : (routeNames.contains(uri.pathSegments[0])
-              ? uri.pathSegments[0]
-              : unknownRouteName),
+          ? rootRouteName
+          : RouteName.values.firstWhere(
+              (name) => name.toShortString() == uri.pathSegments[0],
+              orElse: () => unknownRouteName,
+            ),
       id: uri.pathSegments.length > 2 ? uri.pathSegments[1] : null,
     );
   }
