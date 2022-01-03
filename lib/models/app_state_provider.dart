@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import '../config/routes.dart';
 import '../services/service_listener.dart';
 import '../services/sys_service.dart';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
 import 'app_info.dart';
-import 'app_route.dart';
 
-mixin RouteStateListener {
-  setClientState(ClientState clientState) {}
-  setRoute(AppRoute appRoute) {}
-}
+enum ClientState { loading, guest, pending, authenticated }
+
+const ClientState initialClientState = ClientState.loading;
 
 class AppStateProvider extends ChangeNotifier with ServiceListener {
   final AppInfo appInfo;
@@ -22,9 +19,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   bool _authChecked = false;
   bool _verified = false;
   AccountData? _me;
-  // List<AppRoute> _routes = [AppRoute(name: loadingRouteName)];
   ClientState _clientState = initialClientState;
-  RouteStateListener? _routeStateListener;
 
   AppStateProvider(
     this.appInfo,
@@ -135,19 +130,11 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
     if (_clientState != state) {
       _clientState = state;
-      _routeStateListener?.setClientState(_clientState);
+      notifyListeners();
     }
   }
 
   ClientState get clientState => _clientState;
-
-  set routeStateListener(RouteStateListener routeStateListener) {
-    _routeStateListener ??= routeStateListener;
-  }
-
-  void goRoute(AppRoute appRoute) {
-    _routeStateListener?.setRoute(appRoute);
-  }
 
   bool updateIsAvailable() => version != null && version != appInfo.version;
 }

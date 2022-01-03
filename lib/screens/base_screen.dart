@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:amberpencil/config/routes.dart';
-import 'package:amberpencil/models/app_route.dart';
 import '../config/theme.dart';
 import '../models/app_state_provider.dart';
 import '../utils/web.dart';
@@ -13,14 +10,74 @@ import 'email_verify_screen.dart';
 import 'preferences_screen.dart';
 import 'unknown_screen.dart';
 
+class MenuItem {
+  final String name;
+  final Icon icon;
+  final String label;
+  final List<ClientState> states;
+
+  const MenuItem({
+    required this.name,
+    required this.icon,
+    required this.label,
+    required this.states,
+  });
+}
+
+const List<MenuItem> menuItems = [
+  MenuItem(
+    name: 'loading',
+    icon: Icon(Icons.autorenew),
+    label: 'ホーム',
+    states: [ClientState.loading],
+  ),
+  MenuItem(
+    name: 'signin',
+    icon: Icon(Icons.login),
+    label: 'ログイン',
+    states: [ClientState.guest],
+  ),
+  MenuItem(
+    name: 'verify',
+    icon: Icon(Icons.mark_email_read),
+    label: 'メールアドレスの確認',
+    states: [ClientState.pending],
+  ),
+  MenuItem(
+    name: '',
+    icon: Icon(Icons.home),
+    label: 'ホーム',
+    states: [ClientState.authenticated],
+  ),
+  MenuItem(
+    name: 'prefs',
+    icon: Icon(Icons.settings),
+    label: '設定',
+    states: [
+      ClientState.guest,
+      ClientState.pending,
+      ClientState.authenticated,
+    ],
+  ),
+  MenuItem(
+    name: 'info',
+    icon: Icon(Icons.info),
+    label: 'このアプリについて',
+    states: [
+      ClientState.loading,
+      ClientState.guest,
+      ClientState.pending,
+      ClientState.authenticated
+    ],
+  ),
+];
+
 class BaseScreen extends StatefulWidget {
-  final List<AppRoute> menuRoutes;
-  final AppRoute route;
+  final AppStateProvider appState;
 
   const BaseScreen({
     Key? key,
-    required this.menuRoutes,
-    required this.route,
+    required this.appState,
   }) : super(key: key);
 
   @override
@@ -29,68 +86,42 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  late final List<MenuItem> _tabItems;
   late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+
+    _tabItems = menuItems
+        .where((item) => item.states.contains(widget.appState.clientState))
+        .toList();
     _tabController = TabController(
-      initialIndex: widget.menuRoutes.indexOf(widget.route),
+      initialIndex: 0,
       vsync: this,
-      length: widget.menuRoutes.length,
+      length: _tabItems.length,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    AppStateProvider appState =
-        Provider.of<AppStateProvider>(context, listen: false);
     return Scaffold(
       key: _scaffoldKey,
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              title: Text(appState.appInfo.name),
+              title: Text(widget.appState.appInfo.name),
               pinned: true,
               floating: true,
               forceElevated: innerBoxIsScrolled,
               automaticallyImplyLeading: false,
-              actions: [
-                PopupMenuButton<RouteName>(
-                  onSelected: (RouteName selected) {
-                    appState.goRoute(AppRoute(name: selected));
-                  },
-                  itemBuilder: (BuildContext context) => menuItems
-                      .where((item) =>
-                          autorizedRoutes[appState.clientState]
-                              ?.contains(item.route) ??
-                          false)
-                      .map((item) => PopupMenuItem<RouteName>(
-                            value: item.route,
-                            child: ListTile(
-                              leading: item.icon,
-                              title: Text(item.label),
-                            ),
-                            enabled: item.route != widget.route.name,
-                          ))
-                      .toList(),
-                ),
-              ],
               bottom: TabBar(
-                tabs: widget.menuRoutes
-                    .map(
-                      (route) => menuItems
-                          .firstWhere((item) => item.route == route.name),
-                    )
-                    .map((item) => Tab(
-                          child: Text(item.label),
-                        ))
+                tabs: _tabItems
+                    .map((item) => Tab(child: Text(item.label)))
                     .toList(),
                 controller: _tabController,
-                onTap: (index) {
-                  appState.goRoute(widget.menuRoutes[index]);
-                },
               ),
             ),
           ];
@@ -98,12 +129,11 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
         body: Stack(
           children: [
             TabBarView(
-              children:
-                  widget.menuRoutes.map((route) => getScreen(route)).toList(),
+              children: _tabItems.map((item) => getScreen(item.name)).toList(),
               controller: _tabController,
             ),
             Visibility(
-              visible: appState.updateIsAvailable(),
+              visible: widget.appState.updateIsAvailable(),
               child: Align(
                 alignment: Alignment.topRight,
                 child: Padding(
@@ -131,22 +161,22 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   }
 
   @visibleForTesting
-  Widget getScreen(AppRoute appRoute) {
-    switch (appRoute.name) {
-      case RouteName.home:
-        return HomeScreen(route: appRoute);
-      case RouteName.loading:
-        return LoadingScreen(route: appRoute);
-      case RouteName.signin:
-        return SignInScreen(route: appRoute);
-      case RouteName.verify:
-        return EmailVerifyScreen(route: appRoute);
-      case RouteName.prefs:
-        return PreferencesScreen(route: appRoute);
-      case RouteName.info:
-        return AppInfoScreen(route: appRoute);
+  Widget getScreen(String name) {
+    switch (name) {
+      case '':
+        return const HomeScreen();
+      case 'loading':
+        return const LoadingScreen();
+      case 'signin':
+        return const SignInScreen();
+      case 'verify':
+        return const EmailVerifyScreen();
+      case 'prefs':
+        return const PreferencesScreen();
+      case 'info':
+        return const AppInfoScreen();
       default:
-        return UnknownScreen(route: appRoute);
+        return const UnknownScreen();
     }
   }
 }
