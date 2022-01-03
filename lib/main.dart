@@ -17,13 +17,6 @@ import 'services/sys_service.dart';
 import 'services/auth_service.dart';
 import 'services/accounts_service.dart';
 import 'screens/base_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/loading_screen.dart';
-import 'screens/app_info_screen.dart';
-import 'screens/sign_in_screen.dart';
-import 'screens/email_verify_screen.dart';
-import 'screens/preferences_screen.dart';
-import 'screens/unknown_screen.dart';
 import 'utils/env.dart';
 
 void main() async {
@@ -103,7 +96,7 @@ class _MyAppState extends State<MyApp> {
           Provider.of<AppStateProvider>(context, listen: false);
       appState.routeStateListener = _routerDelegate;
       return MaterialApp.router(
-        title: 'Amber pencil',
+        title: appState.appInfo.name,
         theme: ThemeData(
           brightness: Brightness.light,
           primarySwatch: primarySwatchLight,
@@ -143,7 +136,10 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
         PopNavigatorRouterDelegateMixin<AppRoute>,
         RouteStateListener {
   ClientState _clientState = initialClientState;
-  List<AppRoute> _routes = [AppRoute(name: rootRouteName)];
+  List<AppRoute> _routes = [AppRoute(name: initialRouteName)];
+  List<AppRoute> _menuRoutes = autorizedRoutes[ClientState.loading]!
+      .map((name) => AppRoute(name: name))
+      .toList();
 
   @override
   final GlobalKey<NavigatorState> navigatorKey;
@@ -160,6 +156,9 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
           name: autorizedRoutes[_clientState]?[0] ?? rootRouteName,
         ),
       ];
+      _menuRoutes = autorizedRoutes[clientState]!
+          .map((name) => AppRoute(name: name))
+          .toList();
       notifyListeners();
     }
   }
@@ -167,19 +166,12 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   @override
   setRoute(AppRoute appRoute) {
     // guard
-    if (!(autorizedRoutes[_clientState]?.contains(appRoute.name) ?? false)) {
-      appRoute = AppRoute(
-        name: autorizedRoutes[_clientState]?[0] ?? RouteName.loading,
-      );
+    if (!_menuRoutes.contains(appRoute)) {
+      appRoute = _menuRoutes[0];
     }
 
-    // avoid re-regist the same route.
-    final int index = _routes.indexOf(appRoute);
-    if (index < 0) {
-      _routes = [..._routes, appRoute];
-      notifyListeners();
-    } else if ((index + 1) < _routes.length) {
-      _routes = _routes.sublist(0, index + 1);
+    if (_routes[0] != appRoute) {
+      _routes = [appRoute];
       notifyListeners();
     }
   }
@@ -196,12 +188,13 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
+      transitionDelegate: NoAnimationTransitionDelegate(),
       pages: _routes
           .map<MaterialPage>(
             (route) => MaterialPage(
               key: ValueKey('page-${route.name.toShortString()}'),
               child: BaseScreen(
-                child: getScreen(route),
+                menuRoutes: _menuRoutes,
                 route: route,
               ),
             ),
@@ -222,28 +215,49 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   }
 
   @visibleForTesting
-  Widget getScreen(AppRoute appRoute) {
-    switch (appRoute.name) {
-      case RouteName.home:
-        return HomeScreen(route: appRoute);
-      case RouteName.loading:
-        return LoadingScreen(route: appRoute);
-      case RouteName.signin:
-        return SignInScreen(route: appRoute);
-      case RouteName.verify:
-        return EmailVerifyScreen(route: appRoute);
-      case RouteName.prefs:
-        return PreferencesScreen(route: appRoute);
-      case RouteName.info:
-        return AppInfoScreen(route: appRoute);
-      default:
-        return UnknownScreen(route: appRoute);
-    }
-  }
-
-  @visibleForTesting
   ClientState get clientState => _clientState;
 
   @visibleForTesting
   List<AppRoute> get routes => _routes;
+
+  @visibleForTesting
+  List<AppRoute> get menuRoutes => _menuRoutes;
+}
+
+// https://docs.flutter.dev/release/breaking-changes/route-transition-record-and-transition-delegate
+class NoAnimationTransitionDelegate extends TransitionDelegate<void> {
+  @override
+  Iterable<RouteTransitionRecord> resolve({
+    required List<RouteTransitionRecord> newPageRouteHistory,
+    required Map<RouteTransitionRecord?, RouteTransitionRecord>
+        locationToExitingPageRoute,
+    required Map<RouteTransitionRecord?, List<RouteTransitionRecord>>
+        pageRouteToPagelessRoutes,
+  }) {
+    final List<RouteTransitionRecord> results = <RouteTransitionRecord>[];
+
+    for (final RouteTransitionRecord pageRoute in newPageRouteHistory) {
+      // Renames isEntering to isWaitingForEnteringDecision.
+      if (pageRoute.isWaitingForEnteringDecision) {
+        pageRoute.markForAdd();
+      }
+      results.add(pageRoute);
+    }
+    for (final RouteTransitionRecord exitingPageRoute
+        in locationToExitingPageRoute.values) {
+      // Checks the isWaitingForExitingDecision before calling the markFor methods.
+      if (exitingPageRoute.isWaitingForExitingDecision) {
+        exitingPageRoute.markForRemove();
+        final List<RouteTransitionRecord>? pagelessRoutes =
+            pageRouteToPagelessRoutes[exitingPageRoute];
+        if (pagelessRoutes != null) {
+          for (final RouteTransitionRecord pagelessRoute in pagelessRoutes) {
+            pagelessRoute.markForRemove();
+          }
+        }
+      }
+      results.add(exitingPageRoute);
+    }
+    return results;
+  }
 }
