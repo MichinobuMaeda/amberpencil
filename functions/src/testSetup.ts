@@ -15,34 +15,21 @@ export type DocSnap = firestore.DocumentSnapshot<firestore.DocumentData>;
 
 const test = functionTest();
 
-export const sysNotExist = test.firestore.makeDocumentSnapshot(
+export const confNotExist = test.firestore.makeDocumentSnapshot(
     {},
-    "document/service/sys",
+    "document/service/conf",
 );
-export const sysData = {
+export const confData = {
   version: "1.0.0",
   url: "https://example.com",
-  createdAt: new Date("2020-01-01T01:23:45.678Z"),
-  updatedAt: new Date("2021-01-01T00:11:22.333Z"),
-};
-export const sysSnapshot = test.firestore.makeDocumentSnapshot(
-    sysData,
-    "document/service/sys",
-);
-
-export const invNotExist = test.firestore.makeDocumentSnapshot(
-    {},
-    "document/service/inv",
-);
-export const invData = {
   seed: "test seed",
   invitationExpirationTime: 3 * 24 * 3600 * 1000,
   createdAt: new Date("2020-01-01T01:23:45.678Z"),
   updatedAt: new Date("2021-01-01T00:11:22.333Z"),
 };
-export const invSnapshot = test.firestore.makeDocumentSnapshot(
-    invData,
-    "document/service/inv",
+export const confSnapshot = test.firestore.makeDocumentSnapshot(
+    confData,
+    "document/service/conf",
 );
 
 export const mockGet = jest.fn();
@@ -147,79 +134,3 @@ export const testInvitation = (
   hash.update(seed);
   return hash.digest("hex");
 };
-
-// export const mockGet = jest.fn();
-// export const mockAdd = jest.fn();
-// export const mockSet = jest.fn();
-// export const mockUpdate = jest.fn();
-
-// export const createUser = jest.fn();
-// export const updateUser = jest.fn();
-// export const deleteUser = jest.fn();
-// export const createCustomToken = jest.fn();
-
-// export const getMockFirebase = (): jest.Mocked<admin.app.App> => {
-//   mockAdd.mockImplementation(() => new Promise((resolve) => {
-//     resolve({id: "created"});
-//   }));
-//   mockSet.mockImplementation(() => new Promise((resolve) => {
-//     resolve({});
-//   }));
-//   mockUpdate.mockImplementation(() => new Promise((resolve) => {
-//     resolve({});
-//   }));
-//   createUser.mockImplementation(() => new Promise((resolve) => {
-//     resolve({uid: "created"});
-//   }));
-//   updateUser.mockImplementation(() => new Promise((resolve) => {
-//     resolve({});
-//   }));
-//   deleteUser.mockImplementation(() => new Promise((resolve) => {
-//     resolve({});
-//   }));
-//   createCustomToken.mockImplementation(() => new Promise((resolve) => {
-//     resolve("test token");
-//   }));
-
-//   mockFirebase.firestore.mockImplementation(() => ({
-//     collection: (collection: string) => ({
-//       add: (data: any) => mockAdd({collection, data}),
-//       doc: (id: string) => ({
-//         get: () => mockGet({collection, id}),
-//         set: (data: any) => mockSet({collection, id, data}),
-//         update: (data: any) => mockUpdate({collection, id, data}),
-//       }),
-//       where: (op1: any, op2: any, op3: any) => ({
-//         get: () => mockGet({
-//           collection, op1, op2, op3,
-//         }),
-//       }),
-//       get: () => mockGet({collection}),
-//     }),
-//   }));
-
-//   return {
-//     firestore: () => ({
-//       collection: (collection: string) => ({
-//         add: (data: any) => mockAdd({collection, data}),
-//         doc: (id: string) => ({
-//           get: () => mockGet({collection, id}),
-//           set: (data: any) => mockSet({collection, id, data}),
-//           update: (data: any) => mockUpdate({collection, id, data}),
-//         }),
-//         where: (op1: any, op2: any, op3: any) => ({
-//           get: () => mockGet({
-//             collection, op1, op2, op3,
-//           }),
-//         }),
-//         get: () => mockGet({collection}),
-//       }),
-//     }),
-//     auth: () => ({
-//       createUser,
-//       updateUser,
-//       deleteUser,
-//       createCustomToken,
-//     }),
-//   };
-// };

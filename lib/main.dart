@@ -11,21 +11,24 @@ import 'config/theme.dart';
 import 'models/app_info.dart';
 import 'models/theme_mode_provider.dart';
 import 'models/app_state_provider.dart';
-import 'services/sys_service.dart';
+import 'models/app_info_provider.dart';
+import 'services/conf_service.dart';
 import 'services/auth_service.dart';
 import 'services/accounts_service.dart';
 import 'screens/base_screen.dart';
 import 'utils/env.dart';
+import 'utils/web.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // assets
-  final AppInfo appInfo = AppInfo.fromJson(
+  final AppStaticInfo appInfo = AppStaticInfo.fromJson(
     await rootBundle.loadString('assets/app_info.json'),
   );
 
   // Firebase
+  final String deepLink = getCurrentUrl();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -38,12 +41,13 @@ void main() async {
   );
 
   // Service providers
-  SysService sysService = SysService(
+  ConfService confService = ConfService(
     FirebaseFirestore.instance,
   );
   AuthService authService = AuthService(
     FirebaseAuth.instance,
     FirebaseFirestore.instance,
+    deepLink,
   );
   AccountsService accountsService = AccountsService(
     FirebaseFirestore.instance,
@@ -54,17 +58,23 @@ void main() async {
       // Change notifiers that listen service providers
       providers: [
         ChangeNotifierProvider(
-          create: (context) => AppStateProvider(
-            appInfo,
-            sysService,
+          create: (context) => ThemeModeProvider(
             authService,
             accountsService,
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => ThemeModeProvider(
+          create: (context) => AppStateProvider(
+            appInfo,
+            confService,
             authService,
             accountsService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AppInfoProvider(
+            appInfo,
+            confService,
           ),
         ),
       ],
@@ -85,20 +95,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Consumer<ThemeModeProvider>(builder: (context, themeMode, child) {
       return Consumer<AppStateProvider>(builder: (context, appState, child) {
+        AppInfoProvider appInfoProvider =
+            Provider.of<AppInfoProvider>(context, listen: false);
+
         return MaterialApp(
-          title: appState.appInfo.name,
-          theme: ThemeData(
-            brightness: Brightness.light,
-            primarySwatch: primarySwatchLight,
-            fontFamily: fontFamilySansSerif,
-            textTheme: textTheme,
-          ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            primarySwatch: primarySwatchDark,
-            fontFamily: fontFamilySansSerif,
-            textTheme: textTheme,
-          ),
+          title: appInfoProvider.appInfo.name,
+          theme: lightTheme,
+          darkTheme: darkTheme,
           themeMode: themeMode.themeMode,
           home: BaseScreen(
             key: ValueKey(appState.clientState.toString()),

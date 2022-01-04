@@ -1,8 +1,8 @@
 import {auth, firestore} from "firebase-admin";
 import functionTest from "firebase-functions-test";
 import {
-  invData,
-  invSnapshot,
+  confData,
+  confSnapshot,
   accountNotExist,
   user01Snapshot,
   testInvitation,
@@ -262,7 +262,7 @@ describe("invite()", () => {
   it("creates invitation code and" +
   " save hashed code, host account id and timestamp," +
   " and return invitation code.", async () => {
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
 
     const code = await invite(mockFirebase, "admin", "id01");
 
@@ -272,7 +272,7 @@ describe("invite()", () => {
       ["accounts"],
     ]);
     expect(mockDoc.mock.calls).toEqual([
-      ["inv"],
+      ["conf"],
       ["id01"],
     ]);
     expect(mockUpdate.mock.calls).toEqual([[{
@@ -286,7 +286,7 @@ describe("invite()", () => {
 
 describe("getToken()", () => {
   it("rejects invitation without record.", async () => {
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
     mockQueryGet.mockImplementationOnce(() => Promise.resolve({docs: []}));
 
     await expect(
@@ -297,10 +297,10 @@ describe("getToken()", () => {
       ["service"],
       ["accounts"],
     ]);
-    expect(mockDoc.mock.calls).toEqual([["inv"]]);
+    expect(mockDoc.mock.calls).toEqual([["conf"]]);
     expect(mockGet.mock.calls).toEqual([[]]);
     expect(mockWhere.mock.calls).toEqual([
-      ["invitation", "==", testInvitation("dummy code", invData.seed)],
+      ["invitation", "==", testInvitation("dummy code", confData.seed)],
     ]);
     expect(mockUpdate.mock.calls).toEqual([]);
   });
@@ -322,7 +322,7 @@ describe("getToken()", () => {
       },
       ref: mockInvitedRef as DocRef,
     };
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
     mockQueryGet.mockImplementationOnce(
         () => Promise.resolve({docs: [mockInvited]})
     );
@@ -335,7 +335,7 @@ describe("getToken()", () => {
       ["service"],
       ["accounts"],
     ]);
-    expect(mockDoc.mock.calls).toEqual([["inv"]]);
+    expect(mockDoc.mock.calls).toEqual([["conf"]]);
     expect(mockGet.mock.calls).toEqual([[]]);
     expect(mockWhere.mock.calls).toEqual([
       ["invitation", "==", testInvitation("test code", "test seed")],
@@ -364,7 +364,7 @@ describe("getToken()", () => {
       },
       ref: mockInvitedRef as DocRef,
     };
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
     mockQueryGet.mockImplementationOnce(
         () => Promise.resolve({docs: [mockInvited]})
     );
@@ -377,7 +377,7 @@ describe("getToken()", () => {
       ["service"],
       ["accounts"],
     ]);
-    expect(mockDoc.mock.calls).toEqual([["inv"]]);
+    expect(mockDoc.mock.calls).toEqual([["conf"]]);
     expect(mockGet.mock.calls).toEqual([[]]);
     expect(mockWhere.mock.calls).toEqual([
       ["invitation", "==", testInvitation("test code", "test seed")],
@@ -394,7 +394,7 @@ describe("getToken()", () => {
     const invitation = testInvitation("test code", "test seed");
     const invitedAt = new firestore.Timestamp(
         (Math.floor((
-          new Date().getTime() - invData.invitationExpirationTime) / 1000
+          new Date().getTime() - confData.invitationExpirationTime) / 1000
         ) - 1), 0);
     const mockInvitedRef: Partial<DocRef> = {update: mockUpdate};
     const mockInvited: Partial<DocSnap> = {
@@ -409,7 +409,7 @@ describe("getToken()", () => {
       },
       ref: mockInvitedRef as DocRef,
     };
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
     mockQueryGet.mockImplementationOnce(
         () => Promise.resolve({docs: [mockInvited]})
     );
@@ -421,7 +421,7 @@ describe("getToken()", () => {
       ["service"],
       ["accounts"],
     ]);
-    expect(mockDoc.mock.calls).toEqual([["inv"]]);
+    expect(mockDoc.mock.calls).toEqual([["conf"]]);
     expect(mockGet.mock.calls).toEqual([[]]);
     expect(mockWhere.mock.calls).toEqual([
       ["invitation", "==", testInvitation("test code", "test seed")],
@@ -438,7 +438,7 @@ describe("getToken()", () => {
     const invitation = testInvitation("test code", "test seed");
     const invitedAt = new firestore.Timestamp(
         (Math.floor((
-          new Date().getTime() - invData.invitationExpirationTime) / 1000
+          new Date().getTime() - confData.invitationExpirationTime) / 1000
         ) + 1), 0);
     const mockInvitedRef: Partial<DocRef> = {update: mockUpdate};
     const mockInvited: Partial<DocSnap> = {
@@ -453,7 +453,7 @@ describe("getToken()", () => {
       },
       ref: mockInvitedRef as DocRef,
     };
-    mockGet.mockImplementationOnce(() => Promise.resolve(invSnapshot));
+    mockGet.mockImplementationOnce(() => Promise.resolve(confSnapshot));
     mockQueryGet.mockImplementationOnce(
         () => Promise.resolve({docs: [mockInvited]})
     );

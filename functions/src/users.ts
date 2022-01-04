@@ -113,7 +113,7 @@ export const invite = async (
   const invitedBy = uid;
 
   logger.info(`setUserEmail ${JSON.stringify({invitedBy, invitee})}`);
-  const inv = await db.collection("service").doc("inv").get();
+  const inv = await db.collection("service").doc("conf").get();
   const code = nanoid();
   const ts = new Date();
   const invitation = calcInvitation(code, inv.get("seed"));
@@ -133,7 +133,7 @@ export const getToken = async (
   const db = firebase.firestore();
 
   logger.info(`getToken: ${code}`);
-  const inv = await db.collection("service").doc("inv").get();
+  const inv = await db.collection("service").doc("conf").get();
   const invitation = calcInvitation(code, inv.get("seed"));
   const accounts = await db.collection("accounts")
       .where("invitation", "==", invitation).get();

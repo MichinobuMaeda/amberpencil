@@ -4,7 +4,7 @@ import {Request, Response} from "express";
 import {AxiosStatic} from "axios";
 
 import {
-  getSys,
+  getConf,
   updateVersion,
   updateData,
   install,
@@ -19,20 +19,20 @@ export const setup = (
     req: Request,
     res: Response,
 ): Promise<Response> => {
-  const sys = await getSys(firebase);
-  if (sys) {
-    const verUp = await updateVersion(sys, axios);
+  const conf = await getConf(firebase);
+  if (conf) {
+    const verUp = await updateVersion(conf, axios);
     if (verUp) {
-      await updateData(firebase, sys);
+      await updateData(firebase, conf);
     }
   } else {
-    const sysNew = await install(
+    const confNew = await install(
         firebase,
         functionsConfig.initial.email,
         functionsConfig.initial.password,
         functionsConfig.initial.url,
     );
-    await updateData(firebase, sysNew);
+    await updateData(firebase, confNew);
   }
   return res.send("OK");
 };

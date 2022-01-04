@@ -12,7 +12,7 @@ import 'unknown_screen.dart';
 
 class MenuItem {
   final String name;
-  final Icon icon;
+  final Widget icon;
   final String label;
   final List<ClientState> states;
 
@@ -23,54 +23,6 @@ class MenuItem {
     required this.states,
   });
 }
-
-const List<MenuItem> menuItems = [
-  MenuItem(
-    name: 'loading',
-    icon: Icon(Icons.autorenew),
-    label: 'ホーム',
-    states: [ClientState.loading],
-  ),
-  MenuItem(
-    name: 'signin',
-    icon: Icon(Icons.login),
-    label: 'ログイン',
-    states: [ClientState.guest],
-  ),
-  MenuItem(
-    name: 'verify',
-    icon: Icon(Icons.mark_email_read),
-    label: 'メールアドレスの確認',
-    states: [ClientState.pending],
-  ),
-  MenuItem(
-    name: '',
-    icon: Icon(Icons.home),
-    label: 'ホーム',
-    states: [ClientState.authenticated],
-  ),
-  MenuItem(
-    name: 'prefs',
-    icon: Icon(Icons.settings),
-    label: '設定',
-    states: [
-      ClientState.guest,
-      ClientState.pending,
-      ClientState.authenticated,
-    ],
-  ),
-  MenuItem(
-    name: 'info',
-    icon: Icon(Icons.info),
-    label: 'このアプリについて',
-    states: [
-      ClientState.loading,
-      ClientState.guest,
-      ClientState.pending,
-      ClientState.authenticated
-    ],
-  ),
-];
 
 class BaseScreen extends StatefulWidget {
   final AppStateProvider appState;
@@ -87,6 +39,7 @@ class BaseScreen extends StatefulWidget {
 class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  late final List<MenuItem> _menuItems;
   late final List<MenuItem> _tabItems;
   late final TabController _tabController;
 
@@ -94,7 +47,60 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tabItems = menuItems
+    const Widget homeIcon = Image(
+      image: AssetImage('assets/images/logo.png'),
+      height: 24,
+      width: 24,
+    );
+
+    _menuItems = [
+      const MenuItem(
+        name: 'loading',
+        icon: Icon(Icons.autorenew),
+        label: '準備中',
+        states: [ClientState.loading],
+      ),
+      const MenuItem(
+        name: 'signin',
+        icon: Icon(Icons.login),
+        label: 'ログイン',
+        states: [ClientState.guest],
+      ),
+      const MenuItem(
+        name: 'verify',
+        icon: Icon(Icons.mark_email_read),
+        label: 'メールの確認',
+        states: [ClientState.pending],
+      ),
+      const MenuItem(
+        name: '',
+        icon: Icon(Icons.home),
+        label: 'ホーム',
+        states: [ClientState.authenticated],
+      ),
+      const MenuItem(
+        name: 'prefs',
+        icon: Icon(Icons.settings),
+        label: '設定',
+        states: [
+          ClientState.guest,
+          ClientState.pending,
+          ClientState.authenticated,
+        ],
+      ),
+      const MenuItem(
+        name: 'info',
+        icon: homeIcon,
+        label: 'このアプリについて',
+        states: [
+          ClientState.loading,
+          ClientState.guest,
+          ClientState.pending,
+          ClientState.authenticated
+        ],
+      ),
+    ];
+    _tabItems = _menuItems
         .where((item) => item.states.contains(widget.appState.clientState))
         .toList();
     _tabController = TabController(
@@ -108,54 +114,85 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              title: Text(widget.appState.appInfo.name),
-              pinned: true,
-              floating: true,
-              forceElevated: innerBoxIsScrolled,
-              automaticallyImplyLeading: false,
-              bottom: TabBar(
-                tabs: _tabItems
-                    .map((item) => Tab(child: Text(item.label)))
-                    .toList(),
-                controller: _tabController,
-              ),
-            ),
-          ];
-        },
-        body: Stack(
-          children: [
-            TabBarView(
-              children: _tabItems.map((item) => getScreen(item.name)).toList(),
-              controller: _tabController,
-            ),
-            Visibility(
-              visible: widget.appState.updateIsAvailable(),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: fontSizeBody / 4,
-                    horizontal: fontSizeBody / 4,
-                  ),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.system_update),
-                    label: const Text('アプリを更新してください'),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(colorDanger),
+      appBar: PreferredSize(
+        child: ColoredBox(
+          color: lightTheme.primaryColor,
+          child: TabBar(
+            key: ValueKey('TabBar:${widget.appState.clientState}'),
+            tabs: _tabItems
+                .map(
+                  (item) => Tab(
+                    child: Row(
+                      children: [
+                        item.icon,
+                        const SizedBox(width: 4),
+                        Text(item.label),
+                      ],
                     ),
-                    onPressed: () {
-                      reloadWebAapp();
-                    },
                   ),
+                )
+                .toList(),
+            controller: _tabController,
+            isScrollable: true,
+          ),
+        ),
+        preferredSize: const Size.fromHeight(40.0),
+      ),
+      body: Stack(
+        children: [
+          TabBarView(
+            key: ValueKey('TabBarView:${widget.appState.clientState}'),
+            children: _tabItems
+                .map(
+                  (item) => SafeArea(
+                    key: ValueKey('${item.name}:SafeArea'),
+                    top: false,
+                    bottom: false,
+                    child: LayoutBuilder(
+                      builder: (BuildContext context,
+                          BoxConstraints viewportConstraints) {
+                        return SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight,
+                            ),
+                            child: getScreen(item.name),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                )
+                .toList(),
+            controller: _tabController,
+          ),
+          Visibility(
+            visible: widget.appState.updateIsAvailable(),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: fontSizeBody / 4,
+                  horizontal: fontSizeBody / 4,
+                ),
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.system_update),
+                  label: const Text('アプリを更新してください'),
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(
+                      Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  onPressed: () {
+                    reloadWebAapp();
+                  },
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+        // ),
       ),
     );
   }
@@ -164,19 +201,19 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   Widget getScreen(String name) {
     switch (name) {
       case '':
-        return const HomeScreen();
+        return const HomeScreen(key: ValueKey('HomeScreen'));
       case 'loading':
-        return const LoadingScreen();
+        return const LoadingScreen(key: ValueKey('LoadingScreen'));
       case 'signin':
-        return const SignInScreen();
+        return const SignInScreen(key: ValueKey('SignInScreen'));
       case 'verify':
-        return const EmailVerifyScreen();
+        return const EmailVerifyScreen(key: ValueKey('EmailVerifyScreen'));
       case 'prefs':
-        return const PreferencesScreen();
+        return const PreferencesScreen(key: ValueKey('PreferencesScreen'));
       case 'info':
-        return const AppInfoScreen();
+        return const AppInfoScreen(key: ValueKey('AppInfoScreen'));
       default:
-        return const UnknownScreen();
+        return const UnknownScreen(key: ValueKey('UnknownScreen'));
     }
   }
 }

@@ -5,24 +5,32 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          SizedBox(
-            width: 64,
-            height: 64,
-            child: CircularProgressIndicator(),
-          ),
-          SizedBox(height: 16),
-          Flexible(
-            child: Text(
-              'システムの情報を取得しています',
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: CircularProgressIndicator(),
             ),
-          ),
-          // ),
-        ],
-      ),
+            SizedBox(height: 16),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Flexible(
+              child: Text(
+                'しばらくお待ちください',
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 }

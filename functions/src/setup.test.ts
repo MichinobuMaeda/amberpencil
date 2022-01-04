@@ -3,8 +3,8 @@ import axios from "axios";
 import {
   DocRef,
   DocSnap,
-  sysNotExist,
-  sysData,
+  confNotExist,
+  confData,
   mockGet,
   mockSet,
   mockUpdate,
@@ -15,7 +15,7 @@ import {
 } from "./testSetup";
 import * as users from "./users";
 import {
-  getSys,
+  getConf,
   updateVersion,
   updateData,
   install,
@@ -30,15 +30,15 @@ jest.mock("./users");
 const mockedUsers = users as jest.Mocked<typeof users>;
 
 const mockSysRef: Partial<DocRef> = {update: mockUpdate};
-const sysSnapshot: Partial<DocSnap> = {
-  id: "sys",
+const confSnapshot: Partial<DocSnap> = {
+  id: "conf",
   exists: true,
   get: (key) => {
     switch (key) {
-      case "version": return sysData.version;
-      case "url": return sysData.url;
-      case "createdAt": return sysData.createdAt;
-      case "updatedAt": return sysData.updatedAt;
+      case "version": return confData.version;
+      case "url": return confData.url;
+      case "createdAt": return confData.createdAt;
+      case "updatedAt": return confData.updatedAt;
       default: return undefined;
     }
   },
@@ -50,33 +50,33 @@ beforeEach(() => {
 });
 
 describe("getSys()", () => {
-  it("returns null if document \"sys\" is not exists.", async () => {
+  it("returns null if document \"conf\" is not exists.", async () => {
     mockGet
         .mockImplementationOnce(() => new Promise((resolve) => {
-          resolve(sysNotExist);
+          resolve(confNotExist);
         }));
-    const sys = await getSys(mockFirebase);
-    expect(sys).toBeNull();
+    const conf = await getConf(mockFirebase);
+    expect(conf).toBeNull();
   });
 
-  it("returns document \"sys\" if document \"sys\" is exists.", async () => {
+  it("returns document \"conf\" if document \"conf\" is exists.", async () => {
     mockGet
         .mockImplementationOnce(() => new Promise((resolve) => {
-          resolve(sysSnapshot as DocSnap);
+          resolve(confSnapshot as DocSnap);
         }));
-    const sys = await getSys(mockFirebase);
-    expect(sys).toEqual(sysSnapshot);
+    const conf = await getConf(mockFirebase);
+    expect(conf).toEqual(confSnapshot);
   });
 });
 
 describe("updateVersion()", () => {
   it("returns false and not modifies conf has same version.", async () => {
     mockedAxios.get.mockResolvedValue({
-      data: {version: sysData.version},
+      data: {version: confData.version},
     });
 
     expect(
-        await updateVersion(sysSnapshot as DocSnap, mockedAxios)
+        await updateVersion(confSnapshot as DocSnap, mockedAxios)
     ).toBeFalsy();
     expect(mockUpdate.mock.calls).toEqual([]);
   });
@@ -86,7 +86,7 @@ describe("updateVersion()", () => {
       data: {version: "1.0.1"},
     });
     expect(
-        await updateVersion(sysSnapshot as DocSnap, mockedAxios)
+        await updateVersion(confSnapshot as DocSnap, mockedAxios)
     ).toBeTruthy();
     expect(mockUpdate.mock.calls).toEqual([[{
       version: "1.0.1",
@@ -118,7 +118,7 @@ describe("updateData()", () => {
         {docs: [user01Snapshot, adminSnapshot]}
     ));
 
-    await updateData(mockFirebase, sysSnapshot as DocSnap);
+    await updateData(mockFirebase, confSnapshot as DocSnap);
     expect(mockCollection.mock.calls).toEqual([["accounts"]]);
     expect(mockQueryGet.mock.calls).toEqual([[]]);
     expect(mockUpdate.mock.calls).toEqual([
@@ -146,8 +146,8 @@ describe("updateData()", () => {
   it("do nothing " +
   "if the current data version id the latest data version.", async () => {
     const testSysSnapshot = test.firestore.makeDocumentSnapshot(
-        {...sysData, dataVersion: latestDataVersion},
-        "document/service/sys",
+        {...confData, dataVersion: latestDataVersion},
+        "document/service/conf",
     );
 
     await updateData(mockFirebase, testSysSnapshot);
@@ -156,10 +156,10 @@ describe("updateData()", () => {
 });
 
 describe("install()", () => {
-  it("create sys, inv, policy," +
+  it("create conf," +
   " the primary account in testers group," +
   " the testers group with primary account," +
-  " and returns document 'sys'.", async () => {
+  " and returns document 'conf'.", async () => {
     const email = "primary@example.com";
     const password = "primary's password";
     const url = "https://example.com";
@@ -167,12 +167,12 @@ describe("install()", () => {
         () => Promise.resolve("id01")
     );
     mockGet.mockImplementationOnce(
-        () => Promise.resolve(sysSnapshot as DocSnap)
+        () => Promise.resolve(confSnapshot as DocSnap)
     );
 
     const ret = await install(mockFirebase, email, password, url);
 
-    expect(ret).toEqual(sysSnapshot);
+    expect(ret).toEqual(confSnapshot);
     expect(mockedUsers.createAuthUser.mock.calls).toEqual([
       [
         mockFirebase,
@@ -191,32 +191,18 @@ describe("install()", () => {
       ["groups"],
     ]);
     expect(mockDoc.mock.calls).toEqual([
-      ["sys"],
-      ["inv"],
-      ["policy"],
+      ["conf"],
       ["testers"],
-      ["sys"],
+      ["conf"],
     ]);
     expect(mockSet.mock.calls).toEqual([
       [
         {
           version: "1.0.0",
           url,
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date),
-        },
-      ],
-      [
-        {
           seed: expect.any(String),
-          expiration: 3 * 24 * 3600 * 1000,
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date),
-        },
-      ],
-      [
-        {
-          text: expect.any(String),
+          invitationExpirationTime: 3 * 24 * 3600 * 1000,
+          policy: expect.any(String),
           createdAt: expect.any(Date),
           updatedAt: expect.any(Date),
         },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/service_listener.dart';
-import '../services/sys_service.dart';
+import '../services/conf_service.dart';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
 import 'app_info.dart';
@@ -10,8 +10,8 @@ enum ClientState { loading, guest, pending, authenticated }
 const ClientState initialClientState = ClientState.loading;
 
 class AppStateProvider extends ChangeNotifier with ServiceListener {
-  final AppInfo appInfo;
-  final SysService sysService;
+  final AppStaticInfo appStaticInfo;
+  final ConfService confService;
   final AuthService authService;
   final AccountsService accountsService;
   String? _version;
@@ -22,19 +22,19 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   ClientState _clientState = initialClientState;
 
   AppStateProvider(
-    this.appInfo,
-    this.sysService,
+    this.appStaticInfo,
+    this.confService,
     this.authService,
     this.accountsService,
   ) {
-    sysService.registerListener(this);
+    confService.registerListener(this);
     authService.registerListener(this);
     accountsService.registerListener(this);
   }
 
   @override
   void notify(dynamic data) {
-    if (data is SysData) {
+    if (data is ConfData) {
       version = data.version;
       url = data.url;
     } else if (data is AuthData) {
@@ -136,5 +136,6 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
   ClientState get clientState => _clientState;
 
-  bool updateIsAvailable() => version != null && version != appInfo.version;
+  bool updateIsAvailable() =>
+      version != null && version != appStaticInfo.version;
 }

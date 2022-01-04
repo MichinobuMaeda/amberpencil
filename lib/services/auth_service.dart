@@ -1,6 +1,7 @@
-// import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/web.dart';
 import 'service_provider.dart';
 import 'accounts_service.dart';
 
@@ -29,7 +30,16 @@ class AuthService extends ServiceProvider<AuthData> {
   User? _user;
   String? _url;
 
-  AuthService(this.auth, this.db) : super(AuthData()) {
+  AuthService(this.auth, this.db, String deepLink) : super(AuthData()) {
+    debugPrint(deepLink);
+    if (auth.isSignInWithEmailLink(deepLink)) {
+      final String? email = loadSignInEmail();
+      debugPrint(email);
+      if (email != null) {
+        auth.signInWithEmailLink(email: email, emailLink: deepLink);
+      }
+    }
+
     auth.authStateChanges().listen((User? user) async {
       if (user == null) {
         if (_user != null) {
@@ -96,6 +106,7 @@ class AuthService extends ServiceProvider<AuthData> {
         handleCodeInApp: true,
       ),
     );
+    saveSignInEmail(email);
   }
 
   Future<void> sendEmailVerification() async {

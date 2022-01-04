@@ -5,27 +5,27 @@ import {AxiosStatic} from "axios";
 import {nanoid} from "nanoid";
 import {createAuthUser} from "./users";
 
-export const getSys = async (
+export const getConf = async (
     firebase: app.App,
 ): Promise<firestore.DocumentSnapshot | null> => {
   const db = firebase.firestore();
-  const sys = await db.collection("service").doc("sys").get();
-  return sys.exists ? sys : null;
+  const conf = await db.collection("service").doc("conf").get();
+  return conf.exists ? conf : null;
 };
 
 export const updateVersion = async (
-    sys: firestore.DocumentSnapshot,
+    conf: firestore.DocumentSnapshot,
     axios: AxiosStatic,
 ): Promise<boolean> => {
   const res = await axios.get(
-      `${sys.get("url")}version.json?check=${new Date().getTime()}`,
+      `${conf.get("url")}version.json?check=${new Date().getTime()}`,
   );
   const {version} = res.data;
 
-  if (version !== sys.get("version")) {
+  if (version !== conf.get("version")) {
     logger.info(version);
 
-    await sys.ref.update({
+    await conf.ref.update({
       version,
       updatedAt: new Date(),
     });
@@ -38,10 +38,10 @@ export const updateVersion = async (
 
 export const updateData = async (
     firebase: app.App,
-    sys: firestore.DocumentSnapshot,
+    conf: firestore.DocumentSnapshot,
 ): Promise<void> => {
   const db = firebase.firestore();
-  const dataVersion = sys.get("dataVersion") || 0;
+  const dataVersion = conf.get("dataVersion") || 0;
 
   if (dataVersion < 1) {
     const accounts = await db.collection("accounts").get();
@@ -53,7 +53,7 @@ export const updateData = async (
         updatedAt: new Date(),
       });
     }));
-    await sys.ref.update({
+    await conf.ref.update({
       dataVersion: 1,
       updatedAt: new Date(),
     });
@@ -86,22 +86,12 @@ export const install = async (
   const seed = hash.digest("hex");
 
   const serviceRef = db.collection("service");
-  await serviceRef.doc("sys").set({
+  await serviceRef.doc("conf").set({
     version: "1.0.0",
     url,
-    createdAt: ts,
-    updatedAt: ts,
-  });
-
-  await serviceRef.doc("inv").set({
     seed,
-    expiration: 3 * 24 * 3600 * 1000,
-    createdAt: ts,
-    updatedAt: ts,
-  });
-
-  await serviceRef.doc("policy").set({
-    text: `### Heading 3
+    invitationExpirationTime: 3 * 24 * 3600 * 1000,
+    policy: `### Heading 3
 
     The quick brown fox jumps over the lazy dog.
 `,
@@ -131,5 +121,5 @@ export const install = async (
     deletedAt: null,
   });
 
-  return serviceRef.doc("sys").get();
+  return serviceRef.doc("conf").get();
 };

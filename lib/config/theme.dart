@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
 
-const MaterialColor primarySwatchLight = Colors.brown;
-const MaterialColor primarySwatchDark = Colors.amber;
-const Color colorSecondary = Colors.blueGrey;
-const Color colorDanger = Colors.redAccent;
-const Color colorActiveView = Colors.orangeAccent;
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: Colors.brown,
+  errorColor: Colors.red,
+  fontFamily: fontFamilySansSerif,
+  textTheme: textTheme,
+  elevatedButtonTheme: elevatedButtonTheme,
+  outlinedButtonTheme: outlinedButtonTheme,
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.amber,
+  errorColor: Colors.pinkAccent,
+  fontFamily: fontFamilySansSerif,
+  textTheme: textTheme,
+  elevatedButtonTheme: elevatedButtonTheme,
+  outlinedButtonTheme: outlinedButtonTheme,
+);
 
 const fontFamilySansSerif = 'NotoSansJP';
 const fontFamilyMonoSpace = 'RobotoMono';
 
 const double fontSizeBody = 16.0;
-
-const double maxContentBodyWidth = 960.0;
-const double buttonWidth = fontSizeBody * 7.5;
-const double buttonHeight = fontSizeBody * 3;
 
 const double fontSizeH1 = fontSizeBody * 2.4;
 const double fontSizeH2 = fontSizeBody * 1.6;
@@ -38,16 +48,18 @@ const TextTheme textTheme = TextTheme(
   overline: TextStyle(fontSize: fontSizeBody * 0.9),
 );
 
-final ThemeData lightTheme = ThemeData(
-  brightness: Brightness.light,
-  primarySwatch: primarySwatchLight,
-  fontFamily: fontFamilySansSerif,
-  textTheme: textTheme,
+final buttonMinimumSize = MaterialStateProperty.all<Size>(
+  const Size(fontSizeBody * 8, fontSizeBody * 3),
 );
 
-final ThemeData darkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primarySwatch: primarySwatchDark,
-  fontFamily: fontFamilySansSerif,
-  textTheme: textTheme,
+final elevatedButtonTheme = ElevatedButtonThemeData(
+  style: ButtonStyle(
+    minimumSize: buttonMinimumSize,
+  ),
+);
+
+final outlinedButtonTheme = OutlinedButtonThemeData(
+  style: ButtonStyle(
+    minimumSize: buttonMinimumSize,
+  ),
 );

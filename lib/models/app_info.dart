@@ -1,22 +1,35 @@
 import 'dart:convert';
 
-class AppInfo {
+class AppStaticInfo {
   final String name;
   final String version;
   final String copyright;
 
-  AppInfo({
+  AppStaticInfo({
     required this.name,
     required this.version,
     required this.copyright,
   });
 
-  factory AppInfo.fromJson(String json) {
+  factory AppStaticInfo.fromJson(String json) {
     final appInfo = const JsonDecoder().convert(json);
-    return AppInfo(
+    return AppStaticInfo(
       name: appInfo['name'],
       version: appInfo['version'],
       copyright: appInfo['copyright'],
     );
   }
+}
+
+class AppInfo extends AppStaticInfo {
+  final String? policy;
+
+  AppInfo(
+    AppStaticInfo appStaticInfo, {
+    this.policy,
+  }) : super(
+          name: appStaticInfo.name,
+          version: appStaticInfo.version,
+          copyright: appStaticInfo.copyright,
+        );
 }

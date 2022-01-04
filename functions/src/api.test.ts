@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
 import axios from "axios";
 import {
-  sysSnapshot,
+  confSnapshot,
   mockFirebase,
 } from "./testSetup";
 import * as setupModule from "./setup";
@@ -35,8 +35,8 @@ describe("setup()", () => {
 
   it("calls only updateVersion() " +
   "if conf.version is latest value.", async () => {
-    mockedSetup.getSys.mockImplementationOnce(
-        () => Promise.resolve(sysSnapshot)
+    mockedSetup.getConf.mockImplementationOnce(
+        () => Promise.resolve(confSnapshot)
     );
     mockedSetup.updateVersion.mockImplementationOnce(
         () => Promise.resolve(false)
@@ -45,9 +45,9 @@ describe("setup()", () => {
     const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
-    expect(mockedSetup.getSys.mock.calls).toEqual([[mockFirebase]]);
+    expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
     expect(mockedSetup.updateVersion.mock.calls).toEqual(
-        [[sysSnapshot, mockedAxios]]
+        [[confSnapshot, mockedAxios]]
     );
     expect(mockedSetup.updateData.mock.calls).toEqual([]);
     expect(mockedSetup.install.mock.calls).toEqual([]);
@@ -56,8 +56,8 @@ describe("setup()", () => {
 
   it("calls updateVersion() and updateData() " +
   "if conf.version is not value.", async () => {
-    mockedSetup.getSys.mockImplementationOnce(
-        () => Promise.resolve(sysSnapshot)
+    mockedSetup.getConf.mockImplementationOnce(
+        () => Promise.resolve(confSnapshot)
     );
     mockedSetup.updateVersion.mockImplementationOnce(
         () => Promise.resolve(true)
@@ -66,12 +66,12 @@ describe("setup()", () => {
     const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
-    expect(mockedSetup.getSys.mock.calls).toEqual([[mockFirebase]]);
+    expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
     expect(mockedSetup.updateVersion.mock.calls).toEqual(
-        [[sysSnapshot, mockedAxios]]
+        [[confSnapshot, mockedAxios]]
     );
     expect(mockedSetup.updateData.mock.calls).toEqual(
-        [[mockFirebase, sysSnapshot]]
+        [[mockFirebase, confSnapshot]]
     );
     expect(mockedSetup.install.mock.calls).toEqual([]);
     expect(mockSend.mock.calls).toEqual([["OK"]]);
@@ -79,20 +79,20 @@ describe("setup()", () => {
 
   it("calls install() and updateData() " +
   "if conf is not exists.", async () => {
-    mockedSetup.getSys.mockImplementationOnce(
+    mockedSetup.getConf.mockImplementationOnce(
         () => Promise.resolve(null)
     );
     mockedSetup.install.mockImplementationOnce(
-        () => Promise.resolve(sysSnapshot)
+        () => Promise.resolve(confSnapshot)
     );
 
     const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
-    expect(mockedSetup.getSys.mock.calls).toEqual([[mockFirebase]]);
+    expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
     expect(mockedSetup.updateVersion.mock.calls).toEqual([]);
     expect(mockedSetup.updateData.mock.calls).toEqual(
-        [[mockFirebase, sysSnapshot]]
+        [[mockFirebase, confSnapshot]]
     );
     expect(mockedSetup.install.mock.calls).toEqual([[
       mockFirebase,
