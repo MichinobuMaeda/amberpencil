@@ -1,4 +1,3 @@
-import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/ui_utils.dart';

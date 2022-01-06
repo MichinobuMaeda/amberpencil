@@ -77,7 +77,18 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
               InputContainer(
                 child: TextFormField(
                   initialValue: widget.initialValue,
-                  decoration: InputDecoration(labelText: widget.label),
+                  decoration: InputDecoration(
+                    labelText: widget.label,
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.cancel),
+                      onPressed: () {
+                        setState(() {
+                          _formKey.currentState?.reset();
+                          _value = widget.initialValue ?? '';
+                        });
+                      },
+                    ),
+                  ),
                   validator: (value) => requiredValidator(value),
                   style: widget.monospace
                       ? const TextStyle(fontFamily: fontFamilyMonoSpace)

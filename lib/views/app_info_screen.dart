@@ -30,8 +30,6 @@ class AppInfoScreen extends StatelessWidget {
               }
             }
 
-            ;
-
             return CenteringColumn(
               children: [
                 WrappedRow(

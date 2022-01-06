@@ -131,15 +131,16 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
   Widget build(BuildContext context) {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: widget.labelText,
-          suffixIcon: IconButton(
-            icon: Icon(_hidePassword ? Icons.visibility_off : Icons.visibility),
-            onPressed: () {
-              setState(() {
-                _hidePassword = !_hidePassword;
-              });
-            },
-          )),
+        labelText: widget.labelText,
+        suffixIcon: IconButton(
+          icon: Icon(_hidePassword ? Icons.visibility_off : Icons.visibility),
+          onPressed: () {
+            setState(() {
+              _hidePassword = !_hidePassword;
+            });
+          },
+        ),
+      ),
       obscureText: _hidePassword,
       style: const TextStyle(fontFamily: fontFamilyMonoSpace),
       onChanged: widget.onChanged,
