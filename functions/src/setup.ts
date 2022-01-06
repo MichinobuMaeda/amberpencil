@@ -91,9 +91,28 @@ export const install = async (
     url,
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,
-    policy: `### Heading 3
+    policy: `## Privacy policy
 
-    The quick brown fox jumps over the lazy dog.
+### Heading 3
+
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+The quick brown fox jumps over the lazy dog.
+
+1. Item 1
+2. Item 2
+3. Item 3
+    * Item 3-1
+    * Item 3-2
+    * Item 3-3
+
+\`\`\`
+$ echo Code Block
+\`\`\`
+
+<https://flutter.dev/>
+
+[Flutter](https://flutter.dev/)
 `,
     createdAt: ts,
     updatedAt: ts,

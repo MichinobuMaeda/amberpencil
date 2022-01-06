@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../models/app_state_provider.dart';
-import '../utils/web.dart';
+import '../utils/platform_web.dart';
 import 'home_screen.dart';
 import 'loading_screen.dart';
 import 'app_info_screen.dart';
@@ -112,43 +113,54 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: PreferredSize(
-        child: ColoredBox(
-          color: lightTheme.primaryColor,
-          child: TabBar(
-            key: ValueKey('TabBar:${widget.appState.clientState}'),
-            tabs: _tabItems
-                .map(
-                  (item) => Tab(
-                    child: Row(
-                      children: [
-                        item.icon,
-                        const SizedBox(width: 4),
-                        Text(item.label),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
-            controller: _tabController,
-            isScrollable: true,
+    AppStateProvider appState =
+        Provider.of<AppStateProvider>(context, listen: false);
+    if (widget.appState.clientState == ClientState.authenticated) {
+      if (loadReauthMode()) {
+        _tabController.index = 1;
+        appState.updateSignedInAt();
+      }
+    }
+
+    return SafeArea(
+      left: false,
+      right: false,
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: PreferredSize(
+          child: AppBar(
+            flexibleSpace: Column(
+              children: [
+                TabBar(
+                  key: ValueKey('TabBar:${widget.appState.clientState}'),
+                  tabs: _tabItems
+                      .map(
+                        (item) => Tab(
+                          child: Row(
+                            children: [
+                              item.icon,
+                              const SizedBox(width: 4),
+                              Text(item.label),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  controller: _tabController,
+                  isScrollable: true,
+                ),
+              ],
+            ),
           ),
+          preferredSize: const Size.fromHeight(48.0),
         ),
-        preferredSize: const Size.fromHeight(40.0),
-      ),
-      body: Stack(
-        children: [
-          TabBarView(
-            key: ValueKey('TabBarView:${widget.appState.clientState}'),
-            children: _tabItems
-                .map(
-                  (item) => SafeArea(
-                    key: ValueKey('${item.name}:SafeArea'),
-                    top: false,
-                    bottom: false,
-                    child: LayoutBuilder(
+        body: Stack(
+          children: [
+            TabBarView(
+              key: ValueKey('TabBarView:${widget.appState.clientState}'),
+              children: _tabItems
+                  .map(
+                    (item) => LayoutBuilder(
                       builder: (BuildContext context,
                           BoxConstraints viewportConstraints) {
                         return SingleChildScrollView(
@@ -162,37 +174,37 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                         );
                       },
                     ),
+                  )
+                  .toList(),
+              controller: _tabController,
+            ),
+            Visibility(
+              visible: widget.appState.updateIsAvailable(),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: fontSizeBody / 4,
+                    horizontal: fontSizeBody / 4,
                   ),
-                )
-                .toList(),
-            controller: _tabController,
-          ),
-          Visibility(
-            visible: widget.appState.updateIsAvailable(),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: fontSizeBody / 4,
-                  horizontal: fontSizeBody / 4,
-                ),
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.system_update),
-                  label: const Text('アプリを更新してください'),
-                  style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(
-                      Theme.of(context).colorScheme.error,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.system_update),
+                    label: const Text('アプリを更新してください'),
+                    style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all(
+                        Theme.of(context).colorScheme.error,
+                      ),
                     ),
+                    onPressed: () {
+                      reloadWebAapp();
+                    },
                   ),
-                  onPressed: () {
-                    reloadWebAapp();
-                  },
                 ),
               ),
             ),
-          ),
-        ],
-        // ),
+          ],
+          // ),
+        ),
       ),
     );
   }

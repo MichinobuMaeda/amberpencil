@@ -8,25 +8,25 @@ enum ClientState { loading, guest, pending, authenticated }
 const ClientState initialClientState = ClientState.loading;
 
 class AppInfoProvider extends ChangeNotifier with ServiceListener {
-  AppInfo _appInfo;
+  AppInfo _data;
   final ConfService confService;
 
   AppInfoProvider(
     AppStaticInfo appStaticInfo,
     this.confService,
-  ) : _appInfo = AppInfo(appStaticInfo) {
+  ) : _data = AppInfo(appStaticInfo) {
     confService.registerListener(this);
   }
 
   @override
   void notify(dynamic data) {
     if (data is ConfData) {
-      if (_appInfo.policy != data.policy) {
-        _appInfo = AppInfo(_appInfo, policy: data.policy);
+      if (_data.policy != data.policy) {
+        _data = AppInfo(_data, policy: data.policy);
         notifyListeners();
       }
     }
   }
 
-  AppInfo get appInfo => _appInfo;
+  AppInfo get data => _data;
 }

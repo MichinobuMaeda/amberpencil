@@ -1,7 +1,7 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../config/layouts.dart';
+import '../utils/ui_utils.dart';
 import '../config/validators.dart';
 import '../models/app_state_provider.dart';
 
@@ -16,7 +16,6 @@ class _SignInState extends State<SignInScreen> {
   final GlobalKey<FormState> _emailFormKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
-  bool _hidePassword = true;
   bool _waiting = false;
 
   @override
@@ -86,31 +85,20 @@ class _SignInState extends State<SignInScreen> {
             }
           };
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return CenteringColumn(
       children: [
-        const WrappedRow(
-          children: [
-            Icon(Icons.login, size: fontSizeH2 * 1.6),
-            Text(
-              'ログイン',
-              style: TextStyle(fontSize: fontSizeH2),
-            )
-          ],
-        ),
         Form(
           key: _emailFormKey,
           autovalidateMode: AutovalidateMode.always,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               WrappedRow(
                 children: [
-                  DefaultInputConstrainedBox(
+                  InputContainer(
                     child: TextFormField(
-                      key: const ValueKey('SignInScreen:Email'),
                       decoration: const InputDecoration(labelText: 'メールアドレス'),
-                      validator: (value) => emailValidator(value ?? ''),
+                      validator: emailValidator,
                       style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                       onChanged: emailChanged,
                     ),
@@ -128,22 +116,9 @@ class _SignInState extends State<SignInScreen> {
               ),
               WrappedRow(
                 children: [
-                  DefaultInputConstrainedBox(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                          labelText: 'パスワード',
-                          suffixIcon: IconButton(
-                            icon: Icon(_hidePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility),
-                            onPressed: () {
-                              setState(() {
-                                _hidePassword = !_hidePassword;
-                              });
-                            },
-                          )),
-                      obscureText: _hidePassword,
-                      style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                  InputContainer(
+                    child: PasswordFormField(
+                      labelText: 'パスワード',
                       onChanged: passwordChanged,
                     ),
                   ),
@@ -161,19 +136,21 @@ class _SignInState extends State<SignInScreen> {
             ],
           ),
         ),
-        WrappedRow(
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                await appState.authService.signInWithEmailAndPassword(
-                  'primary@example.com',
-                  'password',
-                );
-              },
-              child: const Text('Test'),
-            ),
-          ],
-        ),
+        if (appState.test)
+          WrappedRow(
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  await appState.authService.signInWithEmailAndPassword(
+                    'primary@example.com',
+                    'password',
+                  );
+                },
+                child: const Text('Test'),
+                style: secondaryElevatedButtonStyle,
+              ),
+            ],
+          ),
       ],
     );
   }

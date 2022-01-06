@@ -28,21 +28,34 @@ class ThemeModeProvider extends ChangeNotifier with ServiceListener {
         _me = null;
       }
     }
-    selected = _me?.themeMode ?? 0;
+
+    if (_me != null) {
+      int themeMode = _me!.themeMode;
+      if (_selected != themeMode) {
+        _selected = themeMode;
+        notifyListeners();
+      }
+    }
   }
 
   set selected(int val) {
     if (_selected != val) {
-      _selected = val;
-      notifyListeners();
+      if (_me == null) {
+        _selected = val;
+        notifyListeners();
+      } else {
+        accountsService.updateAccountProperties(_me!.id!, {
+          "themeMode": val,
+        });
+      }
     }
   }
 
   int get selected => _selected;
 
-  ThemeMode get themeMode => _me?.themeMode == 1
+  ThemeMode get themeMode => _selected == 1
       ? ThemeMode.light
-      : _me?.themeMode == 2
+      : _selected == 2
           ? ThemeMode.dark
           : ThemeMode.system;
 }

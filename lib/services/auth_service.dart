@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../utils/web.dart';
+import '../utils/platform_web.dart';
 import 'service_provider.dart';
 import 'accounts_service.dart';
+
+const String reauthenticateParam = '?reauthenticate=yes';
 
 class AuthData extends AccountData {
   final String? uid;
@@ -34,9 +36,12 @@ class AuthService extends ServiceProvider<AuthData> {
     debugPrint(deepLink);
     if (auth.isSignInWithEmailLink(deepLink)) {
       final String? email = loadSignInEmail();
-      debugPrint(email);
+      debugPrint('sing-in: $email');
       if (email != null) {
         auth.signInWithEmailLink(email: email, emailLink: deepLink);
+        if (deepLink.contains(reauthenticateParam)) {
+          saveReauthMode();
+        }
       }
     }
 
@@ -52,6 +57,7 @@ class AuthService extends ServiceProvider<AuthData> {
         await _getAccountDoc(user);
       } else if (_user?.uid != user.uid) {
         // Suspected to be a program error, unexpected state.
+        _user = null;
         notify(AuthData());
         await signOut();
       }
@@ -94,7 +100,10 @@ class AuthService extends ServiceProvider<AuthData> {
     }
   }
 
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<void> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     await auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
@@ -110,7 +119,35 @@ class AuthService extends ServiceProvider<AuthData> {
   }
 
   Future<void> sendEmailVerification() async {
+    await auth.currentUser?.reload();
     await _user!.sendEmailVerification();
+  }
+
+  Future<void> reauthenticateWithEmail() async {
+    await auth.currentUser?.reload();
+    final String email = auth.currentUser!.email!;
+    await auth.sendSignInLinkToEmail(
+      email: email,
+      actionCodeSettings: ActionCodeSettings(
+        url: '${_url!}$reauthenticateParam',
+        handleCodeInApp: true,
+      ),
+    );
+    saveSignInEmail(email);
+  }
+
+  Future<void> reauthenticateWithPassword(String password) async {
+    await auth.currentUser?.reload();
+    final credential = EmailAuthProvider.credential(
+      email: auth.currentUser!.email!,
+      password: password,
+    );
+    await _user!.reauthenticateWithCredential(credential);
+  }
+
+  Future<void> updateMyPassword(String password) async {
+    await auth.currentUser?.reload();
+    await _user!.updatePassword(password);
   }
 
   Future<void> signOut() async {

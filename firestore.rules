@@ -7,11 +7,8 @@ service cloud.firestore {
     function selectedGroup() {
       return get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data.group
     }
-    match /service/version {
-      allow read: if true;
-    }
     match /service/{docs} {
-      allow update: if isAdmin();
+      allow read, update: if isAdmin();
       allow read: if true;
     }
     match /accounts/{account} {
@@ -19,7 +16,7 @@ service cloud.firestore {
       allow read, update: if request.auth.uid == account;
     }
     match /groups/{group} {
-      allow  read, write: if isAdmin();
+      allow read, write: if isAdmin();
       allow read, update: if request.auth.uid in resource.data.accounts;
     }
     match /people/{person} {

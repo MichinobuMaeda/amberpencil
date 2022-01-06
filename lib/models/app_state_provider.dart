@@ -18,6 +18,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   String? _url;
   bool _authChecked = false;
   bool _verified = false;
+  DateTime? _reauthedAt;
   AccountData? _me;
   ClientState _clientState = initialClientState;
 
@@ -40,10 +41,18 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     } else if (data is AuthData) {
       authChecked = true;
       verified = data.emailVerified;
-      me = data.uid == null ? null : data;
+      AccountData? newMe = data.uid == null ? null : data;
+      if (me != newMe) {
+        me = newMe;
+        notifyListeners();
+      }
     } else if (data is List<AccountData>) {
       try {
-        me = data.firstWhere((item) => item.id == _me?.id);
+        AccountData? newMe = data.firstWhere((item) => item.id == _me?.id);
+        if (me != newMe) {
+          me = newMe;
+          notifyListeners();
+        }
       } catch (e) {
         me = null;
       }
@@ -52,8 +61,14 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
   void clearUserData() {
     _me = null;
+    _reauthedAt = null;
     accountsService.unsubscribe();
     updateClientState();
+  }
+
+  Future<void> signOut() async {
+    clearUserData();
+    await authService.signOut();
   }
 
   set version(String? val) {
@@ -102,8 +117,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
           clearUserData();
         }
         if (prev != null) {
-          clearUserData();
-          authService.signOut();
+          signOut();
         }
       } else {
         if (!accountsService.subscribed) {
@@ -115,6 +129,14 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   }
 
   AccountData? get me => _me;
+
+  DateTime? get reauthedAt => _reauthedAt;
+
+  void updateSignedInAt() {
+    _reauthedAt = DateTime.now();
+    debugPrint('signedInAt: $_reauthedAt');
+    notifyListeners();
+  }
 
   void updateClientState() {
     late ClientState state;
@@ -138,4 +160,6 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
   bool updateIsAvailable() =>
       version != null && version != appStaticInfo.version;
+
+  bool get test => appStaticInfo.version == 'for test';
 }

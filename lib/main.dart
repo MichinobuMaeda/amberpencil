@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,9 +16,9 @@ import 'models/app_info_provider.dart';
 import 'services/conf_service.dart';
 import 'services/auth_service.dart';
 import 'services/accounts_service.dart';
-import 'screens/base_screen.dart';
+import 'views/base_screen.dart';
 import 'utils/env.dart';
-import 'utils/web.dart';
+import 'utils/platform_web.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,10 +100,19 @@ class _MyAppState extends State<MyApp> {
             Provider.of<AppInfoProvider>(context, listen: false);
 
         return MaterialApp(
-          title: appInfoProvider.appInfo.name,
+          title: appInfoProvider.data.name,
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: themeMode.themeMode,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', ''),
+            Locale('ja', ''),
+          ],
           home: BaseScreen(
             key: ValueKey(appState.clientState.toString()),
             appState: appState,
