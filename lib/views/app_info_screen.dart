@@ -39,7 +39,7 @@ class AppInfoScreen extends StatelessWidget {
                         showAboutDialog(
                           context: context,
                           applicationIcon: const Image(
-                            image: AssetImage('assets/images/logo.png'),
+                            image: AssetImage('images/logo.png'),
                             width: 48,
                             height: 48,
                           ),

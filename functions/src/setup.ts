@@ -18,7 +18,7 @@ export const updateVersion = async (
     axios: AxiosStatic,
 ): Promise<boolean> => {
   const res = await axios.get(
-      `${conf.get("url")}version.json?check=${new Date().getTime()}`,
+      `${conf.get("url")}assets/app_info.json?check=${new Date().getTime()}`,
   );
   const {version} = res.data;
 

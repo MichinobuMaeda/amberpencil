@@ -44,7 +44,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'API_KEY_AMBERPENCIL',
+    apiKey: 'FIREBASE_API_KEY',
     appId: '1:359342591180:web:ad39b45347dcf3f4b60669',
     messagingSenderId: '359342591180',
     projectId: 'amberpencil',

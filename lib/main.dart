@@ -25,7 +25,7 @@ void main() async {
 
   // assets
   final AppStaticInfo appInfo = AppStaticInfo.fromJson(
-    await rootBundle.loadString('assets/app_info.json'),
+    await rootBundle.loadString('app_info.json'),
   );
 
   // Firebase

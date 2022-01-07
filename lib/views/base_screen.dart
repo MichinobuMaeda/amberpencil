@@ -49,7 +49,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
     super.initState();
 
     const Widget homeIcon = Image(
-      image: AssetImage('assets/images/logo.png'),
+      image: AssetImage('images/logo.png'),
       height: 24,
       width: 24,
     );

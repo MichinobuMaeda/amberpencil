@@ -26,12 +26,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/logo.png
-    - assets/app_info.json
+    - images/logo.png
+    - app_info.json
   fonts:
     - family: NotoSansJP
       fonts:
-        - asset: assets/fonts/NotoSansJP-Regular.otf
+        - asset: fonts/NotoSansJP-Regular.otf
     - family: RobotoMono
       fonts:
-        - asset: assets/fonts/RobotoMono-Regular.ttf
+        - asset: fonts/RobotoMono-Regular.ttf
