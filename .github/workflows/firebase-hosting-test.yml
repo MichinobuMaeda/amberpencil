@@ -71,8 +71,6 @@ jobs:
       - run: |
           yarn deploy --only storage,firestore \
             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
-      - name: Call setup api
-        run: curl https://asia-northeast1-amberpencil-test.cloudfunctions.net/api/setup
 
       - uses: subosito/flutter-action@v2
         with:
@@ -88,3 +86,5 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_AMBERPENCIL_TEST }}'
           channelId: live
           projectId: amberpencil-test
+      - name: Call setup api
+        run: curl https://asia-northeast1-amberpencil-test.cloudfunctions.net/api/setup
