@@ -12,13 +12,13 @@ jobs:
       FLUTTER_VERSION: '2.8.1'
 
     steps:
+      - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
         id: functionschanged
         with:
           filters: |
             src:
               - 'functions/**'
-      - uses: actions/checkout@v2
 
       - name: For test - firebase project
         run: sed 's/amberpencil/amberpencil-test/' -i .firebaserc
