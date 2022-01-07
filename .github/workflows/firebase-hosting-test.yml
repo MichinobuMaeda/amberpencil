@@ -14,13 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set firebase project
+      - name: For test - firebase project
         run: sed 's/amberpencil/amberpencil-test/' -i .firebaserc
-      - name: Set firebase api key
+      - name: For test - firebase options
+        run: cp lib/config/firebase_options_test.dart lib/config/firebase_options.dart
+      - name: For test -firebase api key
         run: |
           sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
             -i lib/config/firebase_options.dart
-      - name: Set UI node-version
+      - name: For test -UI node-version
         run: |
           VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
             sed "s/for\ test/$VERSION/" -i app_info.json && \
