@@ -74,7 +74,9 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   set version(String? val) {
     if (_version != val) {
       _version = val;
-      updateClientState();
+      if (!updateClientState()) {
+        notifyListeners();
+      }
     }
   }
 
@@ -138,7 +140,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     notifyListeners();
   }
 
-  void updateClientState() {
+  bool updateClientState() {
     late ClientState state;
     if (_version == null || !_authChecked) {
       state = ClientState.loading;
@@ -153,7 +155,9 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     if (_clientState != state) {
       _clientState = state;
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
   ClientState get clientState => _clientState;

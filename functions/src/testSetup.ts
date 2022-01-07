@@ -20,7 +20,7 @@ export const confNotExist = test.firestore.makeDocumentSnapshot(
     "document/service/conf",
 );
 export const confData = {
-  version: "1.0.0",
+  version: "1.0.0+1",
   url: "https://example.com",
   seed: "test seed",
   invitationExpirationTime: 3 * 24 * 3600 * 1000,

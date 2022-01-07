@@ -87,7 +87,7 @@ export const install = async (
 
   const serviceRef = db.collection("service");
   await serviceRef.doc("conf").set({
-    version: "1.0.0",
+    version: "1.0.0+1",
     url,
     seed,
     invitationExpirationTime: 3 * 24 * 3600 * 1000,

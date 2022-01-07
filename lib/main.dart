@@ -113,6 +113,7 @@ class _MyAppState extends State<MyApp> {
             Locale('en', ''),
             Locale('ja', ''),
           ],
+          locale: const Locale('ja', 'JP'),
           home: BaseScreen(
             key: ValueKey(appState.clientState.toString()),
             appState: appState,
