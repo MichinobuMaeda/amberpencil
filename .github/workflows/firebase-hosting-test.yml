@@ -18,7 +18,7 @@ jobs:
         run: sed 's/amberpencil/amberpencil-test/' -i .firebaserc
       - name: Set firebase api key
         run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/'
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
             -i lib/config/firebase_options.dart
       - name: Set UI node-version
         run: |
