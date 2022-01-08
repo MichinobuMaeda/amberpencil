@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -85,3 +86,17 @@ ButtonStyle errorElevatedButtonStyle(BuildContext context) =>
 
 ButtonStyle errorOutlinedButtonStyle(BuildContext context) =>
     ButtonStyle(foregroundColor: errorMaterialStateColor(context));
+
+final MarkdownStyleSheet markdownStyleSheet = MarkdownStyleSheet(
+  h2: const TextStyle(fontSize: fontSizeH2, height: 1.8),
+  h3: const TextStyle(fontSize: fontSizeH3, height: 1.8),
+  h4: const TextStyle(fontSize: fontSizeH4, height: 1.8),
+  h5: const TextStyle(fontSize: fontSizeH5, height: 1.8),
+  h6: const TextStyle(fontSize: fontSizeH6, height: 1.8),
+  p: const TextStyle(fontSize: fontSizeBody, height: 1.8),
+  code: const TextStyle(
+    fontSize: fontSizeBody,
+    height: 1.2,
+    fontFamily: fontFamilyMonoSpace,
+  ),
+);
