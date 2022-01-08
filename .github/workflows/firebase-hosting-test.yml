@@ -62,7 +62,7 @@ jobs:
           VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
             sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
             yarn functions:config:set initial.version="$VERSION" \
-             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}" \
+             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}" && \
             echo $VERSION
       - if: steps.functionschanged.outputs.src == 'true'
         run: |
