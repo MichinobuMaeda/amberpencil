@@ -5,12 +5,29 @@ jobs:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
     runs-on: ubuntu-latest
     env:
-      PUB_CACHE: ~/.pub-cache
       NODE_VERSION: '16'
       FLUTTER_VERSION: '2.8.1'
 
     steps:
       - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: functionschanged
+        with:
+          base: 'test'
+          filters: |
+            src:
+              - 'functions/**'
+
+      - name: Set firebase api key
+        run: |
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+            -i lib/config/firebase_options.dart
+      - name: Set UI version
+        run: |
+          VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
+            sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
+            echo "{\"version\":\"$VERSION\"}" > web/version.json && \
+            echo $VERSION
 
       - name: Cache functions/node_modules
         uses: actions/cache@v2
@@ -26,22 +43,17 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
 
-      - name: Flutter packages
-        uses: actions/cache@v2
-        id: cache-flutter-packages
-        with:
-          path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
-
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm -g i yarn
       - run: yarn install --frozen-lockfile
-      - run: yarn --cwd functions install --frozen-lockfile
-      - run: yarn --cwd functions lint
-      - run: yarn --cwd functions test
 
+      - if: steps.functionschanged.outputs.src == 'true'
+        run: |
+          yarn --cwd functions install --frozen-lockfile && \
+          yarn --cwd functions lint && \
+          yarn --cwd functions test
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
