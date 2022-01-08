@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -86,38 +85,3 @@ ButtonStyle errorElevatedButtonStyle(BuildContext context) =>
 
 ButtonStyle errorOutlinedButtonStyle(BuildContext context) =>
     ButtonStyle(foregroundColor: errorMaterialStateColor(context));
-
-final Map<String, Style> htmlStyle = {
-  "p": Style(
-    fontSize: const FontSize(fontSizeBody),
-    lineHeight: const LineHeight(2.0),
-  ),
-  "li": Style(
-    fontSize: const FontSize(fontSizeBody),
-    lineHeight: const LineHeight(1.5),
-  ),
-  "code": Style(
-    fontFamily: fontFamilyMonoSpace,
-    color: Colors.green,
-    lineHeight: const LineHeight(1.2),
-  ),
-  "h2": Style(
-    fontSize: const FontSize(fontSizeH2),
-    lineHeight: const LineHeight(2.0),
-  ),
-  "h3": Style(
-    fontSize: const FontSize(fontSizeH3),
-  ),
-  "h4": Style(
-    fontSize: const FontSize(fontSizeH4),
-    lineHeight: const LineHeight(2.0),
-  ),
-  "h5": Style(
-    fontSize: const FontSize(fontSizeH5),
-    lineHeight: const LineHeight(2.0),
-  ),
-  "h6": Style(
-    fontSize: const FontSize(fontSizeH6),
-    lineHeight: const LineHeight(2.0),
-  ),
-};
