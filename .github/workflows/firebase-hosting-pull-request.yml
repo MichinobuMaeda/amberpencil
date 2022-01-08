@@ -13,7 +13,7 @@ jobs:
 
       - name: Set firebase api key
         run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL }}/' \
             -i lib/config/firebase_options.dart
       - name: Set UI version
         run: |
@@ -35,6 +35,20 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Cache flutter
+        uses: actions/cache@v2
+        id: cache-flutter
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: ${{ runner.os }}-${{ env.FLUTTER_VERSION }}
+
+      - name: Cache flutter packages
+        uses: actions/cache@v2
+        id: cache-flutter-packages
+        with:
+          path: /home/runner/.pub-cache
+          key: ${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
 
       - uses: actions/setup-node@v2
         with:
