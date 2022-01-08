@@ -10,13 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: functionschanged
-        with:
-          base: 'test'
-          filters: |
-            src:
-              - 'functions/**'
 
       - name: Set firebase api key
         run: |
@@ -49,8 +42,7 @@ jobs:
       - run: npm -g i yarn
       - run: yarn install --frozen-lockfile
 
-      - if: steps.functionschanged.outputs.src == 'true'
-        run: |
+      - run: |
           yarn --cwd functions install --frozen-lockfile && \
           yarn --cwd functions lint && \
           yarn --cwd functions test
