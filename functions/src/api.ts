@@ -1,6 +1,7 @@
 import {config} from "firebase-functions";
 import {app} from "firebase-admin";
 import {Request, Response} from "express";
+import {AxiosStatic} from "axios";
 
 import {
   getConf,
@@ -12,6 +13,7 @@ import {
 /* eslint-disable import/prefer-default-export */
 export const setup = (
     firebase: app.App,
+    axios: AxiosStatic,
     functionsConfig: config.Config,
 ) => async (
     req: Request,
@@ -19,7 +21,7 @@ export const setup = (
 ): Promise<Response> => {
   const conf = await getConf(firebase);
   if (conf) {
-    const verUp = await updateVersion(conf, functionsConfig);
+    const verUp = await updateVersion(conf, axios);
     if (verUp) {
       await updateData(firebase, conf);
     }
@@ -30,7 +32,6 @@ export const setup = (
         functionsConfig.initial.password,
         functionsConfig.initial.url,
     );
-    await updateVersion(confNew, functionsConfig);
     await updateData(firebase, confNew);
   }
   return res.send("OK");

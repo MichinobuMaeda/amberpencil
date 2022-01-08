@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-// import axios from "axios";
+import axios from "axios";
 import {
   confSnapshot,
   mockFirebase,
@@ -9,8 +9,8 @@ import {
   setup,
 } from "./api";
 
-// jest.mock("axios");
-// const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock("axios");
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock("./setup");
 const mockedSetup = setupModule as jest.Mocked<typeof setupModule>;
@@ -25,7 +25,6 @@ describe("setup()", () => {
       email: "info@example.com",
       password: "testpass",
       url: "https://example.com",
-      version: "1.0.0+1",
     },
   };
   const req: Partial<Request> = {};
@@ -43,12 +42,12 @@ describe("setup()", () => {
         () => Promise.resolve(false)
     );
 
-    const fn = setup(mockFirebase, config);
+    const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
     expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
     expect(mockedSetup.updateVersion.mock.calls).toEqual(
-        [[confSnapshot, config]]
+        [[confSnapshot, mockedAxios]]
     );
     expect(mockedSetup.updateData.mock.calls).toEqual([]);
     expect(mockedSetup.install.mock.calls).toEqual([]);
@@ -64,12 +63,12 @@ describe("setup()", () => {
         () => Promise.resolve(true)
     );
 
-    const fn = setup(mockFirebase, config);
+    const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
     expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
     expect(mockedSetup.updateVersion.mock.calls).toEqual(
-        [[confSnapshot, config]]
+        [[confSnapshot, mockedAxios]]
     );
     expect(mockedSetup.updateData.mock.calls).toEqual(
         [[mockFirebase, confSnapshot]]
@@ -87,13 +86,11 @@ describe("setup()", () => {
         () => Promise.resolve(confSnapshot)
     );
 
-    const fn = setup(mockFirebase, config);
+    const fn = setup(mockFirebase, mockedAxios, config);
     await fn(req as Request, res as Response);
 
     expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
-    expect(mockedSetup.updateVersion.mock.calls).toEqual([
-      [confSnapshot, config],
-    ]);
+    expect(mockedSetup.updateVersion.mock.calls).toEqual([]);
     expect(mockedSetup.updateData.mock.calls).toEqual(
         [[mockFirebase, confSnapshot]]
     );

@@ -2,7 +2,7 @@ import {config, region} from "firebase-functions";
 import admin from "firebase-admin";
 import express from "express";
 import cors from "cors";
-// import axios from "axios";
+import axios from "axios";
 import {adminUser} from "./guard";
 import * as users from "./users";
 import {
@@ -16,7 +16,7 @@ const firebase = admin.initializeApp();
 const httpApp = express();
 httpApp.use(cors({origin: true}));
 httpApp.use(express.urlencoded({extended: true}));
-httpApp.get("/setup", setup(firebase, config()));
+httpApp.get("/setup", setup(firebase, axios, config()));
 
 export const api = region(REGION).https.onRequest(httpApp);
 

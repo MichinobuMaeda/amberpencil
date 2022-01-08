@@ -13,11 +13,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: functionschanged
+        with:
+          base: 'test'
+          filters: |
+            src:
+              - 'functions/**'
 
       - name: For test - firebase project
         run: sed 's/amberpencil/amberpencil-test/' -i .firebaserc
       - name: For test - firebase options
         run: cp lib/config/firebase_options_test.dart lib/config/firebase_options.dart
+
+      - name: Set firebase api key
+        run: |
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+            -i lib/config/firebase_options.dart
+      - name: Set UI version
+        run: |
+          VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
+            sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
+            echo "{\"version\":\"$VERSION\"}" > web/version.json && \
+            echo $VERSION
 
       - name: Cache functions/node_modules
         uses: actions/cache@v2
@@ -46,18 +64,11 @@ jobs:
       - run: npm -g i yarn
       - run: yarn install --frozen-lockfile
 
-      - run: |
+      - if: steps.functionschanged.outputs.src == 'true'
+        run: |
           yarn --cwd functions install --frozen-lockfile && \
           yarn --cwd functions lint && \
-          yarn --cwd functions test
-      - name: Set UI version
-        run: |
-          VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
-            sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
-            yarn functions:config:set initial.version="$VERSION" \
-             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}" && \
-            echo $VERSION
-      - run: |
+          yarn --cwd functions test && \
           yarn deploy --only functions --force \
             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
       - run: |
@@ -67,10 +78,6 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
-      - name: Set firebase api key
-        run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
-            -i lib/config/firebase_options.dart
       - run: flutter pub get
       # - run: flutter test
       - run: flutter build web
