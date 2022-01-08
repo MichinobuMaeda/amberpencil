@@ -30,6 +30,7 @@ export const setup = (
         functionsConfig.initial.password,
         functionsConfig.initial.url,
     );
+    await updateVersion(confNew, functionsConfig);
     await updateData(firebase, confNew);
   }
   return res.send("OK");

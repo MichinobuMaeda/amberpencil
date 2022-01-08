@@ -25,6 +25,7 @@ describe("setup()", () => {
       email: "info@example.com",
       password: "testpass",
       url: "https://example.com",
+      version: "1.0.0+1",
     },
   };
   const req: Partial<Request> = {};
@@ -90,7 +91,9 @@ describe("setup()", () => {
     await fn(req as Request, res as Response);
 
     expect(mockedSetup.getConf.mock.calls).toEqual([[mockFirebase]]);
-    expect(mockedSetup.updateVersion.mock.calls).toEqual([]);
+    expect(mockedSetup.updateVersion.mock.calls).toEqual([
+      [confSnapshot, config],
+    ]);
     expect(mockedSetup.updateData.mock.calls).toEqual(
         [[mockFirebase, confSnapshot]]
     );
