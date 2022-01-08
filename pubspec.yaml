@@ -27,7 +27,6 @@ flutter:
   uses-material-design: true
   assets:
     - images/logo.png
-    - app_info.json
   fonts:
     - family: NotoSansJP
       fonts:

@@ -5,7 +5,8 @@
   "scripts": {
     "test:setup": "curl http://localhost:5001/amberpencil/asia-northeast1/api/setup",
     "start": "yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui \"yarn test:setup && flutter run -d chrome --web-port 5000\"",
-    "deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "functions:config:set": "firebase functions:config:set"
   },
   "repository": {
     "type": "git",

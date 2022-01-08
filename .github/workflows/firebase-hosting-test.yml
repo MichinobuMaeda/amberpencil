@@ -24,15 +24,6 @@ jobs:
         run: sed 's/amberpencil/amberpencil-test/' -i .firebaserc
       - name: For test - firebase options
         run: cp lib/config/firebase_options_test.dart lib/config/firebase_options.dart
-      - name: Set firebase api key
-        run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
-            -i lib/config/firebase_options.dart
-      - name: Set UI version
-        run: |
-          VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
-            sed "s/for\ test/$VERSION/" -i app_info.json && \
-            echo $VERSION
 
       - name: Cache functions/node_modules
         uses: actions/cache@v2
@@ -67,6 +58,19 @@ jobs:
           yarn --cwd functions lint && \
           yarn --cwd functions test && \
           yarn deploy --only functions --force \
+
+      - name: Set firebase api key
+        run: |
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+            -i lib/config/firebase_options.dart
+      - name: Set version
+        run: |
+          VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
+            sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
+            yarn functions:config:set initial.version="$VERSION"
+            echo $VERSION
+
+      - run: |
             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
       - run: |
           yarn deploy --only storage,firestore \

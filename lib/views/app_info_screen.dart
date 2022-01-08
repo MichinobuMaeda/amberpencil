@@ -32,7 +32,8 @@ class AppInfoScreen extends StatelessWidget {
 
             return CenteringColumn(
               children: [
-                WrappedRow(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     OutlinedButton.icon(
                       onPressed: () {

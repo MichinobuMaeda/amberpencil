@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'config/app_info.dart';
 import 'config/firebase_options.dart';
 import 'config/theme.dart';
-import 'models/app_info.dart';
 import 'models/theme_mode_provider.dart';
 import 'models/app_state_provider.dart';
 import 'models/app_info_provider.dart';
@@ -23,18 +22,13 @@ import 'utils/platform_web.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // assets
-  final AppStaticInfo appInfo = AppStaticInfo.fromJson(
-    await rootBundle.loadString('app_info.json'),
-  );
-
   // Firebase
   final String deepLink = getCurrentUrl();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await useFirebaseEmulators(
-    appInfo.version,
+    appStaticInfo.version,
     FirebaseAuth.instance,
     FirebaseFirestore.instance,
     FirebaseFunctions.instance,
@@ -66,7 +60,7 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => AppStateProvider(
-            appInfo,
+            appStaticInfo,
             confService,
             authService,
             accountsService,
@@ -74,7 +68,7 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => AppInfoProvider(
-            appInfo,
+            appStaticInfo,
             confService,
           ),
         ),

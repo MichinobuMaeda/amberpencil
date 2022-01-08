@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import '../config/app_info.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
-import 'app_info.dart';
 
 enum ClientState { loading, guest, pending, authenticated }
 
 const ClientState initialClientState = ClientState.loading;
+
+class AppInfo extends AppStaticInfo {
+  final String? policy;
+
+  AppInfo(
+    AppStaticInfo appStaticInfo, {
+    this.policy,
+  }) : super(
+          name: appStaticInfo.name,
+          version: appStaticInfo.version,
+          copyright: appStaticInfo.copyright,
+        );
+}
 
 class AppInfoProvider extends ChangeNotifier with ServiceListener {
   AppInfo _data;

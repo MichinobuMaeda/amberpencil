@@ -1,7 +1,6 @@
-import {logger} from "firebase-functions";
+import {logger, config} from "firebase-functions";
 import {app, firestore} from "firebase-admin";
 import {createHash} from "crypto";
-import {AxiosStatic} from "axios";
 import {nanoid} from "nanoid";
 import {createAuthUser} from "./users";
 
@@ -15,12 +14,9 @@ export const getConf = async (
 
 export const updateVersion = async (
     conf: firestore.DocumentSnapshot,
-    axios: AxiosStatic,
+    functionsConfig: config.Config,
 ): Promise<boolean> => {
-  const res = await axios.get(
-      `${conf.get("url")}assets/app_info.json?check=${new Date().getTime()}`,
-  );
-  const {version} = res.data;
+  const version = functionsConfig.initial.version;
 
   if (version !== conf.get("version")) {
     logger.info(version);

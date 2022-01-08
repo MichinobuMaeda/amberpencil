@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../config/app_info.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
-import 'app_info.dart';
 
 enum ClientState { loading, guest, pending, authenticated }
 

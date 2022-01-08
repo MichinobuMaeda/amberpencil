@@ -1,5 +1,5 @@
 import functionTest from "firebase-functions-test";
-import axios from "axios";
+// import axios from "axios";
 import {
   DocRef,
   DocSnap,
@@ -23,8 +23,8 @@ import {
 
 const test = functionTest();
 
-jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+// jest.mock("axios");
+// const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock("./users");
 const mockedUsers = users as jest.Mocked<typeof users>;
@@ -71,22 +71,26 @@ describe("getSys()", () => {
 
 describe("updateVersion()", () => {
   it("returns false and not modifies conf has same version.", async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: {version: confData.version},
-    });
+    const config = {
+      initial: {
+        version: confData.version,
+      },
+    };
 
     expect(
-        await updateVersion(confSnapshot as DocSnap, mockedAxios)
+        await updateVersion(confSnapshot as DocSnap, config)
     ).toBeFalsy();
     expect(mockUpdate.mock.calls).toEqual([]);
   });
 
   it("returns true and update conf has old version.", async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: {version: "1.0.1"},
-    });
+    const config = {
+      initial: {
+        version: "1.0.1",
+      },
+    };
     expect(
-        await updateVersion(confSnapshot as DocSnap, mockedAxios)
+        await updateVersion(confSnapshot as DocSnap, config)
     ).toBeTruthy();
     expect(mockUpdate.mock.calls).toEqual([[{
       version: "1.0.1",
