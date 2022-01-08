@@ -1,9 +1,6 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:flutter_html/flutter_html.dart';
-import 'package:markdown/markdown.dart' as markdown;
-// import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../utils/ui_utils.dart';
 
 class EditMarkdownPanel extends StatefulWidget {
@@ -114,21 +111,7 @@ class _EditMarkdownState extends State<EditMarkdownPanel> {
           ),
         Stack(
           children: [
-            Html.fromDom(
-              document: dom.Document.html(markdown.markdownToHtml(
-                widget.initialValue ?? '',
-              )),
-              shrinkWrap: true,
-              // onAnchorTap: (
-              //   String? url,
-              //   RenderContext context,
-              //   Map<String, String> attributes,
-              //   dom.Element? element,
-              // ) {
-              //   if (url != null) launch(url);
-              // },
-              style: htmlStyle,
-            ),
+            MarkdownBody(data: widget.initialValue ?? ''),
             if (widget.editable && !_edit)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
