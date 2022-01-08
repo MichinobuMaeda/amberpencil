@@ -30,38 +30,50 @@ class AppInfoScreen extends StatelessWidget {
               }
             }
 
-            return CenteringColumn(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        showAboutDialog(
-                          context: context,
-                          applicationIcon: const Image(
-                            image: AssetImage('images/logo.png'),
-                            width: 48,
-                            height: 48,
-                          ),
-                          applicationName: appInfo.data.name,
-                          applicationVersion: appInfo.data.version,
-                          applicationLegalese: appInfo.data.copyright,
-                        );
-                      },
-                      icon: const Icon(Icons.info),
-                      label: const Text('著作権とライセンス'),
-                    ),
-                  ],
-                ),
-                EditMarkdownPanel(
-                  label: 'プライバシー・ポリシー',
-                  initialValue: appInfo.data.policy,
-                  editable: appState.me?.admin ?? false,
-                  onSave: onPolicySave,
-                )
-              ],
-            );
+            try {
+              return CenteringColumn(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          showAboutDialog(
+                            context: context,
+                            applicationIcon: const Image(
+                              image: AssetImage('images/logo.png'),
+                              width: 48,
+                              height: 48,
+                            ),
+                            applicationName: appInfo.data.name,
+                            applicationVersion: appInfo.data.version,
+                            applicationLegalese: appInfo.data.copyright,
+                          );
+                        },
+                        icon: const Icon(Icons.info),
+                        label: const Text('著作権とライセンス'),
+                      ),
+                    ],
+                  ),
+                  EditMarkdownPanel(
+                    label: 'プライバシー・ポリシー',
+                    initialValue: appInfo.data.policy,
+                    editable: appState.me?.admin ?? false,
+                    onSave: onPolicySave,
+                  )
+                ],
+              );
+            } catch (e) {
+              return CenteringColumn(
+                children: [
+                  WrappedRow(
+                    children: [
+                      Text(e.toString()),
+                    ],
+                  ),
+                ],
+              );
+            }
           },
         );
       },
