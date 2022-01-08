@@ -7,7 +7,6 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     env:
-      PUB_CACHE: ~/.pub-cache
       NODE_VERSION: '16'
       FLUTTER_VERSION: '2.8.1'
 
@@ -50,13 +49,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-
-      - name: Cache flutter packages
-        uses: actions/cache@v2
-        id: cache-flutter-packages
-        with:
-          path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
 
       - uses: actions/setup-node@v2
         with:
