@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:flutter_html/flutter_html.dart';
 import 'package:markdown/markdown.dart' as markdown;
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 import '../utils/ui_utils.dart';
 
 class EditMarkdownPanel extends StatefulWidget {
@@ -119,14 +119,14 @@ class _EditMarkdownState extends State<EditMarkdownPanel> {
                 widget.initialValue ?? '',
               )),
               shrinkWrap: true,
-              onAnchorTap: (
-                String? url,
-                RenderContext context,
-                Map<String, String> attributes,
-                dom.Element? element,
-              ) {
-                if (url != null) launch(url);
-              },
+              // onAnchorTap: (
+              //   String? url,
+              //   RenderContext context,
+              //   Map<String, String> attributes,
+              //   dom.Element? element,
+              // ) {
+              //   if (url != null) launch(url);
+              // },
               style: htmlStyle,
             ),
             if (widget.editable && !_edit)
