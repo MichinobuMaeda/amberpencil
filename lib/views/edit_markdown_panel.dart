@@ -114,10 +114,11 @@ class _EditMarkdownState extends State<EditMarkdownPanel> {
           ),
         Stack(
           children: [
-            Html(
-              data: markdown.markdownToHtml(
+            Html.fromDom(
+              document: dom.Document.html(markdown.markdownToHtml(
                 widget.initialValue ?? '',
-              ),
+              )),
+              shrinkWrap: true,
               onAnchorTap: (
                 String? url,
                 RenderContext context,
