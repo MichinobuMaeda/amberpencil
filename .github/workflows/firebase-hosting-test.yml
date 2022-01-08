@@ -56,8 +56,8 @@ jobs:
         run: |
           yarn --cwd functions install --frozen-lockfile && \
           yarn --cwd functions lint && \
-          yarn --cwd functions test && \
-      - name: Set version
+          yarn --cwd functions test
+      - name: Set UI version
         run: |
           VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
             sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
