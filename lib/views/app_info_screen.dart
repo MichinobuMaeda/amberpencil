@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/app_info_provider.dart';
 import '../models/app_state_provider.dart';
 import '../utils/ui_utils.dart';
-import 'edit_markdown_panel.dart';
+// import 'edit_markdown_panel.dart';
 
 class AppInfoScreen extends StatelessWidget {
   const AppInfoScreen({Key? key}) : super(key: key);
@@ -14,21 +14,21 @@ class AppInfoScreen extends StatelessWidget {
       builder: (context, appInfo, child) {
         return Consumer<AppStateProvider>(
           builder: (context, appState, child) {
-            Future<void> onPolicySave(String value) async {
-              try {
-                await appState.confService.updateConfProperties(
-                  appState.me!.id!,
-                  {"policy": value},
-                );
-              } catch (e) {
-                showMessageBar(
-                  context,
-                  'メールが保存できませんでした。'
-                  '通信の状態を確認してやり直してください。',
-                  error: true,
-                );
-              }
-            }
+            // Future<void> onPolicySave(String value) async {
+            //   try {
+            //     await appState.confService.updateConfProperties(
+            //       appState.me!.id!,
+            //       {"policy": value},
+            //     );
+            //   } catch (e) {
+            //     showMessageBar(
+            //       context,
+            //       'メールが保存できませんでした。'
+            //       '通信の状態を確認してやり直してください。',
+            //       error: true,
+            //     );
+            //   }
+            // }
 
             return CenteringColumn(
               children: [
@@ -54,12 +54,12 @@ class AppInfoScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                EditMarkdownPanel(
-                  label: 'プライバシー・ポリシー',
-                  initialValue: appInfo.data.policy,
-                  editable: appState.me?.admin ?? false,
-                  onSave: onPolicySave,
-                )
+                // EditMarkdownPanel(
+                //   label: 'プライバシー・ポリシー',
+                //   initialValue: appInfo.data.policy,
+                //   editable: appState.me?.admin ?? false,
+                //   onSave: onPolicySave,
+                // )
               ],
             );
           },
