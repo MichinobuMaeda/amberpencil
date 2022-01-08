@@ -57,29 +57,28 @@ jobs:
           yarn --cwd functions install --frozen-lockfile && \
           yarn --cwd functions lint && \
           yarn --cwd functions test && \
-          yarn deploy --only functions --force \
-
-      - name: Set firebase api key
-        run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
-            -i lib/config/firebase_options.dart
       - name: Set version
         run: |
           VERSION=`grep 'version:' pubspec.yaml | sed 's/.*\s//'` && \
             sed "s/for\ test/$VERSION/" -i lib/config/app_info.dart  && \
-            yarn functions:config:set initial.version="$VERSION"
+            yarn functions:config:set initial.version="$VERSION" \
+             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}" \
             echo $VERSION
-
-      - run: |
+      - if: steps.functionschanged.outputs.src == 'true'
+        run: |
+          yarn deploy --only functions --force \
             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
       - run: |
           yarn deploy --only storage,firestore \
             --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
+      - name: Set firebase api key
+        run: |
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+            -i lib/config/firebase_options.dart
       - run: flutter pub get
       # - run: flutter test
       - run: flutter build web
