@@ -25,7 +25,7 @@ jobs:
 
       - name: Set firebase api key
         run: |
-          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL_TEST }}/' \
+          sed 's/FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY_AMBERPENCIL }}/' \
             -i lib/config/firebase_options.dart
       - name: Set UI version
         run: |
@@ -60,10 +60,10 @@ jobs:
           yarn --cwd functions lint && \
           yarn --cwd functions test && \
           yarn deploy --only functions --force \
-            --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
+            --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL }}"
       - run: |
           yarn deploy --only storage,firestore \
-            --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL_TEST }}"
+            --token "${{ secrets.FIREBASE_TOKEN_AMBERPENCIL }}"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -79,4 +79,4 @@ jobs:
           channelId: live
           projectId: amberpencil
       - name: Call setup api
-        run: curl https://asia-northeast1-amberpencil-test.cloudfunctions.net/api/setup
+        run: curl https://asia-northeast1-amberpencil.cloudfunctions.net/api/setup
