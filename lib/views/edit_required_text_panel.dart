@@ -1,7 +1,7 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
-import '../utils/ui_utils.dart';
 import '../config/validators.dart';
+import 'widgets.dart';
 
 class EditRequiredTextPanel extends StatefulWidget {
   final String label;
@@ -38,7 +38,7 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
       setState(() {
         _value = value;
         _waiting = false;
-        closeMessageBar(context);
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
       });
     }
 
@@ -56,11 +56,13 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
               setState(() {
                 _waiting = false;
               });
-              showMessageBar(
-                context,
-                '保存できませんでした。'
-                '通信の状態を確認してやり直してください。',
-                error: true,
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    '保存できませんでした。'
+                    '通信の状態を確認してやり直してください。',
+                  ),
+                ),
               );
             }
           };
@@ -74,7 +76,7 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
           WrappedRow(
             alignment: WrapAlignment.end,
             children: [
-              InputContainer(
+              DefaultInputContainer(
                 child: TextFormField(
                   initialValue: widget.initialValue,
                   decoration: InputDecoration(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+const AssetImage logoAsset = AssetImage('images/logo.png');
+
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   primarySwatch: Colors.brown,
@@ -9,6 +11,14 @@ final ThemeData lightTheme = ThemeData(
   textTheme: textTheme,
   elevatedButtonTheme: elevatedButtonTheme,
   outlinedButtonTheme: outlinedButtonTheme,
+  snackBarTheme: const SnackBarThemeData(
+    backgroundColor: Colors.brown,
+    contentTextStyle: TextStyle(
+      fontFamily: fontFamilySansSerif,
+      fontSize: fontSizeBody,
+      color: Colors.white,
+    ),
+  ),
 );
 
 final ThemeData darkTheme = ThemeData(
@@ -19,6 +29,14 @@ final ThemeData darkTheme = ThemeData(
   textTheme: textTheme,
   elevatedButtonTheme: elevatedButtonTheme,
   outlinedButtonTheme: outlinedButtonTheme,
+  snackBarTheme: const SnackBarThemeData(
+    backgroundColor: Colors.amber,
+    contentTextStyle: TextStyle(
+      fontFamily: fontFamilySansSerif,
+      fontSize: fontSizeBody,
+      color: Colors.black,
+    ),
+  ),
 );
 
 const fontFamilySansSerif = 'NotoSansJP';
@@ -65,26 +83,36 @@ final outlinedButtonTheme = OutlinedButtonThemeData(
   ),
 );
 
-Color secondaryColor = Colors.blueGrey;
+Color secondaryBackgroundColor = Colors.blueGrey;
+Color secondaryTextColor = Colors.grey;
 Color errorColor(BuildContext context) => Theme.of(context).colorScheme.error;
 
-MaterialStateProperty<Color> secondaryMaterialStateColor =
-    MaterialStateProperty.all<Color>(secondaryColor);
+MaterialStateProperty<Color> secondaryBackgroundMaterialStateColor =
+    MaterialStateProperty.all<Color>(secondaryBackgroundColor);
+MaterialStateProperty<Color> secondaryTextMaterialStateColor =
+    MaterialStateProperty.all<Color>(secondaryTextColor);
 MaterialStateProperty<Color> errorMaterialStateColor(BuildContext context) =>
     MaterialStateProperty.all<Color>(errorColor(context));
 
 final secondaryElevatedButtonStyle = ButtonStyle(
-  backgroundColor: secondaryMaterialStateColor,
+  backgroundColor: secondaryBackgroundMaterialStateColor,
 );
 
-final secondaryOutlinedButtonStyle = ButtonStyle(
-  foregroundColor: secondaryMaterialStateColor,
+ButtonStyle secondaryOutlinedButtonStyle = ButtonStyle(
+  foregroundColor: secondaryTextMaterialStateColor,
+);
+
+ButtonStyle secondaryTextButtonStyle = ButtonStyle(
+  foregroundColor: secondaryTextMaterialStateColor,
 );
 
 ButtonStyle errorElevatedButtonStyle(BuildContext context) =>
     ButtonStyle(backgroundColor: errorMaterialStateColor(context));
 
 ButtonStyle errorOutlinedButtonStyle(BuildContext context) =>
+    ButtonStyle(foregroundColor: errorMaterialStateColor(context));
+
+ButtonStyle errorTextButtonStyle(BuildContext context) =>
     ButtonStyle(foregroundColor: errorMaterialStateColor(context));
 
 final MarkdownStyleSheet markdownStyleSheet = MarkdownStyleSheet(
@@ -98,5 +126,6 @@ final MarkdownStyleSheet markdownStyleSheet = MarkdownStyleSheet(
     fontSize: fontSizeBody,
     height: 1.2,
     fontFamily: fontFamilyMonoSpace,
+    color: Colors.green,
   ),
 );

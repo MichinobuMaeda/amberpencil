@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../config/app_info.dart';
+import '../config/routes.dart';
+import '../models/app_route.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
 
-enum ClientState { loading, guest, pending, authenticated }
-
-const ClientState initialClientState = ClientState.loading;
+mixin RouteStateListener {
+  setClientState(ClientState clientState) {}
+  setRoute(AppRoute appRoute) {}
+}
 
 class AppStateProvider extends ChangeNotifier with ServiceListener {
   final AppStaticInfo appStaticInfo;
@@ -21,6 +24,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   DateTime? _reauthedAt;
   AccountData? _me;
   ClientState _clientState = initialClientState;
+  RouteStateListener? _routeStateListener;
 
   AppStateProvider(
     this.appStaticInfo,
@@ -42,7 +46,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
       authChecked = true;
       verified = data.emailVerified;
       AccountData? newMe = data.uid == null ? null : data;
-      if (me != newMe) {
+      if (me?.id != newMe?.id) {
         me = newMe;
         notifyListeners();
       }
@@ -74,9 +78,8 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   set version(String? val) {
     if (_version != val) {
       _version = val;
-      if (!updateClientState()) {
-        notifyListeners();
-      }
+      updateClientState();
+      notifyListeners();
     }
   }
 
@@ -136,11 +139,10 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
   void updateSignedInAt() {
     _reauthedAt = DateTime.now();
-    debugPrint('signedInAt: $_reauthedAt');
     notifyListeners();
   }
 
-  bool updateClientState() {
+  void updateClientState() {
     late ClientState state;
     if (_version == null || !_authChecked) {
       state = ClientState.loading;
@@ -154,13 +156,19 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
     if (_clientState != state) {
       _clientState = state;
-      notifyListeners();
-      return true;
+      _routeStateListener?.setClientState(_clientState);
     }
-    return false;
   }
 
   ClientState get clientState => _clientState;
+
+  set routeStateListener(RouteStateListener routeStateListener) {
+    _routeStateListener ??= routeStateListener;
+  }
+
+  void goRoute(AppRoute appRoute) {
+    _routeStateListener?.setRoute(appRoute);
+  }
 
   bool updateIsAvailable() =>
       version != null && version != appStaticInfo.version;

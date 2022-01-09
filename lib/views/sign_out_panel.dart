@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../models/app_state_provider.dart';
-import '../utils/ui_utils.dart';
+import 'widgets.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
 
@@ -25,13 +25,14 @@ class SignOutPanel extends StatelessWidget {
           ),
           WrappedRow(
             children: [
-              ElevatedButton.icon(
+              ComfirmDangerButon(
+                context: context,
+                message: '本当にログアウトしますか？',
+                icon: const Icon(Icons.logout),
+                label: 'ログアウト',
                 onPressed: () {
                   appState.signOut();
                 },
-                icon: const Icon(Icons.logout),
-                label: const Text('ログアウト'),
-                style: errorElevatedButtonStyle(context),
               ),
             ],
           ),

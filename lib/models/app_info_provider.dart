@@ -3,10 +3,6 @@ import '../config/app_info.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
 
-enum ClientState { loading, guest, pending, authenticated }
-
-const ClientState initialClientState = ClientState.loading;
-
 class AppInfo extends AppStaticInfo {
   final String? policy;
 

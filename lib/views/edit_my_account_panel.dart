@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state_provider.dart';
-import '../utils/ui_utils.dart';
+import 'widgets.dart';
 import 'edit_required_text_panel.dart';
 import 'reauthentication_panel.dart';
 import 'edit_my_email_panel.dart';

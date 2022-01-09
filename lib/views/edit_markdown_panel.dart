@@ -2,7 +2,7 @@ import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../utils/ui_utils.dart';
+import 'widgets.dart';
 
 class EditMarkdownPanel extends StatefulWidget {
   final String label;
@@ -40,7 +40,7 @@ class _EditMarkdownState extends State<EditMarkdownPanel> {
       setState(() {
         _value = value;
         _waiting = false;
-        closeMessageBar(context);
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
       });
     }
 
@@ -61,11 +61,13 @@ class _EditMarkdownState extends State<EditMarkdownPanel> {
               setState(() {
                 _waiting = false;
               });
-              showMessageBar(
-                context,
-                '保存できませんでした。'
-                '通信の状態を確認してやり直してください。',
-                error: true,
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    '保存できませんでした。'
+                    '通信の状態を確認してやり直してください。',
+                  ),
+                ),
               );
             }
           };

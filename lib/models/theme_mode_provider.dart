@@ -20,7 +20,10 @@ class ThemeModeProvider extends ChangeNotifier with ServiceListener {
   @override
   void notify(dynamic data) {
     if (data is AuthData) {
-      _me = data.uid == null ? null : data;
+      AuthData? newMe = data.uid == null ? null : data;
+      if (_me?.id != newMe?.id) {
+        _me = newMe;
+      }
     } else if (data is List<AccountData>) {
       try {
         _me = data.firstWhere((item) => item.id == _me?.id);

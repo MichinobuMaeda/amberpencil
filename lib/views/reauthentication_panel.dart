@@ -1,9 +1,9 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../utils/ui_utils.dart';
 import '../config/validators.dart';
 import '../models/app_state_provider.dart';
+import 'widgets.dart';
 
 class ReauthenticationPanel extends StatefulWidget {
   const ReauthenticationPanel({Key? key}) : super(key: key);
@@ -26,7 +26,7 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
       setState(() {
         _password = value;
         _waiting = false;
-        closeMessageBar(context);
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
       });
     }
 
@@ -36,12 +36,22 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
       });
       try {
         await appState.authService.reauthenticateWithEmail();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${appState.me?.email ?? ''} にメールを送信しました。'
+              'メールに記載された手順で再ログインしてください。',
+            ),
+          ),
+        );
       } catch (e) {
-        showMessageBar(
-          context,
-          'メールが送信できませんでした。'
-          '通信の状態を確認してやり直してください。',
-          error: true,
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'メールが送信できませんでした。'
+              '通信の状態を確認してやり直してください。',
+            ),
+          ),
         );
       }
     }
@@ -60,10 +70,12 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
               );
               appState.updateSignedInAt();
             } catch (e) {
-              showMessageBar(
-                context,
-                'パスワードの確認ができませんでした。',
-                error: true,
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'パスワードの確認ができませんでした。',
+                  ),
+                ),
               );
             }
           };
@@ -92,11 +104,12 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
           WrappedRow(
             alignment: WrapAlignment.end,
             children: [
-              InputContainer(
+              DefaultInputContainer(
                 child: PasswordFormField(
                   labelText: 'パスワード',
                   onChanged: passwordChanged,
                   validator: requiredValidator,
+                  style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                 ),
               ),
               ElevatedButton.icon(

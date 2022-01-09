@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../utils/ui_utils.dart';
+import '../config/theme.dart';
 import '../config/validators.dart';
 import '../models/app_state_provider.dart';
+import 'widgets.dart';
 
 class EditMyPasswordPanel extends StatefulWidget {
   const EditMyPasswordPanel({Key? key}) : super(key: key);
@@ -23,14 +24,14 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
         setState(() {
           _value = value;
           _waiting = false;
-          closeMessageBar(context);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         });
       }
 
       void confirmationChanged(String value) {
         setState(() {
           _waiting = false;
-          closeMessageBar(context);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         });
       }
 
@@ -44,11 +45,13 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
                   try {
                     await appState.authService.updateMyPassword(_value);
                   } catch (e) {
-                    showMessageBar(
-                      context,
-                      'パスワードが保存できませんでした。'
-                      '通信の状態を確認してやり直してください。',
-                      error: true,
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'パスワードが保存できませんでした。'
+                          '通信の状態を確認してやり直してください。',
+                        ),
+                      ),
                     );
                   }
                 };
@@ -61,11 +64,12 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
           children: [
             WrappedRow(
               children: [
-                InputContainer(
+                DefaultInputContainer(
                   child: PasswordFormField(
                     labelText: 'パスワード',
                     validator: passwordValidator,
                     onChanged: valueChanged,
+                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   ),
                 ),
               ],
@@ -73,11 +77,12 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
             WrappedRow(
               alignment: WrapAlignment.end,
               children: [
-                InputContainer(
+                DefaultInputContainer(
                   child: PasswordFormField(
                     labelText: '確認',
                     validator: (value) => confermValidator(_value, value),
                     onChanged: confirmationChanged,
+                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   ),
                 ),
                 ElevatedButton.icon(

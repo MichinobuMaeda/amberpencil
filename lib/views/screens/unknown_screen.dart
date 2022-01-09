@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/ui_utils.dart';
+import '../widgets.dart';
 
 class UnknownScreen extends StatelessWidget {
   const UnknownScreen({Key? key}) : super(key: key);

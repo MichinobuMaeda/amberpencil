@@ -1,9 +1,9 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../utils/ui_utils.dart';
 import '../config/validators.dart';
 import '../models/app_state_provider.dart';
+import 'widgets.dart';
 
 class EditMyEmailPanel extends StatefulWidget {
   const EditMyEmailPanel({Key? key}) : super(key: key);
@@ -26,14 +26,14 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
         setState(() {
           _value = value;
           _waiting = false;
-          closeMessageBar(context);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         });
       }
 
       void confirmationChanged(String value) {
         setState(() {
           _waiting = false;
-          closeMessageBar(context);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         });
       }
 
@@ -51,11 +51,13 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
                   {"email": _value},
                 );
               } catch (e) {
-                showMessageBar(
-                  context,
-                  'メールが保存できませんでした。'
-                  '通信の状態を確認してやり直してください。',
-                  error: true,
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'メールが保存できませんでした。'
+                      '通信の状態を確認してやり直してください。',
+                    ),
+                  ),
                 );
               }
             };
@@ -68,7 +70,7 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
           children: [
             WrappedRow(
               children: [
-                InputContainer(
+                DefaultInputContainer(
                   child: TextFormField(
                     decoration: const InputDecoration(labelText: 'メールアドレス'),
                     validator: emailValidator,
@@ -81,7 +83,7 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
             WrappedRow(
               alignment: WrapAlignment.end,
               children: [
-                InputContainer(
+                DefaultInputContainer(
                   child: TextFormField(
                     decoration: const InputDecoration(labelText: '確認'),
                     validator: (value) => confermValidator(_value, value),

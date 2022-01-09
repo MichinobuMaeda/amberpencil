@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/theme_mode_provider.dart';
-import '../utils/ui_utils.dart';
+import 'widgets.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
 
