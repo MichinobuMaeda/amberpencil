@@ -55,7 +55,7 @@ class _EditMyAccountState extends State<EditMyAccountPanel> {
                 validator: requiredValidator,
                 onSave: (String value) async {
                   appState.accountsService.updateAccountProperties(
-                    appState.me!.id!,
+                    appState.me!.id,
                     {"name": value},
                   );
                 },

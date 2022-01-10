@@ -58,7 +58,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                   handle:
                       NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: SliverAppBar(
-                    pinned: appState.updateIsAvailable(),
+                    pinned: appState.updateIsAvailable,
                     snap: false,
                     floating: true,
                     forceElevated: innerBoxIsScrolled,
@@ -92,7 +92,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                           ),
                         )
                         .toList(),
-                    bottom: appState.updateIsAvailable()
+                    bottom: appState.updateIsAvailable
                         ? PreferredSize(
                             preferredSize: const Size.fromHeight(54.0),
                             child: MaterialBanner(

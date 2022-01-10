@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config/app_info.dart';
 import '../../config/theme.dart';
-import '../../models/app_info_provider.dart';
+import '../../models/conf_provider.dart';
 import '../widgets.dart';
 
 class AppInfoPanel extends StatelessWidget {
@@ -9,7 +10,7 @@ class AppInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppInfoProvider>(
+    return Consumer<ConfProvider>(
       builder: (context, appInfo, child) {
         return BoxSliver(
           children: [
@@ -22,9 +23,9 @@ class AppInfoPanel extends StatelessWidget {
                     width: 48,
                     height: 48,
                   ),
-                  applicationName: appInfo.data.name,
-                  applicationVersion: appInfo.data.version,
-                  applicationLegalese: appInfo.data.copyright,
+                  applicationName: appName,
+                  applicationVersion: version,
+                  applicationLegalese: copyright,
                 );
               },
               icon: const Icon(Icons.info),

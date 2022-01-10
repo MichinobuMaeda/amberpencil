@@ -1,39 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/auth_user.dart';
 import '../utils/platform_web.dart';
 import 'service_provider.dart';
-import 'accounts_service.dart';
 
 const String reauthenticateParam = '?reauthenticate=yes';
 
-class AuthData extends AccountData {
-  final String? uid;
-  final bool emailVerified;
-  AuthData()
-      : uid = null,
-        emailVerified = false,
-        super();
-  AuthData.fromUserDataAndSnapshot({
-    this.uid,
-    this.emailVerified = false,
-    required DocumentSnapshot<Map<String, dynamic>> snap,
-  }) : super.fromSnapshot(snap);
-  AuthData.fromAccountData({
-    this.uid,
-    this.emailVerified = false,
-    required AccountData accountData,
-  }) : super.from(accountData);
-}
-
-class AuthService extends ServiceProvider<AuthData> {
-  final FirebaseAuth auth;
-  final FirebaseFirestore db;
-  User? _user;
+class AuthService extends ServiceProvider<AuthUser> {
+  final FirebaseAuth _auth;
   String? _url;
 
-  AuthService(this.auth, this.db, String deepLink) : super(AuthData()) {
+  AuthService(FirebaseAuth auth, String deepLink)
+      : _auth = auth,
+        super('auth') {
     debugPrint(deepLink);
+
     if (auth.isSignInWithEmailLink(deepLink)) {
       final String? email = loadSignInEmail();
       debugPrint('sing-in: $email');
@@ -46,57 +27,24 @@ class AuthService extends ServiceProvider<AuthData> {
     }
 
     auth.authStateChanges().listen((User? user) async {
-      if (user == null) {
-        if (_user != null) {
-          // Signed out.
-          _user = null;
-          notify(AuthData());
-        }
-      } else if (_user?.uid == null) {
-        // Signed in.
-        await _getAccountDoc(user);
-      } else if (_user?.uid != user.uid) {
-        // Suspected to be a program error, unexpected state.
-        _user = null;
-        notify(AuthData());
-        await signOut();
+      debugPrint('authStateChanges ${user?.uid}');
+      final authUser = user == null ? null : AuthUser.fromUser(user);
+      if (data != authUser) {
+        update(authUser);
       }
-      // } else {
-      //   // _user?.uid == null && _user?.uid == user.uid
-      //   // I have nothing to do.
-      // }
     });
   }
 
-  Future<void> _getAccountDoc(User user) async {
-    final me = await db.collection('accounts').doc(user.uid).get();
-    if (_user?.uid == user.uid) {
-      return;
-    }
-    _user = user;
-    if (!me.exists || me.get('valid') == false || me.get('deletedAt') != null) {
-      _user = null;
-      await signOut();
-    } else {
-      notify(
-        AuthData.fromUserDataAndSnapshot(
-          uid: user.uid,
-          emailVerified: user.emailVerified,
-          snap: me,
-        ),
-      );
-    }
+  set url(String val) {
+    _url = val;
   }
 
   Future<void> reload() async {
-    if (auth.currentUser != null) {
-      await auth.currentUser!.reload();
-      _user = auth.currentUser;
-      notify(AuthData.fromAccountData(
-        uid: data.uid,
-        emailVerified: _user!.emailVerified,
-        accountData: data,
-      ));
+    await _auth.currentUser?.reload();
+    final User? user = _auth.currentUser;
+    final authUser = user == null ? null : AuthUser.fromUser(user);
+    if (data != authUser) {
+      update(authUser);
     }
   }
 
@@ -104,11 +52,14 @@ class AuthService extends ServiceProvider<AuthData> {
     String email,
     String password,
   ) async {
-    await auth.signInWithEmailAndPassword(email: email, password: password);
+    await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   Future<void> sendSignInLinkToEmail(String email) async {
-    await auth.sendSignInLinkToEmail(
+    await _auth.sendSignInLinkToEmail(
       email: email,
       actionCodeSettings: ActionCodeSettings(
         url: _url!,
@@ -119,14 +70,14 @@ class AuthService extends ServiceProvider<AuthData> {
   }
 
   Future<void> sendEmailVerification() async {
-    await auth.currentUser?.reload();
-    await _user!.sendEmailVerification();
+    await reload();
+    await _auth.currentUser!.sendEmailVerification();
   }
 
   Future<void> reauthenticateWithEmail() async {
-    await auth.currentUser?.reload();
-    final String email = auth.currentUser!.email!;
-    await auth.sendSignInLinkToEmail(
+    await reload();
+    final String email = _auth.currentUser!.email!;
+    await _auth.sendSignInLinkToEmail(
       email: email,
       actionCodeSettings: ActionCodeSettings(
         url: '${_url!}$reauthenticateParam',
@@ -137,27 +88,23 @@ class AuthService extends ServiceProvider<AuthData> {
   }
 
   Future<void> reauthenticateWithPassword(String password) async {
-    await auth.currentUser?.reload();
+    await reload();
     final credential = EmailAuthProvider.credential(
-      email: auth.currentUser!.email!,
+      email: _auth.currentUser!.email!,
       password: password,
     );
-    await _user!.reauthenticateWithCredential(credential);
+    await _auth.currentUser!.reauthenticateWithCredential(credential);
   }
 
   Future<void> updateMyPassword(String password) async {
-    await auth.currentUser?.reload();
-    await _user!.updatePassword(password);
+    await reload();
+    await _auth.currentUser!.updatePassword(password);
   }
 
   Future<void> signOut() async {
-    await auth.currentUser?.reload();
-    if (auth.currentUser != null) {
-      await auth.signOut();
+    await reload();
+    if (_auth.currentUser != null) {
+      await _auth.signOut();
     }
-  }
-
-  set url(String? url) {
-    _url = url;
   }
 }

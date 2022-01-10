@@ -2,6 +2,9 @@ import 'package:amberpencil/utils/platform_web.dart';
 import 'package:flutter/material.dart';
 import '../config/app_info.dart';
 import '../config/routes.dart';
+import '../models/auth_user.dart';
+import '../models/account.dart';
+import '../models/conf.dart';
 import '../models/app_route.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
@@ -14,21 +17,19 @@ mixin RouteStateListener {
 }
 
 class AppStateProvider extends ChangeNotifier with ServiceListener {
-  final AppStaticInfo appStaticInfo;
   final ConfService confService;
   final AuthService authService;
   final AccountsService accountsService;
-  String? _version;
-  String? _url;
-  bool _authChecked = false;
-  bool _verified = false;
+  Conf? _conf;
+  bool _autChecked = false;
+  AuthUser? _authUser;
+  Account? _me;
+
   DateTime? _reauthedAt;
-  AccountData? _me;
   ClientState _clientState = initialClientState;
   RouteStateListener? _routeStateListener;
 
   AppStateProvider(
-    this.appStaticInfo,
     this.confService,
     this.authService,
     this.accountsService,
@@ -39,27 +40,39 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   }
 
   @override
-  void notify(dynamic data) {
-    if (data is ConfData) {
-      version = data.version;
-      url = data.url;
-    } else if (data is AuthData) {
-      authChecked = true;
-      verified = data.emailVerified;
-      AccountData? newMe = data.uid == null ? null : data;
-      if (me?.id != newMe?.id) {
-        me = newMe;
+  void notify(String key, dynamic data) {
+    if (key == confService.key) {
+      Conf? prev = _conf;
+      _conf = data;
+      if (data is Conf) {
+        authService.url = _conf!.url;
+      }
+      if (prev?.id != _conf?.id) {
+        updateClientState();
+      }
+      if (prev != null && _conf != null && prev.version != _conf!.version) {
         notifyListeners();
       }
-    } else if (data is List<AccountData>) {
-      try {
-        AccountData? newMe = data.firstWhere((item) => item.id == _me?.id);
-        if (me != newMe) {
-          me = newMe;
-          notifyListeners();
-        }
-      } catch (e) {
-        me = null;
+    } else if (key == authService.key) {
+      AuthUser? prev = _authUser;
+      _authUser = data;
+      if (!_autChecked ||
+          prev?.emailVerified != (data as AuthUser?)?.emailVerified) {
+        _autChecked = true;
+        updateClientState();
+      }
+      if (_authUser != null) {
+        accountsService.subscribe(_authUser!.uid);
+      }
+    } else if (key == accountsService.key) {
+      Account? prev = _me;
+      _me = accountsService.me;
+      if ((_authUser != null || prev != null) && _me == null) {
+        signOut();
+      }
+      if (prev != _me) {
+        notifyListeners();
+        updateClientState();
       }
     }
   }
@@ -76,65 +89,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     await authService.signOut();
   }
 
-  set version(String? val) {
-    if (_version != val) {
-      _version = val;
-      updateClientState();
-      notifyListeners();
-    }
-  }
-
-  String? get version => _version;
-
-  set url(String? val) {
-    if (_url != val) {
-      _url = val;
-      authService.url = url;
-    }
-  }
-
-  String? get url => _url;
-
-  set authChecked(bool val) {
-    if (_authChecked != val) {
-      _authChecked = val;
-      updateClientState();
-    }
-  }
-
-  bool get authChecked => _authChecked;
-
-  set verified(bool? val) {
-    if (_verified != val) {
-      _verified = val ?? false;
-      updateClientState();
-    }
-  }
-
-  bool get verified => _verified;
-
-  set me(AccountData? val) {
-    bool clientStateChanged = _me?.id != val?.id;
-    AccountData? prev = _me;
-    _me = val;
-    if (clientStateChanged) {
-      if (_me == null) {
-        if (accountsService.subscribed) {
-          clearUserData();
-        }
-        if (prev != null) {
-          signOut();
-        }
-      } else {
-        if (!accountsService.subscribed) {
-          accountsService.subscribe(_me!);
-        }
-      }
-      updateClientState();
-    }
-  }
-
-  AccountData? get me => _me;
+  Account? get me => _me;
 
   DateTime? get reauthedAt => _reauthedAt;
 
@@ -145,11 +100,11 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
 
   void updateClientState() {
     late ClientState state;
-    if (_version == null || !_authChecked) {
+    if (_conf == null || !_autChecked) {
       state = ClientState.loading;
     } else if (_me == null) {
       state = ClientState.guest;
-    } else if (!verified) {
+    } else if (_authUser?.emailVerified != true) {
       state = ClientState.pending;
     } else {
       state = ClientState.authenticated;
@@ -175,8 +130,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     _routeStateListener?.setRoute(appRoute);
   }
 
-  bool updateIsAvailable() =>
-      version != null && version != appStaticInfo.version;
+  bool get updateIsAvailable => _conf != null && _conf!.version != version;
 
-  bool get isTest => appStaticInfo.version == 'for test';
+  bool get isTest => version == 'for test';
 }

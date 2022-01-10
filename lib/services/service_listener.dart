@@ -1,3 +1,3 @@
 mixin ServiceListener<Type> {
-  void notify(Type data);
+  void notify(String key, Type? data);
 }

@@ -47,7 +47,7 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
               });
               try {
                 await appState.accountsService.updateAccountProperties(
-                  appState.me!.id!,
+                  appState.me!.id,
                   {"email": _value},
                 );
               } catch (e) {

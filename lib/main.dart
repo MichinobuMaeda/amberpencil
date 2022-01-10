@@ -12,7 +12,7 @@ import 'config/theme.dart';
 import 'config/routes.dart';
 import 'models/theme_mode_provider.dart';
 import 'models/app_state_provider.dart';
-import 'models/app_info_provider.dart';
+import 'models/conf_provider.dart';
 import 'models/app_route.dart';
 import 'services/conf_service.dart';
 import 'services/auth_service.dart';
@@ -30,7 +30,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await useFirebaseEmulators(
-    appStaticInfo.version,
+    version,
     FirebaseAuth.instance,
     FirebaseFirestore.instance,
     FirebaseFunctions.instance,
@@ -43,7 +43,6 @@ void main() async {
   );
   AuthService authService = AuthService(
     FirebaseAuth.instance,
-    FirebaseFirestore.instance,
     deepLink,
   );
   AccountsService accountsService = AccountsService(
@@ -56,21 +55,18 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (context) => ThemeModeProvider(
-            authService,
             accountsService,
           ),
         ),
         ChangeNotifierProvider(
           create: (context) => AppStateProvider(
-            appStaticInfo,
             confService,
             authService,
             accountsService,
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => AppInfoProvider(
-            appStaticInfo,
+          create: (context) => ConfProvider(
             confService,
           ),
         ),
@@ -96,12 +92,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Consumer<ThemeModeProvider>(builder: (context, themeMode, child) {
       return Consumer<AppStateProvider>(builder: (context, appState, child) {
-        AppInfoProvider appInfoProvider =
-            Provider.of<AppInfoProvider>(context, listen: false);
         appState.routeStateListener = _routerDelegate;
 
         return MaterialApp.router(
-          title: appInfoProvider.data.name,
+          title: appName,
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: themeMode.themeMode,
