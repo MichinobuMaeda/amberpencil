@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/theme_mode_provider.dart';
-import 'widgets.dart';
+import '../../models/theme_mode_provider.dart';
+import '../widgets.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
 
@@ -11,7 +11,7 @@ class ThemeModePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeModeProvider>(builder: (context, themeMode, child) {
-      return WrappedRow(
+      return BoxSliver(
         children: List<Widget>.generate(
           themeModeList.length,
           (int index) {

@@ -1,3 +1,4 @@
+import 'package:amberpencil/utils/platform_web.dart';
 import 'package:flutter/material.dart';
 import '../config/app_info.dart';
 import '../config/routes.dart';
@@ -157,6 +158,10 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
     if (_clientState != state) {
       _clientState = state;
       _routeStateListener?.setClientState(_clientState);
+      if (_clientState == ClientState.authenticated && loadReauthMode()) {
+        _reauthedAt = DateTime.now();
+        goRoute(AppRoute(name: RouteName.prefs));
+      }
     }
   }
 
@@ -173,5 +178,5 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   bool updateIsAvailable() =>
       version != null && version != appStaticInfo.version;
 
-  bool get test => appStaticInfo.version == 'for test';
+  bool get isTest => appStaticInfo.version == 'for test';
 }

@@ -1,9 +1,9 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../config/validators.dart';
-import '../models/app_state_provider.dart';
-import 'widgets.dart';
+import '../../config/validators.dart';
+import '../../models/app_state_provider.dart';
+import '../widgets.dart';
 
 class EditMyEmailPanel extends StatefulWidget {
   const EditMyEmailPanel({Key? key}) : super(key: key);
@@ -62,13 +62,17 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
               }
             };
 
+      const double width = 640.0;
+
       return Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.always,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             WrappedRow(
+              width: width,
+              alignment: WrapAlignment.center,
               children: [
                 DefaultInputContainer(
                   child: TextFormField(
@@ -78,11 +82,7 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
                     onChanged: valueChanged,
                   ),
                 ),
-              ],
-            ),
-            WrappedRow(
-              alignment: WrapAlignment.end,
-              children: [
+                const SizedBox(width: 120.0),
                 DefaultInputContainer(
                   child: TextFormField(
                     decoration: const InputDecoration(labelText: '確認'),

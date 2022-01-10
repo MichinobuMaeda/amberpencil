@@ -1,6 +1,6 @@
 part of '../widgets.dart';
 
-class DefaultInputContainer extends Widget {
+class DefaultInputContainer extends StatelessWidget {
   final Widget child;
   final double width;
   final double height;
@@ -13,10 +13,10 @@ class DefaultInputContainer extends Widget {
   }) : super(key: key);
 
   @override
-  Element createElement() {
+  Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints.tight(Size(width, height)),
       child: child,
-    ).createElement();
+    );
   }
 }

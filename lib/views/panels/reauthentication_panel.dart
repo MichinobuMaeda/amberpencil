@@ -1,9 +1,9 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../config/validators.dart';
-import '../models/app_state_provider.dart';
-import 'widgets.dart';
+import '../../config/validators.dart';
+import '../../models/app_state_provider.dart';
+import '../widgets.dart';
 
 class ReauthenticationPanel extends StatefulWidget {
   const ReauthenticationPanel({Key? key}) : super(key: key);
@@ -80,19 +80,28 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
             }
           };
 
+    const double width = 640.0;
+
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.always,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const WrappedRow(
+            alignment: WrapAlignment.center,
+            width: width * 2 / 3,
             children: [
-              Text('メールアドレスまたはパスワードを変更する場合、'
-                  '現在のメールアドレスまたはパスワードの確認が必要です。'),
+              Text(
+                'メールアドレスまたはパスワードを変更する場合、'
+                '現在のメールアドレスまたはパスワードの確認が必要です。',
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
           WrappedRow(
+            alignment: WrapAlignment.center,
+            width: width,
             children: [
               OutlinedButton(
                 onPressed: onSendEmailLink,
@@ -102,7 +111,8 @@ class _ReauthenticationState extends State<ReauthenticationPanel> {
             ],
           ),
           WrappedRow(
-            alignment: WrapAlignment.end,
+            width: width,
+            alignment: WrapAlignment.center,
             children: [
               DefaultInputContainer(
                 child: PasswordFormField(

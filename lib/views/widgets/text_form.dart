@@ -1,27 +1,26 @@
-import 'package:amberpencil/config/theme.dart';
-import 'package:flutter/material.dart';
-import '../config/validators.dart';
-import 'widgets.dart';
+part of '../widgets.dart';
 
-class EditRequiredTextPanel extends StatefulWidget {
+class TextForm extends StatefulWidget {
   final String label;
   final String? initialValue;
+  final String? Function(String?)? validator;
   final Future<void> Function(String text) onSave;
   final bool monospace;
 
-  const EditRequiredTextPanel({
+  const TextForm({
     Key? key,
     required this.label,
     this.initialValue,
+    this.validator,
     required this.onSave,
     this.monospace = false,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _EditRequiredTextState();
+  State<StatefulWidget> createState() => _TextFormState();
 }
 
-class _EditRequiredTextState extends State<EditRequiredTextPanel> {
+class _TextFormState extends State<TextForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String _value;
   bool _waiting = false;
@@ -71,10 +70,10 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.always,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           WrappedRow(
-            alignment: WrapAlignment.end,
+            alignment: WrapAlignment.center,
             children: [
               DefaultInputContainer(
                 child: TextFormField(
@@ -91,7 +90,7 @@ class _EditRequiredTextState extends State<EditRequiredTextPanel> {
                       },
                     ),
                   ),
-                  validator: (value) => requiredValidator(value),
+                  validator: widget.validator,
                   style: widget.monospace
                       ? const TextStyle(fontFamily: fontFamilyMonoSpace)
                       : null,

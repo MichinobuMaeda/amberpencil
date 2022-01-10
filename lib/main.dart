@@ -17,7 +17,7 @@ import 'models/app_route.dart';
 import 'services/conf_service.dart';
 import 'services/auth_service.dart';
 import 'services/accounts_service.dart';
-import 'views/screens/base_screen.dart';
+import 'views/base_screen.dart';
 import 'utils/env.dart';
 import 'utils/platform_web.dart';
 

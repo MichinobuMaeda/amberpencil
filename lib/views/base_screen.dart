@@ -1,19 +1,23 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../config/routes.dart';
-import '../../models/app_route.dart';
-import '../../models/app_state_provider.dart';
-import '../../utils/platform_web.dart';
-import '../widgets.dart';
-import 'home_screen.dart';
-import 'loading_screen.dart';
-import 'app_info_screen.dart';
-import 'sign_in_screen.dart';
-import 'email_verify_screen.dart';
-import 'preferences_screen.dart';
-import 'admin_screen.dart';
-import 'unknown_screen.dart';
+import '../config/routes.dart';
+import '../models/app_route.dart';
+import '../models/app_state_provider.dart';
+import '../utils/platform_web.dart';
+import 'panels/app_info_panel.dart';
+import 'panels/edit_my_account_panel.dart';
+import 'panels/email_verify_panel.dart';
+import 'panels/groups_panel.dart';
+import 'panels/loading_panel.dart';
+import 'panels/page_title_panel.dart';
+import 'panels/policy_panel.dart';
+import 'panels/sign_in_panel.dart';
+import 'panels/sign_out_panel.dart';
+import 'panels/theme_mode_panel.dart';
+import 'panels/home_panel.dart';
+import 'panels/unknown_panel.dart';
+import 'widgets.dart';
 
 class BaseScreen extends StatefulWidget {
   final AppRoute route;
@@ -29,28 +33,6 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @visibleForTesting
-  Widget getScreen(RouteName name) {
-    switch (name) {
-      case RouteName.home:
-        return const HomeScreen(key: ValueKey('HomeScreen'));
-      case RouteName.loading:
-        return const LoadingScreen(key: ValueKey('LoadingScreen'));
-      case RouteName.signin:
-        return const SignInScreen(key: ValueKey('SignInScreen'));
-      case RouteName.verify:
-        return const EmailVerifyScreen(key: ValueKey('EmailVerifyScreen'));
-      case RouteName.prefs:
-        return const PreferencesScreen(key: ValueKey('PreferencesScreen'));
-      case RouteName.admin:
-        return const AdminScreen(key: ValueKey('AdminScreen'));
-      case RouteName.info:
-        return const AppInfoScreen(key: ValueKey('AppInfoScreen'));
-      default:
-        return const UnknownScreen(key: ValueKey('UnknownScreen'));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,14 +93,22 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                         .toList(),
                     bottom: appState.updateIsAvailable()
                         ? PreferredSize(
-                            preferredSize: const Size.fromHeight(28.0),
-                            child: TextButton.icon(
-                              icon: const Icon(Icons.system_update),
-                              label: const Text('アプリを更新してください'),
-                              style: menuButtonStype,
-                              onPressed: () {
-                                reloadWebAapp();
-                              },
+                            preferredSize: const Size.fromHeight(54.0),
+                            child: MaterialBanner(
+                              content: const Text(
+                                'アプリを更新してください',
+                                textAlign: TextAlign.right,
+                              ),
+                              actions: const [
+                                IconButton(
+                                  onPressed: reloadWebAapp,
+                                  icon: Icon(Icons.system_update),
+                                )
+                              ],
+                              backgroundColor: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.amber.shade900
+                                  : Colors.amber.shade400,
                             ),
                           )
                         : null,
@@ -139,32 +129,35 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       ...menuItems
-                          .where(
-                            (item) => item.route == widget.route.name,
-                          )
-                          .map(
-                            (item) => SliverToBoxAdapter(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Wrap(
-                                  children: [
-                                    SizedBox(
-                                      width: fontSizeH2 * 1.6,
-                                      height: fontSizeH2 * 1.6,
-                                      child: item.icon,
-                                    ),
-                                    Text(
-                                      item.label,
-                                      style: const TextStyle(
-                                        fontSize: fontSizeH2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                      getScreen(widget.route.name),
+                          .where((item) => item.route == widget.route.name)
+                          .map((item) => PageTitilePanel(
+                                title: item.label,
+                                icon: item.icon,
+                              )),
+                      if (widget.route.name == RouteName.loading)
+                        const LoadingPanel(),
+                      if (widget.route.name == RouteName.signin)
+                        const SignInPanel(),
+                      if (widget.route.name == RouteName.verify)
+                        const EmailVerifyPanel(),
+                      if (widget.route.name == RouteName.home)
+                        const HomePanel(),
+                      if (widget.route.name == RouteName.admin)
+                        const GroupsPanel(),
+                      if (widget.route.name == RouteName.signin ||
+                          widget.route.name == RouteName.verify ||
+                          widget.route.name == RouteName.prefs)
+                        const ThemeModePanel(),
+                      if (widget.route.name == RouteName.prefs)
+                        const EditMyAccountPanel(),
+                      if (widget.route.name == RouteName.prefs)
+                        const SignOutPanel(),
+                      if (widget.route.name == RouteName.info)
+                        const AppInfoPanel(),
+                      if (widget.route.name == RouteName.info)
+                        const PolicyPanel(),
+                      if (widget.route.name == RouteName.unknown)
+                        const UnknownPanel(),
                     ],
                   );
                 },

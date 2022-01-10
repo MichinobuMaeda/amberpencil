@@ -1,16 +1,12 @@
-import 'package:amberpencil/config/theme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'widgets.dart';
+part of '../widgets.dart';
 
-class EditMarkdownPanel extends StatefulWidget {
+class MarkdownForm extends StatefulWidget {
   final String label;
   final String? initialValue;
   final bool editable;
   final Future<void> Function(String text) onSave;
 
-  const EditMarkdownPanel({
+  const MarkdownForm({
     Key? key,
     required this.label,
     this.initialValue,
@@ -19,10 +15,10 @@ class EditMarkdownPanel extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _EditMarkdownState();
+  State<StatefulWidget> createState() => _MarkdownFormState();
 }
 
-class _EditMarkdownState extends State<EditMarkdownPanel> {
+class _MarkdownFormState extends State<MarkdownForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String _value;
   bool _waiting = false;

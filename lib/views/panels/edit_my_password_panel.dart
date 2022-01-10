@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../config/theme.dart';
-import '../config/validators.dart';
-import '../models/app_state_provider.dart';
-import 'widgets.dart';
+import '../../config/theme.dart';
+import '../../config/validators.dart';
+import '../../models/app_state_provider.dart';
+import '../widgets.dart';
 
 class EditMyPasswordPanel extends StatefulWidget {
   const EditMyPasswordPanel({Key? key}) : super(key: key);
@@ -56,13 +56,17 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
                   }
                 };
 
+      const double width = 640.0;
+
       return Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.always,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             WrappedRow(
+              width: width,
+              alignment: WrapAlignment.center,
               children: [
                 DefaultInputContainer(
                   child: PasswordFormField(
@@ -72,11 +76,7 @@ class _EditMyPasswordState extends State<EditMyPasswordPanel> {
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   ),
                 ),
-              ],
-            ),
-            WrappedRow(
-              alignment: WrapAlignment.end,
-              children: [
+                const SizedBox(width: 120.0),
                 DefaultInputContainer(
                   child: PasswordFormField(
                     labelText: '確認',

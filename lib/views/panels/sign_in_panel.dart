@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../theme_mode_panel.dart';
 import '../widgets.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({Key? key}) : super(key: key);
+class SignInPanel extends StatefulWidget {
+  const SignInPanel({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SignInState();
 }
 
-class _SignInState extends State<SignInScreen> {
+class _SignInState extends State<SignInPanel> {
   final GlobalKey<FormState> _emailFormKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
@@ -78,6 +77,7 @@ class _SignInState extends State<SignInScreen> {
                 _email,
                 _password,
               );
+              appState.updateSignedInAt();
             } catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -90,77 +90,79 @@ class _SignInState extends State<SignInScreen> {
             }
           };
 
-    return SliverToBoxAdapter(
-      child: CenteringColumn(
-        children: [
-          Form(
-            key: _emailFormKey,
-            autovalidateMode: AutovalidateMode.always,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return BoxSliver(
+      children: [
+        Form(
+          key: _emailFormKey,
+          autovalidateMode: AutovalidateMode.always,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              WrappedRow(
+                alignment: WrapAlignment.center,
+                children: [
+                  DefaultInputContainer(
+                    child: TextFormField(
+                      decoration: const InputDecoration(labelText: 'メールアドレス'),
+                      validator: emailValidator,
+                      style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                      onChanged: emailChanged,
+                    ),
+                  ),
+                ],
+              ),
+              WrappedRow(
+                alignment: WrapAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: onSendEmailLink,
+                    child: const Text('ログイン用のURLをメールで受け取る'),
+                    style: ButtonStyle(minimumSize: buttonMinimumSize),
+                  ),
+                ],
+              ),
+              WrappedRow(
+                alignment: WrapAlignment.center,
+                children: [
+                  DefaultInputContainer(
+                    child: PasswordFormField(
+                      labelText: 'パスワード',
+                      onChanged: passwordChanged,
+                      style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                    ),
+                  ),
+                ],
+              ),
+              WrappedRow(
+                alignment: WrapAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: onSendEmailAndPassword,
+                    child: const Text('メールアドレスとパスワードでログインする'),
+                    style: ButtonStyle(minimumSize: buttonMinimumSize),
+                  ),
+                ],
+              ),
+              if (appState.isTest)
                 WrappedRow(
+                  alignment: WrapAlignment.center,
                   children: [
-                    DefaultInputContainer(
-                      child: TextFormField(
-                        decoration: const InputDecoration(labelText: 'メールアドレス'),
-                        validator: emailValidator,
-                        style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-                        onChanged: emailChanged,
-                      ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await appState.authService.signInWithEmailAndPassword(
+                          'primary@example.com',
+                          'password',
+                        );
+                      },
+                      child: const Text('Test'),
+                      style: secondaryElevatedButtonStyle,
                     ),
                   ],
                 ),
-                WrappedRow(
-                  children: [
-                    OutlinedButton(
-                      onPressed: onSendEmailLink,
-                      child: const Text('ログイン用のURLをメールで受け取る'),
-                      style: ButtonStyle(minimumSize: buttonMinimumSize),
-                    ),
-                  ],
-                ),
-                WrappedRow(
-                  children: [
-                    DefaultInputContainer(
-                      child: PasswordFormField(
-                        labelText: 'パスワード',
-                        onChanged: passwordChanged,
-                        style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-                      ),
-                    ),
-                  ],
-                ),
-                WrappedRow(
-                  children: [
-                    OutlinedButton(
-                      onPressed: onSendEmailAndPassword,
-                      child: const Text('メールアドレスとパスワードでログインする'),
-                      style: ButtonStyle(minimumSize: buttonMinimumSize),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            ],
           ),
-          if (appState.test)
-            WrappedRow(
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    await appState.authService.signInWithEmailAndPassword(
-                      'primary@example.com',
-                      'password',
-                    );
-                  },
-                  child: const Text('Test'),
-                  style: secondaryElevatedButtonStyle,
-                ),
-              ],
-            ),
-          const ThemeModePanel(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
