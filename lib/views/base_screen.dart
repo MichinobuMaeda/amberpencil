@@ -62,6 +62,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                     snap: false,
                     floating: true,
                     forceElevated: innerBoxIsScrolled,
+                    toolbarHeight: 72,
                     leading: const Padding(
                       padding: EdgeInsets.all(4.0),
                       child: Image(image: logoAsset),

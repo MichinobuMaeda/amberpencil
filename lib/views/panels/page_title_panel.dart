@@ -12,24 +12,27 @@ class PageTitilePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: ColoredBox(
-        color: Theme.of(context).backgroundColor,
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          children: [
-            SizedBox(
-              width: fontSizeH2 * 1.6,
-              height: fontSizeH2 * 1.6,
-              child: icon,
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: fontSizeH2,
+    return SliverPadding(
+      padding: const EdgeInsets.all(4.0),
+      sliver: SliverToBoxAdapter(
+        child: ColoredBox(
+          color: Theme.of(context).backgroundColor,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              SizedBox(
+                width: fontSizeH2 * 1.6,
+                height: fontSizeH2 * 1.6,
+                child: icon,
               ),
-            ),
-          ],
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: fontSizeH2,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
