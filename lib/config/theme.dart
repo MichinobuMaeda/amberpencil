@@ -3,7 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 const AssetImage logoAsset = AssetImage('images/logo.png');
 
-final ThemeData lightTheme = ThemeData(
+final ThemeData baseLightTheme = ThemeData(
   brightness: Brightness.light,
   primarySwatch: Colors.brown,
   errorColor: Colors.red,
@@ -21,7 +21,14 @@ final ThemeData lightTheme = ThemeData(
   ),
 );
 
-final ThemeData darkTheme = ThemeData(
+final ThemeData lightTheme = baseLightTheme.copyWith(
+  colorScheme: baseLightTheme.colorScheme.copyWith(
+    secondary: Colors.blueGrey,
+    onSecondary: baseLightTheme.colorScheme.onPrimary,
+  ),
+);
+
+final ThemeData baseDarkTheme = ThemeData(
   brightness: Brightness.dark,
   primarySwatch: Colors.amber,
   errorColor: Colors.pinkAccent,
@@ -36,6 +43,13 @@ final ThemeData darkTheme = ThemeData(
       fontSize: fontSizeBody,
       color: Colors.black,
     ),
+  ),
+);
+
+final ThemeData darkTheme = baseDarkTheme.copyWith(
+  colorScheme: baseDarkTheme.colorScheme.copyWith(
+    secondary: Colors.cyan,
+    onSecondary: baseLightTheme.colorScheme.onSurface,
   ),
 );
 
@@ -83,49 +97,19 @@ final outlinedButtonTheme = OutlinedButtonThemeData(
   ),
 );
 
-Color secondaryBackgroundColor = Colors.blueGrey;
-Color secondaryTextColor = Colors.grey;
-Color errorColor(BuildContext context) => Theme.of(context).colorScheme.error;
-
-MaterialStateProperty<Color> secondaryBackgroundMaterialStateColor =
-    MaterialStateProperty.all<Color>(secondaryBackgroundColor);
-MaterialStateProperty<Color> secondaryTextMaterialStateColor =
-    MaterialStateProperty.all<Color>(secondaryTextColor);
-MaterialStateProperty<Color> errorMaterialStateColor(BuildContext context) =>
-    MaterialStateProperty.all<Color>(errorColor(context));
-
-final secondaryElevatedButtonStyle = ButtonStyle(
-  backgroundColor: secondaryBackgroundMaterialStateColor,
-);
-
-ButtonStyle secondaryOutlinedButtonStyle = ButtonStyle(
-  foregroundColor: secondaryTextMaterialStateColor,
-);
-
-ButtonStyle secondaryTextButtonStyle = ButtonStyle(
-  foregroundColor: secondaryTextMaterialStateColor,
-);
-
-ButtonStyle errorElevatedButtonStyle(BuildContext context) =>
-    ButtonStyle(backgroundColor: errorMaterialStateColor(context));
-
-ButtonStyle errorOutlinedButtonStyle(BuildContext context) =>
-    ButtonStyle(foregroundColor: errorMaterialStateColor(context));
-
-ButtonStyle errorTextButtonStyle(BuildContext context) =>
-    ButtonStyle(foregroundColor: errorMaterialStateColor(context));
-
-final MarkdownStyleSheet markdownStyleSheet = MarkdownStyleSheet(
-  h2: const TextStyle(fontSize: fontSizeH2, height: 1.8),
-  h3: const TextStyle(fontSize: fontSizeH3, height: 1.8),
-  h4: const TextStyle(fontSize: fontSizeH4, height: 1.8),
-  h5: const TextStyle(fontSize: fontSizeH5, height: 1.8),
-  h6: const TextStyle(fontSize: fontSizeH6, height: 1.8),
-  p: const TextStyle(fontSize: fontSizeBody, height: 1.8),
-  code: const TextStyle(
-    fontSize: fontSizeBody,
-    height: 1.2,
-    fontFamily: fontFamilyMonoSpace,
-    color: Colors.green,
-  ),
-);
+MarkdownStyleSheet markdownStyleSheet(BuildContext context) {
+  final theme = Theme.of(context);
+  return MarkdownStyleSheet(
+    h2: theme.textTheme.headline2,
+    h3: theme.textTheme.headline3,
+    h4: theme.textTheme.headline4,
+    h5: theme.textTheme.headline5,
+    h6: theme.textTheme.headline6,
+    p: theme.textTheme.bodyText2,
+    code: theme.textTheme.bodyText2?.copyWith(
+      height: 1.2,
+      fontFamily: fontFamilyMonoSpace,
+      color: theme.colorScheme.secondary,
+    ),
+  );
+}

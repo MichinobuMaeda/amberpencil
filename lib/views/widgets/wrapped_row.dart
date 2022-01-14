@@ -1,4 +1,4 @@
-part of '../widgets.dart';
+import 'package:flutter/material.dart';
 
 class WrappedRow extends StatelessWidget {
   final List<Widget> children;

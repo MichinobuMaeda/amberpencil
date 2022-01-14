@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/theme_mode_provider.dart';
-import '../widgets.dart';
+import '../widgets/box_sliver.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
 

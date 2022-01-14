@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets.dart';
+import '../widgets/default_input_container.dart';
+import '../widgets/password_form_field.dart';
+import '../widgets/wrapped_row.dart';
 
 class ReauthenticationPanel extends StatefulWidget {
   const ReauthenticationPanel({Key? key}) : super(key: key);

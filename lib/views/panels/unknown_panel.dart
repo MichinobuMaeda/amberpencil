@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets.dart';
+import '../widgets/box_sliver.dart';
 
 class UnknownPanel extends StatelessWidget {
   const UnknownPanel({Key? key}) : super(key: key);

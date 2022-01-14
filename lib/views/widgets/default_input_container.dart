@@ -1,4 +1,4 @@
-part of '../widgets.dart';
+import 'package:flutter/material.dart';
 
 class DefaultInputContainer extends StatelessWidget {
   final Widget child;

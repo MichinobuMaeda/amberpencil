@@ -17,7 +17,7 @@ import 'panels/sign_out_panel.dart';
 import 'panels/theme_mode_panel.dart';
 import 'panels/home_panel.dart';
 import 'panels/unknown_panel.dart';
-import 'widgets.dart';
+import 'widgets/vertical_label_icon_button.dart';
 
 class BaseScreen extends StatefulWidget {
   final AppRoute route;

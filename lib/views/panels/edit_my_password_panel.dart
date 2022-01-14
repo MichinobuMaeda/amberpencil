@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets.dart';
+import '../widgets/default_input_container.dart';
+import '../widgets/password_form_field.dart';
+import '../widgets/wrapped_row.dart';
 
 class EditMyPasswordPanel extends StatefulWidget {
   const EditMyPasswordPanel({Key? key}) : super(key: key);

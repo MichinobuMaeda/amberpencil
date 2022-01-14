@@ -18,8 +18,8 @@ class ThemeModeProvider extends ChangeNotifier with ServiceListener {
   void notify(String key, dynamic data) {
     if (key == accountsService.key) {
       _me = accountsService.me;
-      if (data is Account && _selected != data.themeMode) {
-        _selected = data.themeMode;
+      if (data is List<Account> && _me != null && _selected != _me!.themeMode) {
+        _selected = _me!.themeMode;
         notifyListeners();
       }
     }

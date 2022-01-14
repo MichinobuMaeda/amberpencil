@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../config/theme.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets.dart';
+import '../widgets/box_sliver.dart';
+import '../widgets/comfirm_danger_buton.dart';
 
 class SignOutPanel extends StatelessWidget {
   const SignOutPanel({Key? key}) : super(key: key);
@@ -20,7 +20,7 @@ class SignOutPanel extends StatelessWidget {
             children: [
               Text(
                 'このアプリの通常の使い方でログアウトする必要はありません。',
-                style: TextStyle(color: errorColor(context)),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
               ComfirmDangerButon(
                 context: context,

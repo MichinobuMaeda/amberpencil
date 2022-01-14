@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets.dart';
+import '../widgets/box_sliver.dart';
+import '../widgets/default_input_container.dart';
+import '../widgets/password_form_field.dart';
+import '../widgets/wrapped_row.dart';
 
 class SignInPanel extends StatefulWidget {
   const SignInPanel({Key? key}) : super(key: key);
@@ -155,7 +158,14 @@ class _SignInState extends State<SignInPanel> {
                         );
                       },
                       child: const Text('Test'),
-                      style: secondaryElevatedButtonStyle,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).colorScheme.secondary,
+                        ),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).colorScheme.onSecondary,
+                        ),
+                      ),
                     ),
                   ],
                 ),

@@ -1,6 +1,16 @@
-part of '../widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class PasswordFormField extends StatefulWidget {
+class PasswordFormState extends ChangeNotifier {
+  bool hidePassword = true;
+
+  void toggle() {
+    hidePassword = !hidePassword;
+    notifyListeners();
+  }
+}
+
+class PasswordFormField extends StatelessWidget {
   final String labelText;
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
@@ -15,30 +25,30 @@ class PasswordFormField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _PasswordFormFieldState();
-}
-
-class _PasswordFormFieldState extends State<PasswordFormField> {
-  bool _hidePassword = true;
-
-  @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: widget.labelText,
-        suffixIcon: IconButton(
-          icon: Icon(_hidePassword ? Icons.visibility_off : Icons.visibility),
-          onPressed: () {
-            setState(() {
-              _hidePassword = !_hidePassword;
-            });
-          },
+    return ChangeNotifierProvider<PasswordFormState>(
+      create: (context) => PasswordFormState(),
+      child: Builder(
+        builder: (context) => TextFormField(
+          decoration: InputDecoration(
+            labelText: labelText,
+            suffixIcon: IconButton(
+              icon: Icon(
+                context.watch<PasswordFormState>().hidePassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
+              ),
+              onPressed: () {
+                context.read<PasswordFormState>().toggle();
+              },
+            ),
+          ),
+          obscureText: context.watch<PasswordFormState>().hidePassword,
+          style: style,
+          onChanged: onChanged,
+          validator: validator,
         ),
       ),
-      obscureText: _hidePassword,
-      style: widget.style,
-      onChanged: widget.onChanged,
-      validator: widget.validator,
     );
   }
 }
