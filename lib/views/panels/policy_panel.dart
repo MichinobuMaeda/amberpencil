@@ -5,7 +5,7 @@ import '../../config/theme.dart';
 import '../../models/conf_provider.dart';
 import '../../models/app_state_provider.dart';
 import '../widgets/box_sliver.dart';
-import '../widgets/markdown_form.dart';
+import '../widgets/multi_line_text_form.dart';
 import '../widgets/wrapped_row.dart';
 
 Future<void> Function(String) onSave(
@@ -28,16 +28,16 @@ class PolicyPanel extends StatelessWidget {
         children: [
           WrappedRow(
             children: [
-              MarkdownForm(
+              MultiLineTextForm(
                 key: const ValueKey('PolicyPanel:DisplayName'),
                 label: 'プライバシー・ポリシー',
                 initialValue: context.watch<ConfProvider>().data?.policy ?? '',
-                editable: context.watch<AppStateProvider>().me?.admin == true,
                 onSave: onSave(
                   context.read<ConfProvider>().confService,
                   context.watch<AppStateProvider>().me?.id,
                 ),
                 style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                markdown: true,
                 markdownStyleSheet: markdownStyleSheet(context),
               ),
             ],

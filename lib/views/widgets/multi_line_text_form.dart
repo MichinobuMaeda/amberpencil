@@ -4,67 +4,39 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'single_field_form_bloc.dart';
+import 'text_form.dart';
 import 'wrapped_row.dart';
 
 typedef _State = SingleFieldFormBloc<String>;
 
-typedef MarkdownFormValidate = SingleFieldValidate<String>;
-typedef MarkdownFormOnSave = SingleFieldOnSave<String>;
-
-VoidCallback onChange(
-  BuildContext context,
-) =>
-    () {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    };
-
-VoidCallback onReset(
-  TextEditingController controller,
-  String initialValue,
-) =>
-    () {
-      controller.text = initialValue;
-      controller.selection = TextSelection(
-        baseOffset: controller.text.length,
-        extentOffset: controller.text.length,
-      );
-    };
-
-VoidCallback onError(
-  BuildContext context,
-) =>
-    () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('保存できませんでした。通信の状態を確認してやり直してください。'),
-        ),
-      );
-    };
-
-void onTapLink(String text, String? href, String title) {
-  if (href != null) launch(href);
-}
-
-class MarkdownForm extends StatelessWidget {
-  final String label;
-  final String? initialValue;
-  final MarkdownFormValidate? validator;
-  final bool editable;
-  final MarkdownFormOnSave _onSave;
-  final TextStyle? style;
+class MultiLineTextForm extends TextForm {
+  final int inputMaxLines;
+  // "withEditMode: false" is not yet supported.
+  final bool withEditMode = true;
+  final TextFormOnSave _onSave;
+  final bool markdown;
   final MarkdownStyleSheet? markdownStyleSheet;
 
-  const MarkdownForm({
+  const MultiLineTextForm({
     Key? key,
-    required this.label,
-    this.initialValue,
-    this.validator,
-    required MarkdownFormOnSave onSave,
-    this.style,
+    required String label,
+    String? initialValue,
+    TextFormValidate? validator,
+    required TextFormOnSave onSave,
+    TextStyle? style,
+    this.inputMaxLines = 12,
+    this.markdown = false,
     this.markdownStyleSheet,
-    this.editable = false,
+    // this.withEditMode = false,
   })  : _onSave = onSave,
-        super(key: key);
+        super(
+          key: key,
+          label: label,
+          initialValue: initialValue,
+          validator: validator,
+          onSave: onSave,
+          style: style,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -75,15 +47,14 @@ class MarkdownForm extends StatelessWidget {
           'ProviderOf:MarkdownForm:${key.toString()}:${initialValue ?? ''}'),
       create: (context) => SingleFieldFormBloc<String>(
         initialValue ?? '',
-        withEditMode: true,
+        withEditMode: withEditMode,
       ),
-      // withEditMode: true,
       child: Builder(
         builder: (context) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Visibility(
-              visible: editable && context.watch<_State>().state.editMode,
+              visible: withEditMode && context.watch<_State>().state.editMode,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -151,14 +122,20 @@ class MarkdownForm extends StatelessWidget {
             ),
             Stack(
               children: [
-                MarkdownBody(
-                  data: initialValue ?? '',
-                  selectable: true,
-                  styleSheet: markdownStyleSheet,
-                  onTapLink: onTapLink,
-                ),
+                markdown
+                    ? MarkdownBody(
+                        data: initialValue ?? '',
+                        selectable: true,
+                        styleSheet: markdownStyleSheet,
+                        onTapLink: onTapLink,
+                      )
+                    : Text(
+                        initialValue ?? '',
+                        style: style,
+                      ),
                 Visibility(
-                  visible: editable && !context.watch<_State>().state.editMode,
+                  visible:
+                      withEditMode && !context.watch<_State>().state.editMode,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -179,5 +156,9 @@ class MarkdownForm extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void onTapLink(String text, String? href, String title) {
+    if (href != null) launch(href);
   }
 }

@@ -11,36 +11,6 @@ typedef TextFormValidate = SingleFieldValidate<String>;
 typedef TextFormReset = SingleFieldOnValueReset<String>;
 typedef TextFormOnSave = SingleFieldOnSave<String>;
 
-VoidCallback onChange(
-  BuildContext context,
-) =>
-    () {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    };
-
-VoidCallback onReset(
-  TextEditingController controller,
-  String initialValue,
-) =>
-    () {
-      controller.text = initialValue;
-      controller.selection = TextSelection(
-        baseOffset: controller.text.length,
-        extentOffset: controller.text.length,
-      );
-    };
-
-VoidCallback onError(
-  BuildContext context,
-) =>
-    () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('保存できませんでした。通信の状態を確認してやり直してください。'),
-        ),
-      );
-    };
-
 class TextForm extends StatelessWidget {
   final String label;
   final String? initialValue;
@@ -123,4 +93,34 @@ class TextForm extends StatelessWidget {
       ),
     );
   }
+
+  VoidCallback onChange(
+    BuildContext context,
+  ) =>
+      () {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      };
+
+  VoidCallback onReset(
+    TextEditingController controller,
+    String initialValue,
+  ) =>
+      () {
+        controller.text = initialValue;
+        controller.selection = TextSelection(
+          baseOffset: controller.text.length,
+          extentOffset: controller.text.length,
+        );
+      };
+
+  VoidCallback onError(
+    BuildContext context,
+  ) =>
+      () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('保存できませんでした。通信の状態を確認してやり直してください。'),
+          ),
+        );
+      };
 }
