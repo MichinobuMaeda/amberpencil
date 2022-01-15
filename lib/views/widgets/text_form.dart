@@ -57,15 +57,14 @@ class TextForm extends StatelessWidget {
                                   ),
                                 );
                           }),
-                      errorText:
-                          context.watch<_State>().state.validationErrorMessage,
+                      errorText: context.watch<_State>().state.validationError,
                     ),
                     style: style,
                     onChanged: (value) {
                       context.read<_State>().add(
                             SingleFieldFormChanged(
                               value,
-                              validate: validator,
+                              validator: validator,
                               onValueChange: onChange(context),
                             ),
                           );

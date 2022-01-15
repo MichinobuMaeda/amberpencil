@@ -7,13 +7,13 @@ typedef SingleFieldOnSave<T> = Future<void> Function(T);
 
 class SingleFieldFormState<T> {
   final T value;
-  final String? validationErrorMessage;
+  final String? validationError;
   final bool buttonEnabled;
   final bool editMode;
 
   const SingleFieldFormState({
     required this.value,
-    this.validationErrorMessage,
+    this.validationError,
     required this.buttonEnabled,
     this.editMode = true,
   });
@@ -23,12 +23,12 @@ abstract class SingleFieldFormEvent<T> {}
 
 class SingleFieldFormChanged<T> extends SingleFieldFormEvent<T> {
   final T value;
-  final SingleFieldValidate<T>? validate;
+  final SingleFieldValidate<T>? validator;
   final VoidCallback? onValueChange;
 
   SingleFieldFormChanged(
     this.value, {
-    this.validate,
+    this.validator,
     this.onValueChange,
   });
 }
@@ -75,16 +75,15 @@ class SingleFieldFormBloc<T>
   }
 
   void onSingleFieldFormChanged(SingleFieldFormChanged<T> event, emit) {
-    final String? validationErrorMessage =
-        (event.value == initialValue || event.validate == null)
+    final String? validationError =
+        (event.value == initialValue || event.validator == null)
             ? null
-            : event.validate!(event.value);
+            : event.validator!(event.value);
     emit(
       SingleFieldFormState<T>(
         value: event.value,
-        validationErrorMessage: validationErrorMessage,
-        buttonEnabled:
-            event.value != initialValue && validationErrorMessage == null,
+        validationError: validationError,
+        buttonEnabled: event.value != initialValue && validationError == null,
       ),
     );
     if (event.onValueChange != null) event.onValueChange!();
