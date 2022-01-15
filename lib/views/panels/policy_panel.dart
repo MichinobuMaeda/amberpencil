@@ -1,3 +1,4 @@
+import 'package:amberpencil/services/conf_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
@@ -8,12 +9,12 @@ import '../widgets/markdown_form.dart';
 import '../widgets/wrapped_row.dart';
 
 Future<void> Function(String) onSave(
-  BuildContext context,
+  ConfService confService,
   String? uid,
 ) =>
     (String value) async {
       assert(uid != null, 'Before sign-in.');
-      await context.read<ConfProvider>().confService.updateConfProperties(
+      await confService.updateConfProperties(
         uid!,
         {"policy": value},
       );
@@ -28,11 +29,12 @@ class PolicyPanel extends StatelessWidget {
           WrappedRow(
             children: [
               MarkdownForm(
+                key: const ValueKey('PolicyPanel:DisplayName'),
                 label: 'プライバシー・ポリシー',
                 initialValue: context.watch<ConfProvider>().data?.policy ?? '',
                 editable: context.watch<AppStateProvider>().me?.admin == true,
                 onSave: onSave(
-                  context,
+                  context.read<ConfProvider>().confService,
                   context.watch<AppStateProvider>().me?.id,
                 ),
                 style: const TextStyle(fontFamily: fontFamilyMonoSpace),

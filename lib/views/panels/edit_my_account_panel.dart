@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:amberpencil/services/accounts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/validators.dart';
@@ -10,26 +11,12 @@ import 'reauthentication_panel.dart';
 import 'edit_my_email_panel.dart';
 import 'edit_my_password_panel.dart';
 
-class TestModeState extends ChangeNotifier {
-  bool _testMode = false;
-
-  bool get testMode => _testMode;
-
-  set testMode(bool val) {
-    _testMode = val;
-    notifyListeners();
-  }
-}
-
-Future<void> Function(String) onSaveDisplayName(
-  BuildContext context,
+TextFormOnSave onSaveDisplayName(
+  AccountsService accountsService,
   String uid,
 ) =>
     (String value) async {
-      await context
-          .read<AppStateProvider>()
-          .accountsService
-          .updateAccountProperties(
+      await accountsService.updateAccountProperties(
         uid,
         {"name": value},
       );
@@ -41,6 +28,17 @@ bool isExpired(BuildContext context) {
   bool testMode = context.watch<TestModeState>().testMode;
   return (DateTime.now().millisecondsSinceEpoch - reauthedAtMilliSec) >
       (testMode ? 10 * 1000 : 1800 * 1000);
+}
+
+class TestModeState extends ChangeNotifier {
+  bool _testMode = false;
+
+  bool get testMode => _testMode;
+
+  set testMode(bool val) {
+    _testMode = val;
+    notifyListeners();
+  }
 }
 
 class EditMyAccountPanel extends StatelessWidget {
@@ -64,11 +62,12 @@ class EditMyAccountPanel extends StatelessWidget {
               builder: (context) => Column(
                 children: [
                   TextForm(
+                    key: const ValueKey('EditMyAccountPanel:DisplayName'),
                     label: '表示名',
                     initialValue: context.watch<AppStateProvider>().me!.name,
                     validator: requiredValidator,
                     onSave: onSaveDisplayName(
-                      context,
+                      context.read<AppStateProvider>().accountsService,
                       context.read<AppStateProvider>().me!.id,
                     ),
                   ),
