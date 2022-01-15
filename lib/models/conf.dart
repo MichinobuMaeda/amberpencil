@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/firestore_utils.dart';
 
-class Conf {
+class Conf extends Equatable {
   final String id;
   final String version;
   final int dataVersion;
@@ -15,7 +15,7 @@ class Conf {
   final DateTime updatedAt;
   final String? updatedBy;
 
-  Conf({
+  const Conf({
     required this.id,
     required this.version,
     required this.dataVersion,
@@ -46,20 +46,7 @@ class Conf {
         updatedBy = getFieldValue<String>(snap, 'createdBy');
 
   @override
-  bool operator ==(Object other) =>
-      other is Conf &&
-      other.id == id &&
-      other.version == version &&
-      other.dataVersion == dataVersion &&
-      other.url == url &&
-      other.seed == seed &&
-      other.invitationExpirationTime == invitationExpirationTime &&
-      other.policy == policy &&
-      other.createdAt == createdAt &&
-      other.updatedAt == updatedAt;
-
-  @override
-  int get hashCode => hashValues(
+  List<Object?> get props => [
         id,
         version,
         dataVersion,
@@ -69,5 +56,5 @@ class Conf {
         policy,
         createdAt,
         updatedAt,
-      );
+      ];
 }

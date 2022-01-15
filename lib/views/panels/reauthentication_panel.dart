@@ -15,9 +15,15 @@ class ReauthenticationPanel extends StatefulWidget {
 }
 
 class _ReauthenticationState extends State<ReauthenticationPanel> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late GlobalKey<FormState> _formKey;
   String _password = '';
   bool _waiting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _formKey = GlobalKey<FormState>();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -96,11 +96,8 @@ class MultiLineTextForm extends TextForm {
                       ),
                       ElevatedButton.icon(
                         onPressed: () {
-                          context.read<_State>().add(
-                                SingleFieldFormReset(
-                                  onReset(controller, initialValue ?? ''),
-                                ),
-                              );
+                          controller.text = initialValue ?? '';
+                          context.read<_State>().add(SingleFieldFormReset());
                         },
                         label: const Text('中止'),
                         icon: const Icon(Icons.cancel),

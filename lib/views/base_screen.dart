@@ -6,7 +6,8 @@ import '../models/app_route.dart';
 import '../models/app_state_provider.dart';
 import '../utils/platform_web.dart';
 import 'panels/app_info_panel.dart';
-import 'panels/edit_my_account_panel.dart';
+import 'panels/edit_my_name_panel.dart';
+import 'panels/edit_my_email_password_panel.dart';
 import 'panels/email_verify_panel.dart';
 import 'panels/groups_panel.dart';
 import 'panels/loading_panel.dart';
@@ -150,7 +151,9 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                           widget.route.name == RouteName.prefs)
                         const ThemeModePanel(),
                       if (widget.route.name == RouteName.prefs)
-                        const EditMyAccountPanel(),
+                        const EditMyNamePanel(),
+                      if (widget.route.name == RouteName.prefs)
+                        const EditMyEmaiPasswordPanel(),
                       if (widget.route.name == RouteName.prefs)
                         const SignOutPanel(),
                       if (widget.route.name == RouteName.info)

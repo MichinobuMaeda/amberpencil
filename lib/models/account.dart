@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import '../utils/firestore_utils.dart';
 
-class Account {
+class Account extends Equatable {
   final String id;
   final String name;
   final String? email;
@@ -18,7 +18,7 @@ class Account {
   final DateTime? deletedAt;
   final String? deletedBy;
 
-  Account({
+  const Account({
     required this.id,
     required this.name,
     this.email,
@@ -54,25 +54,7 @@ class Account {
         deletedBy = getFieldValue<DateTime>(snap, 'deletedBy');
 
   @override
-  bool operator ==(Object other) =>
-      other is Account &&
-      other.id == id &&
-      other.name == name &&
-      other.email == email &&
-      other.group == group &&
-      other.valid == valid &&
-      other.admin == admin &&
-      other.tester == tester &&
-      other.themeMode == themeMode &&
-      other.createdAt == createdAt &&
-      other.createdBy == createdBy &&
-      other.updatedAt == updatedAt &&
-      other.updatedBy == updatedBy &&
-      other.deletedAt == deletedAt &&
-      other.deletedBy == deletedBy;
-
-  @override
-  int get hashCode => hashValues(
+  List<Object?> get props => [
         id,
         name,
         email,
@@ -87,5 +69,5 @@ class Account {
         updatedBy,
         deletedAt,
         deletedBy,
-      );
+      ];
 }

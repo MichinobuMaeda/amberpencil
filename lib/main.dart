@@ -52,38 +52,46 @@ void main() async {
       // Change notifiers that listen service providers
       providers: [
         ChangeNotifierProvider(
-          create: (context) => ThemeModeProvider(
+          create: (_) => ThemeModeProvider(
             accountsService,
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => AppStateProvider(
+          create: (_) => AppStateProvider(
             confService,
             authService,
             accountsService,
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => ConfProvider(
+          create: (_) => ConfProvider(
             confService,
           ),
         ),
+        ChangeNotifierProvider(
+          create: (_) => AppRouterDelegate(),
+        ),
+        Provider(
+          create: (_) => AppRouteInformationParser(),
+        ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
-
-  final AppRouterDelegate _routerDelegate = AppRouterDelegate();
-  final AppRouteInformationParser _routeInformationParser =
-      AppRouteInformationParser();
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    context.read<AppStateProvider>().routeStateListener = _routerDelegate;
+    AppRouterDelegate routerDelegate = context.read<AppRouterDelegate>();
+    AppRouteInformationParser routeInformationParser =
+        context.read<AppRouteInformationParser>();
+    AppStateProvider appStateProvider = context.read<AppStateProvider>();
+
+    appStateProvider.routeStateListener = routerDelegate;
+
     return MaterialApp.router(
       title: appName,
       theme: lightTheme,
@@ -99,8 +107,8 @@ class MyApp extends StatelessWidget {
         Locale('ja', ''),
       ],
       locale: const Locale('ja', 'JP'),
-      routerDelegate: _routerDelegate,
-      routeInformationParser: _routeInformationParser,
+      routerDelegate: routerDelegate,
+      routeInformationParser: routeInformationParser,
     );
   }
 }

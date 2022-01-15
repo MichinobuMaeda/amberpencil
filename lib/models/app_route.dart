@@ -1,18 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 import '../config/routes.dart';
 
-class AppRoute {
+class AppRoute extends Equatable {
   final RouteName name;
   final String? id;
 
-  AppRoute({required this.name, this.id});
-
-  @override
-  bool operator ==(Object other) =>
-      other is AppRoute && other.name == name && other.id == id;
-
-  @override
-  int get hashCode => hashValues(name, id);
+  const AppRoute({required this.name, this.id});
 
   @override
   String toString() => id == null
@@ -34,4 +27,7 @@ class AppRoute {
       id: uri.pathSegments.length > 2 ? uri.pathSegments[1] : null,
     );
   }
+
+  @override
+  List<Object?> get props => [name, id];
 }

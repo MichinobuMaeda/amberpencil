@@ -1,28 +1,35 @@
-import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
 import '../widgets/default_input_container.dart';
+import '../widgets/password_form_field.dart';
 import '../widgets/wrapped_row.dart';
 
-class EditMyEmailPanel extends StatefulWidget {
-  const EditMyEmailPanel({Key? key}) : super(key: key);
+class EditMyPasswordSection extends StatefulWidget {
+  const EditMyPasswordSection({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _EditMyEmailState();
+  State<StatefulWidget> createState() => _EditMyPasswordState();
 }
 
-class _EditMyEmailState extends State<EditMyEmailPanel> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class _EditMyPasswordState extends State<EditMyPasswordSection> {
+  late GlobalKey<FormState> _formKey;
   String _value = '';
   bool _waiting = false;
 
   @override
+  void initState() {
+    super.initState();
+    _formKey = GlobalKey<FormState>();
+  }
+
+  final double width = 640.0;
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<AppStateProvider>(builder: (context, appState, child) {
-      final String _current = appState.me!.email!;
-
       void valueChanged(String value) {
         setState(() {
           _value = value;
@@ -38,32 +45,26 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
         });
       }
 
-      void Function()? onSave = (_waiting ||
-              _formKey.currentState?.validate() != true ||
-              _value == _current)
-          ? null
-          : () async {
-              setState(() {
-                _waiting = true;
-              });
-              try {
-                await appState.accountsService.updateAccountProperties(
-                  appState.me!.id,
-                  {"email": _value},
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'メールが保存できませんでした。'
-                      '通信の状態を確認してやり直してください。',
-                    ),
-                  ),
-                );
-              }
-            };
-
-      const double width = 640.0;
+      void Function()? onSave =
+          (_waiting || _formKey.currentState?.validate() != true)
+              ? null
+              : () async {
+                  setState(() {
+                    _waiting = true;
+                  });
+                  try {
+                    await appState.authService.updateMyPassword(_value);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'パスワードが保存できませんでした。'
+                          '通信の状態を確認してやり直してください。',
+                        ),
+                      ),
+                    );
+                  }
+                };
 
       return Form(
         key: _formKey,
@@ -76,20 +77,20 @@ class _EditMyEmailState extends State<EditMyEmailPanel> {
               alignment: WrapAlignment.center,
               children: [
                 DefaultInputContainer(
-                  child: TextFormField(
-                    decoration: const InputDecoration(labelText: 'メールアドレス'),
-                    validator: emailValidator,
-                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+                  child: PasswordFormField(
+                    labelText: 'パスワード',
+                    validator: passwordValidator,
                     onChanged: valueChanged,
+                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   ),
                 ),
                 const SizedBox(width: 120.0),
                 DefaultInputContainer(
-                  child: TextFormField(
-                    decoration: const InputDecoration(labelText: '確認'),
+                  child: PasswordFormField(
+                    labelText: '確認',
                     validator: (value) => confermValidator(_value, value),
-                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     onChanged: confirmationChanged,
+                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                   ),
                 ),
                 ElevatedButton.icon(

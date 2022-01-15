@@ -115,7 +115,7 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
       _routeStateListener?.setClientState(_clientState);
       if (_clientState == ClientState.authenticated && loadReauthMode()) {
         _reauthedAt = DateTime.now();
-        goRoute(AppRoute(name: RouteName.prefs));
+        goRoute(const AppRoute(name: RouteName.prefs));
       }
     }
   }

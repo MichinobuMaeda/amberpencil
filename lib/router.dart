@@ -23,7 +23,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
         PopNavigatorRouterDelegateMixin<AppRoute>,
         RouteStateListener {
   ClientState _clientState = initialClientState;
-  List<AppRoute> _routes = [AppRoute(name: rootRouteName)];
+  List<AppRoute> _routes = [const AppRoute(name: rootRouteName)];
 
   @override
   final GlobalKey<NavigatorState> navigatorKey;
