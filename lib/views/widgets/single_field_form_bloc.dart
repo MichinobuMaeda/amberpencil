@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 typedef SingleFieldValidate<T> = String? Function(T?)?;
 typedef SingleFieldOnSave<T> = Future<void> Function(T);
+typedef SingleFieldConvertFrom<T> = String Function(T);
 
 class SingleFieldFormState<T> extends Equatable {
   final T value;
@@ -11,16 +12,16 @@ class SingleFieldFormState<T> extends Equatable {
   final bool buttonEnabled;
   final bool editMode;
   final T? confirmation;
+  final String? confirmationError;
 
   const SingleFieldFormState({
     required this.value,
-    this.validationError,
+    required this.validationError,
     required this.buttonEnabled,
-    this.editMode = true,
+    required this.editMode,
     required this.confirmation,
+    required this.confirmationError,
   });
-
-  bool get confirmed => value == confirmation;
 
   @override
   List<Object?> get props => [
@@ -29,6 +30,7 @@ class SingleFieldFormState<T> extends Equatable {
         buttonEnabled,
         editMode,
         confirmation,
+        confirmationError,
       ];
 }
 
@@ -36,14 +38,8 @@ abstract class SingleFieldFormEvent<T> {}
 
 class SingleFieldFormChanged<T> extends SingleFieldFormEvent<T> {
   final T value;
-  final SingleFieldValidate<T>? validator;
-  final VoidCallback? onValueChange;
 
-  SingleFieldFormChanged(
-    this.value, {
-    this.validator,
-    this.onValueChange,
-  });
+  SingleFieldFormChanged(this.value);
 }
 
 class SingleFieldFormConfirmed<T> extends SingleFieldFormEvent<T> {
@@ -73,45 +69,61 @@ class SingleFieldFormBloc<T>
     extends Bloc<SingleFieldFormEvent<T>, SingleFieldFormState<T>> {
   final T initialValue;
   final bool withEditMode;
-  final bool withConfirmation;
+  final SingleFieldValidate<T>? validator;
+  final String? Function(T?, T?)? confermationValidator;
+
+  late SingleFieldConvertFrom<T> convertFrom;
+  late TextEditingController controller;
+  late TextEditingController confirmationController;
 
   SingleFieldFormBloc(
     this.initialValue, {
+    SingleFieldConvertFrom<T>? convertFrom,
     this.withEditMode = false,
-    this.withConfirmation = false,
+    this.validator,
+    this.confermationValidator,
   }) : super(
           SingleFieldFormState<T>(
             value: initialValue,
+            validationError: null,
             buttonEnabled: false,
             editMode: !withEditMode,
             confirmation: null,
+            confirmationError: null,
           ),
         ) {
+    this.convertFrom = convertFrom ?? (T value) => value.toString();
+    controller = TextEditingController(text: this.convertFrom(initialValue));
+    confirmationController = TextEditingController(text: '');
+
     on<SingleFieldFormChanged<T>>(onSingleFieldFormChanged);
     on<SingleFieldFormSave<T>>(onSingleFieldFormSave);
     on<SingleFieldFormReset<T>>(onSingleFieldFormReset);
     on<SingleFieldFormSetEditMode<T>>(onSingleFieldFormSetEditMode);
     on<SingleFieldFormConfirmed<T>>(onSingleFieldFormConfirmed);
+    on<SingleFieldFormConfirmationReset<T>>(onSingleFieldFormConfirmationReset);
   }
 
   void onSingleFieldFormChanged(SingleFieldFormChanged<T> event, emit) {
     final String? validationError =
-        (event.value == initialValue || event.validator == null)
+        (event.value == initialValue || validator == null)
             ? null
-            : event.validator!(event.value);
+            : validator!(event.value);
+    final String? confirmationError = confirm(event.value, state.confirmation);
     emit(
       SingleFieldFormState<T>(
         value: event.value,
         validationError: validationError,
-        buttonEnabled: isButtonEnabled(
+        buttonEnabled: validate(
           event.value,
-          state.confirmation,
           validationError,
+          confirmationError,
         ),
+        editMode: state.editMode,
         confirmation: state.confirmation,
+        confirmationError: confirmationError,
       ),
     );
-    if (event.onValueChange != null) event.onValueChange!();
   }
 
   void onSingleFieldFormSave(SingleFieldFormSave<T> event, emit) async {
@@ -120,18 +132,27 @@ class SingleFieldFormBloc<T>
         emit(
           SingleFieldFormState<T>(
             value: state.value,
+            validationError: state.validationError,
             buttonEnabled: false,
+            editMode: state.editMode,
             confirmation: state.confirmation,
+            confirmationError: state.confirmationError,
           ),
         );
         await event.onSave(state.value);
       } catch (e, s) {
-        debugPrint('Error on SingleFieldFormSave: $e\n$s');
+        debugPrint(
+          '\nInvoked event.onSaveError() on SingleFieldFormSave:'
+          '\n$e\n$s',
+        );
         emit(
           SingleFieldFormState<T>(
             value: state.value,
+            validationError: state.validationError,
             buttonEnabled: state.value != initialValue,
+            editMode: state.editMode,
             confirmation: state.confirmation,
+            confirmationError: state.confirmationError,
           ),
         );
         event.onSaveError();
@@ -140,12 +161,15 @@ class SingleFieldFormBloc<T>
   }
 
   void onSingleFieldFormReset(SingleFieldFormReset<T> event, emit) async {
+    final String? confirmationError = confirm(initialValue, state.confirmation);
     emit(
       SingleFieldFormState<T>(
         value: initialValue,
+        validationError: null,
         buttonEnabled: false,
         editMode: !withEditMode,
         confirmation: state.confirmation,
+        confirmationError: confirmationError,
       ),
     );
   }
@@ -154,30 +178,58 @@ class SingleFieldFormBloc<T>
     emit(
       SingleFieldFormState<T>(
         value: initialValue,
+        validationError: null,
         buttonEnabled: false,
         editMode: true,
         confirmation: null,
+        confirmationError: null,
       ),
     );
   }
 
   void onSingleFieldFormConfirmed(SingleFieldFormConfirmed<T> event, emit) {
+    final String? confirmationError = confirm(state.value, event.confirmation);
     emit(
       SingleFieldFormState<T>(
         value: state.value,
-        buttonEnabled: isButtonEnabled(
+        validationError: state.validationError,
+        buttonEnabled: validate(
           state.value,
-          event.confirmation,
           state.validationError,
+          confirmationError,
         ),
         editMode: state.editMode,
         confirmation: event.confirmation,
+        confirmationError: confirmationError,
       ),
     );
   }
 
-  bool isButtonEnabled(T value, T? confirmation, String? validationError) =>
+  void onSingleFieldFormConfirmationReset(
+      SingleFieldFormConfirmationReset<T> event, emit) async {
+    final String? confirmationError = confirm(initialValue, null);
+    emit(
+      SingleFieldFormState<T>(
+        value: state.value,
+        validationError: state.validationError,
+        buttonEnabled: false,
+        editMode: state.editMode,
+        confirmation: null,
+        confirmationError: confirmationError,
+      ),
+    );
+  }
+
+  String? confirm(T? value, T? confirmation) => confermationValidator == null
+      ? null
+      : confermationValidator!(value, confirmation);
+
+  bool validate(
+    T value,
+    String? validationError,
+    String? confirmationError,
+  ) =>
       value != initialValue &&
       validationError == null &&
-      (!withConfirmation || state.confirmed);
+      confirmationError == null;
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LoadingPanel extends StatelessWidget {
-  const LoadingPanel({Key? key}) : super(key: key);
+class LoadingSliver extends StatelessWidget {
+  const LoadingSliver({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => SliverFillRemaining(

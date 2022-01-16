@@ -1,39 +1,33 @@
-import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/routes.dart';
+import '../config/theme.dart';
 import '../models/app_route.dart';
 import '../models/app_state_provider.dart';
 import '../utils/platform_web.dart';
-import 'panels/app_info_panel.dart';
-import 'panels/edit_my_name_panel.dart';
-import 'panels/edit_my_email_password_panel.dart';
-import 'panels/email_verify_panel.dart';
-import 'panels/groups_panel.dart';
-import 'panels/loading_panel.dart';
-import 'panels/page_title_panel.dart';
-import 'panels/policy_panel.dart';
-import 'panels/sign_in_panel.dart';
-import 'panels/sign_out_panel.dart';
-import 'panels/theme_mode_panel.dart';
-import 'panels/home_panel.dart';
-import 'panels/unknown_panel.dart';
+import 'slivers/app_info_sliver.dart';
+import 'slivers/edit_my_name_sliver.dart';
+import 'slivers/edit_my_email_password_sliver.dart';
+import 'slivers/email_verify_sliver.dart';
+import 'slivers/groups_sliver.dart';
+import 'slivers/loading_sliver.dart';
+import 'slivers/page_title_sliver.dart';
+import 'slivers/policy_sliver.dart';
+import 'slivers/sign_in_sliver.dart';
+import 'slivers/sign_out_sliver.dart';
+import 'slivers/theme_mode_sliver.dart';
+import 'slivers/home_sliver.dart';
+import 'slivers/unknown_sliver.dart';
 import 'widgets/vertical_label_icon_button.dart';
 
-class BaseScreen extends StatefulWidget {
+class BaseScreen extends StatelessWidget {
   final AppRoute route;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  const BaseScreen({
+  BaseScreen({
     Key? key,
     required this.route,
   }) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _BaseState();
-}
-
-class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +69,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                           ),
                         )
                         .where(
-                          (item) => item.route != widget.route.name || !mobile,
+                          (item) => item.route != route.name || !mobile,
                         )
                         .map(
                           (item) => VerticalLabelIconButton(
@@ -83,7 +77,7 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                             icon: item.icon,
                             style: menuButtonStype,
                             fontSize: fontSizeBody * 0.75,
-                            onPressed: item.route == widget.route.name
+                            onPressed: item.route == route.name
                                 ? null
                                 : () {
                                     appState.goRoute(
@@ -131,37 +125,31 @@ class _BaseState extends State<BaseScreen> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       ...menuItems
-                          .where((item) => item.route == widget.route.name)
-                          .map((item) => PageTitilePanel(
+                          .where((item) => item.route == route.name)
+                          .map((item) => PageTitileSliver(
                                 title: item.label,
                                 icon: item.icon,
                               )),
-                      if (widget.route.name == RouteName.loading)
-                        const LoadingPanel(),
-                      if (widget.route.name == RouteName.signin)
-                        const SignInPanel(),
-                      if (widget.route.name == RouteName.verify)
-                        const EmailVerifyPanel(),
-                      if (widget.route.name == RouteName.home)
-                        const HomePanel(),
-                      if (widget.route.name == RouteName.admin)
-                        const GroupsPanel(),
-                      if (widget.route.name == RouteName.signin ||
-                          widget.route.name == RouteName.verify ||
-                          widget.route.name == RouteName.prefs)
-                        const ThemeModePanel(),
-                      if (widget.route.name == RouteName.prefs)
-                        const EditMyNamePanel(),
-                      if (widget.route.name == RouteName.prefs)
-                        const EditMyEmaiPasswordPanel(),
-                      if (widget.route.name == RouteName.prefs)
-                        const SignOutPanel(),
-                      if (widget.route.name == RouteName.info)
-                        const AppInfoPanel(),
-                      if (widget.route.name == RouteName.info)
-                        const PolicyPanel(),
-                      if (widget.route.name == RouteName.unknown)
-                        const UnknownPanel(),
+                      if (route.name == RouteName.loading)
+                        const LoadingSliver(),
+                      if (route.name == RouteName.signin) const SignInSliver(),
+                      if (route.name == RouteName.verify)
+                        const EmailVerifySliver(),
+                      if (route.name == RouteName.home) const HomeSliver(),
+                      if (route.name == RouteName.admin) const GroupsSliver(),
+                      if (route.name == RouteName.signin ||
+                          route.name == RouteName.verify ||
+                          route.name == RouteName.prefs)
+                        const ThemeModeSliver(),
+                      if (route.name == RouteName.prefs)
+                        const EditMyNameSliver(),
+                      if (route.name == RouteName.prefs)
+                        const EditMyEmaiPasswordSliver(),
+                      if (route.name == RouteName.prefs) const SignOutSliver(),
+                      if (route.name == RouteName.info) const AppInfoPSliver(),
+                      if (route.name == RouteName.info) const PolicySliver(),
+                      if (route.name == RouteName.unknown)
+                        const UnknownSliver(),
                     ],
                   );
                 },

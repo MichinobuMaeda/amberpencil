@@ -1,108 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../services/auth_service.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/default_input_container.dart';
-import '../widgets/password_form_field.dart';
-import '../widgets/wrapped_row.dart';
+import '../widgets/text_form.dart';
+import '../widgets/single_field_form_bloc.dart';
 
-class EditMyPasswordSection extends StatefulWidget {
+class EditMyPasswordSection extends StatelessWidget {
   const EditMyPasswordSection({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _EditMyPasswordState();
-}
-
-class _EditMyPasswordState extends State<EditMyPasswordSection> {
-  late GlobalKey<FormState> _formKey;
-  String _value = '';
-  bool _waiting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _formKey = GlobalKey<FormState>();
-  }
-
-  final double width = 640.0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AppStateProvider>(builder: (context, appState, child) {
-      void valueChanged(String value) {
-        setState(() {
-          _value = value;
-          _waiting = false;
-          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        });
-      }
-
-      void confirmationChanged(String value) {
-        setState(() {
-          _waiting = false;
-          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        });
-      }
-
-      void Function()? onSave =
-          (_waiting || _formKey.currentState?.validate() != true)
-              ? null
-              : () async {
-                  setState(() {
-                    _waiting = true;
-                  });
-                  try {
-                    await appState.authService.updateMyPassword(_value);
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'パスワードが保存できませんでした。'
-                          '通信の状態を確認してやり直してください。',
-                        ),
-                      ),
-                    );
-                  }
-                };
-
-      return Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.always,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            WrappedRow(
-              width: width,
-              alignment: WrapAlignment.center,
-              children: [
-                DefaultInputContainer(
-                  child: PasswordFormField(
-                    labelText: 'パスワード',
-                    validator: passwordValidator,
-                    onChanged: valueChanged,
-                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-                  ),
-                ),
-                const SizedBox(width: 120.0),
-                DefaultInputContainer(
-                  child: PasswordFormField(
-                    labelText: '確認',
-                    validator: (value) => confermValidator(_value, value),
-                    onChanged: confirmationChanged,
-                    style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: onSave,
-                  label: const Text('保存'),
-                  icon: const Icon(Icons.save_alt),
-                ),
-              ],
-            ),
-          ],
+  Widget build(BuildContext context) => BlocProvider(
+        key: ValueKey('${(EditMyPasswordSection).toString()}:password'),
+        create: (context) => SingleFieldFormBloc(
+          '',
+          validator: passwordValidator,
+          confermationValidator: confermationValidator,
+        ),
+        child: Builder(
+          builder: (context) => TextForm(
+            label: 'パスワード',
+            password: true,
+            style: const TextStyle(fontFamily: fontFamilyMonoSpace),
+            onSave: onSave(context.read<AppStateProvider>().authService),
+          ),
         ),
       );
-    });
-  }
+
+  Future<void> Function(String) onSave(AuthService authService) =>
+      (String value) async {
+        await authService.updateMyPassword(value);
+        await authService.reload();
+      };
 }

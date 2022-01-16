@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/theme.dart';
 
 class DefaultInputContainer extends StatelessWidget {
   final Widget child;
@@ -8,7 +9,7 @@ class DefaultInputContainer extends StatelessWidget {
   const DefaultInputContainer({
     Key? key,
     required this.child,
-    this.width = 480.0,
+    this.width = fieldWidth,
     this.height = 84.0,
   }) : super(key: key);
 

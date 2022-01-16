@@ -17,5 +17,5 @@ String? passwordValidator(String? value) => (value == null || value.length < 8)
         ? '3種類以上の文字（大文字・小文字・数字・記号）を使ってください。'
         : null;
 
-String? confermValidator(String? value, String? confirmation) =>
-    value == confirmation ? null : '確認の入力内容が一致しません。';
+String? confermationValidator(String? value, String? confirmation) =>
+    (value ?? '') == (confirmation ?? '') ? null : '確認の入力内容が一致しません。';

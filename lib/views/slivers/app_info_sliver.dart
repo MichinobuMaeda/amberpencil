@@ -3,8 +3,8 @@ import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../widgets/box_sliver.dart';
 
-class AppInfoPanel extends StatelessWidget {
-  const AppInfoPanel({Key? key}) : super(key: key);
+class AppInfoPSliver extends StatelessWidget {
+  const AppInfoPSliver({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BoxSliver(

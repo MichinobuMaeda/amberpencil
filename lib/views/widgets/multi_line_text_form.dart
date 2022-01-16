@@ -7,12 +7,10 @@ import 'single_field_form_bloc.dart';
 import 'text_form.dart';
 import 'wrapped_row.dart';
 
-typedef _State = SingleFieldFormBloc<String>;
+typedef _Bloc = SingleFieldFormBloc<String>;
 
 class MultiLineTextForm extends TextForm {
   final int inputMaxLines;
-  // "withEditMode: false" is not yet supported.
-  final bool withEditMode = true;
   final TextFormOnSave _onSave;
   final bool markdown;
   final MarkdownStyleSheet? markdownStyleSheet;
@@ -20,138 +18,115 @@ class MultiLineTextForm extends TextForm {
   const MultiLineTextForm({
     Key? key,
     required String label,
-    String? initialValue,
-    TextFormValidate? validator,
     required TextFormOnSave onSave,
     TextStyle? style,
     this.inputMaxLines = 12,
     this.markdown = false,
     this.markdownStyleSheet,
-    // this.withEditMode = false,
   })  : _onSave = onSave,
         super(
           key: key,
           label: label,
-          initialValue: initialValue,
-          validator: validator,
           onSave: onSave,
           style: style,
         );
 
   @override
-  Widget build(BuildContext context) {
-    final controller = TextEditingController(text: initialValue ?? '');
-
-    return BlocProvider(
-      key: ValueKey(
-          'ProviderOf:MarkdownForm:${key.toString()}:${initialValue ?? ''}'),
-      create: (context) => SingleFieldFormBloc<String>(
-        initialValue ?? '',
-        withEditMode: withEditMode,
-      ),
-      child: Builder(
-        builder: (context) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Visibility(
-              visible: withEditMode && context.watch<_State>().state.editMode,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  WrappedRow(
-                    alignment: WrapAlignment.end,
-                    children: [
-                      TextField(
-                        controller: controller,
-                        decoration: InputDecoration(
-                          labelText: label,
-                          errorText:
-                              context.watch<_State>().state.validationError,
-                        ),
-                        style: style,
-                        onChanged: (value) {
-                          context.read<_State>().add(
-                                SingleFieldFormChanged(
-                                  value,
-                                  validator: validator,
-                                  onValueChange: onChange(context),
-                                ),
-                              );
-                        },
-                        maxLines: 12,
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: context.watch<_State>().state.buttonEnabled
-                            ? () {
-                                context.read<_State>().add(
-                                      SingleFieldFormSave(
-                                        _onSave,
-                                        onError(context),
-                                      ),
-                                    );
-                              }
-                            : null,
-                        label: const Text('保存'),
-                        icon: const Icon(Icons.save_alt),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          controller.text = initialValue ?? '';
-                          context.read<_State>().add(SingleFieldFormReset());
-                        },
-                        label: const Text('中止'),
-                        icon: const Icon(Icons.cancel),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            Theme.of(context).colorScheme.secondary,
-                          ),
-                          foregroundColor: MaterialStateProperty.all<Color>(
-                            Theme.of(context).colorScheme.onSecondary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Stack(
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Visibility(
+            visible: context.watch<_Bloc>().state.editMode,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                markdown
-                    ? MarkdownBody(
-                        data: initialValue ?? '',
-                        selectable: true,
-                        styleSheet: markdownStyleSheet,
-                        onTapLink: onTapLink,
-                      )
-                    : Text(
-                        initialValue ?? '',
-                        style: style,
+                WrappedRow(
+                  alignment: WrapAlignment.end,
+                  children: [
+                    TextField(
+                      controller: context.read<_Bloc>().controller,
+                      decoration: InputDecoration(
+                        labelText: label,
+                        errorText: context.watch<_Bloc>().state.validationError,
                       ),
-                Visibility(
-                  visible:
-                      withEditMode && !context.watch<_State>().state.editMode,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          context.read<_State>().add(
-                                SingleFieldFormSetEditMode(),
-                              );
-                        },
-                        icon: const Icon(Icons.edit),
+                      style: style,
+                      onChanged: (value) {
+                        context
+                            .read<_Bloc>()
+                            .add(SingleFieldFormChanged(value));
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                      },
+                      maxLines: 12,
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: context.watch<_Bloc>().state.buttonEnabled
+                          ? () {
+                              context.read<_Bloc>().add(
+                                    SingleFieldFormSave(
+                                      _onSave,
+                                      onError(context),
+                                    ),
+                                  );
+                            }
+                          : null,
+                      label: const Text('保存'),
+                      icon: const Icon(Icons.save_alt),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<_Bloc>().controller.text =
+                            context.read<_Bloc>().initialValue;
+                        context.read<_Bloc>().add(SingleFieldFormReset());
+                      },
+                      label: const Text('中止'),
+                      icon: const Icon(Icons.cancel),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).colorScheme.secondary,
+                        ),
+                        foregroundColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).colorScheme.onSecondary,
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+          Stack(
+            children: [
+              markdown
+                  ? MarkdownBody(
+                      data: context.read<_Bloc>().initialValue,
+                      selectable: true,
+                      styleSheet: markdownStyleSheet,
+                      onTapLink: onTapLink,
+                    )
+                  : Text(
+                      context.read<_Bloc>().initialValue,
+                      style: style,
+                    ),
+              Visibility(
+                visible: !context.watch<_Bloc>().state.editMode,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        context.read<_Bloc>().add(
+                              SingleFieldFormSetEditMode(),
+                            );
+                      },
+                      icon: const Icon(Icons.edit),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
 
   void onTapLink(String text, String? href, String title) {
     if (href != null) launch(href);

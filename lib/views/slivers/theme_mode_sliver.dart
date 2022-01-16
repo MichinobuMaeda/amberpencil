@@ -5,28 +5,24 @@ import '../widgets/box_sliver.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
 
-class ThemeModePanel extends StatelessWidget {
-  const ThemeModePanel({Key? key}) : super(key: key);
+class ThemeModeSliver extends StatelessWidget {
+  const ThemeModeSliver({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeModeProvider>(builder: (context, themeMode, child) {
-      return BoxSliver(
+  Widget build(BuildContext context) => BoxSliver(
         children: List<Widget>.generate(
           themeModeList.length,
           (int index) {
             return ChoiceChip(
               label: Text(themeModeList[index]),
-              selected: themeMode.selected == index,
+              selected: context.watch<ThemeModeProvider>().selected == index,
               onSelected: (bool selected) {
                 if (selected) {
-                  themeMode.selected = index;
+                  context.read<ThemeModeProvider>().selected = index;
                 }
               },
             );
           },
         ).toList(),
       );
-    });
-  }
 }

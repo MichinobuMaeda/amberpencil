@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 
-class PageTitilePanel extends StatelessWidget {
+class PageTitileSliver extends StatelessWidget {
   final String title;
   final Widget icon;
-  const PageTitilePanel({
+  const PageTitileSliver({
     Key? key,
     required this.title,
     required this.icon,
@@ -17,7 +17,6 @@ class PageTitilePanel extends StatelessWidget {
           child: ColoredBox(
             color: Theme.of(context).backgroundColor,
             child: Wrap(
-              alignment: WrapAlignment.center,
               children: [
                 SizedBox(
                   width: fontSizeH2 * 1.6,

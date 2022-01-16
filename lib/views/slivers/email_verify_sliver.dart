@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../config/theme.dart';
 import '../../models/app_state_provider.dart';
 import '../../utils/time_ticker_bloc.dart';
 import '../widgets/box_sliver.dart';
@@ -10,9 +11,8 @@ class SendCubit extends Cubit<bool> {
   void set(bool state) => emit(state);
 }
 
-class EmailVerifyPanel extends StatelessWidget {
-  const EmailVerifyPanel({Key? key}) : super(key: key);
-  final double width = 480.0;
+class EmailVerifySliver extends StatelessWidget {
+  const EmailVerifySliver({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BoxSliver(
@@ -33,8 +33,7 @@ class EmailVerifyPanel extends StatelessWidget {
               builder: (context) => Column(
                 children: [
                   WrappedRow(
-                    alignment: WrapAlignment.center,
-                    width: width,
+                    width: fieldWidth,
                     children: [
                       Text(
                         '初めて使うメールアドレスの確認が必要です。'
@@ -42,13 +41,11 @@ class EmailVerifyPanel extends StatelessWidget {
                         '${context.watch<AppStateProvider>().me!.email}'
                         ' に確認のためのメールを送信しますので、'
                         'そのメールに記載された確認のためのボタンを押してください。',
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                   WrappedRow(
-                    alignment: WrapAlignment.center,
-                    width: width,
+                    width: fieldWidth,
                     children: [
                       ElevatedButton.icon(
                         onPressed: () async {
@@ -65,23 +62,20 @@ class EmailVerifyPanel extends StatelessWidget {
                     ],
                   ),
                   if (context.watch<SendCubit>().state)
-                    WrappedRow(
-                      alignment: WrapAlignment.center,
-                      width: width,
-                      children: const [
+                    const WrappedRow(
+                      width: fieldWidth,
+                      children: [
                         Text(
                           '確認のためのメールを送信しました。'
                           'そのメールに記載された確認のためのボタンを押しても'
                           'この表示が自動で切り替わらない場合は'
                           '下の「更新」ボタンを押してください。',
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   if (context.watch<SendCubit>().state)
                     WrappedRow(
-                      alignment: WrapAlignment.center,
-                      width: width,
+                      width: fieldWidth,
                       children: [
                         ElevatedButton(
                           onPressed: context
@@ -92,19 +86,16 @@ class EmailVerifyPanel extends StatelessWidget {
                         ),
                       ],
                     ),
-                  WrappedRow(
-                    alignment: WrapAlignment.center,
-                    width: width,
-                    children: const [
+                  const WrappedRow(
+                    width: fieldWidth,
+                    children: [
                       Text(
                         'メールアドレスを修正してやり直す場合はログアウトしてください。',
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                   WrappedRow(
-                    alignment: WrapAlignment.center,
-                    width: width,
+                    width: fieldWidth,
                     children: [
                       ElevatedButton(
                         onPressed: context.read<AppStateProvider>().signOut,

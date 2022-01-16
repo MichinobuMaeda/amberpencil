@@ -3,6 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 const AssetImage logoAsset = AssetImage('images/logo.png');
 
+const pageWidth = 720.0;
+const columnWidth = 720.0;
+const fieldWidth = 480.0;
+
 final ThemeData baseLightTheme = ThemeData(
   brightness: Brightness.light,
   primarySwatch: Colors.brown,

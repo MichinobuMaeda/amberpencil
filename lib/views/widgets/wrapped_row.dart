@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/theme.dart';
 
 class WrappedRow extends StatelessWidget {
   final List<Widget> children;
@@ -9,8 +10,8 @@ class WrappedRow extends StatelessWidget {
   const WrappedRow({
     Key? key,
     required this.children,
-    this.width = 720.0,
-    this.alignment = WrapAlignment.start,
+    this.width = pageWidth,
+    this.alignment = WrapAlignment.center,
     this.crossAxisAlignment = WrapCrossAlignment.center,
   }) : super(key: key);
 

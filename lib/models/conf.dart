@@ -55,6 +55,8 @@ class Conf extends Equatable {
         invitationExpirationTime,
         policy,
         createdAt,
+        createdBy,
         updatedAt,
+        updatedBy,
       ];
 }
