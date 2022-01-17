@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/wrapped_row.dart';
+import '../theme_widgets/wrapped_row.dart';
 
-class ConfirmMyEmailSection extends StatelessWidget {
-  const ConfirmMyEmailSection({Key? key}) : super(key: key);
+class ConfirmMyEmailPanel extends StatelessWidget {
+  const ConfirmMyEmailPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => WrappedRow(

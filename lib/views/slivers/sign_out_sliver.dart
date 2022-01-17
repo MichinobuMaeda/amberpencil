@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/box_sliver.dart';
-import '../widgets/comfirm_danger_buton.dart';
-import '../widgets/wrapped_row.dart';
+import '../theme_widgets/box_sliver.dart';
+import '../theme_widgets/comfirm_danger_buton.dart';
+import '../theme_widgets/wrapped_row.dart';
 
 class SignOutSliver extends StatelessWidget {
   const SignOutSliver({Key? key}) : super(key: key);

@@ -7,6 +7,9 @@ const pageWidth = 720.0;
 const columnWidth = 720.0;
 const fieldWidth = 480.0;
 
+const double baseFontSize = 16.0;
+const double spacing = baseFontSize;
+
 final ThemeData baseLightTheme = ThemeData(
   brightness: Brightness.light,
   primarySwatch: Colors.brown,
@@ -19,7 +22,7 @@ final ThemeData baseLightTheme = ThemeData(
     backgroundColor: Colors.brown,
     contentTextStyle: TextStyle(
       fontFamily: fontFamilySansSerif,
-      fontSize: fontSizeBody,
+      fontSize: baseFontSize,
       color: Colors.white,
     ),
   ),
@@ -44,7 +47,7 @@ final ThemeData baseDarkTheme = ThemeData(
     backgroundColor: Colors.amber,
     contentTextStyle: TextStyle(
       fontFamily: fontFamilySansSerif,
-      fontSize: fontSizeBody,
+      fontSize: baseFontSize,
       color: Colors.black,
     ),
   ),
@@ -60,14 +63,12 @@ final ThemeData darkTheme = baseDarkTheme.copyWith(
 const fontFamilySansSerif = 'NotoSansJP';
 const fontFamilyMonoSpace = 'RobotoMono';
 
-const double fontSizeBody = 16.0;
-
-const double fontSizeH1 = fontSizeBody * 2.4;
-const double fontSizeH2 = fontSizeBody * 1.6;
-const double fontSizeH3 = fontSizeBody * 1.3;
-const double fontSizeH4 = fontSizeBody * 1.1;
-const double fontSizeH5 = fontSizeBody * 1.05;
-const double fontSizeH6 = fontSizeBody * 1.0;
+const double fontSizeH1 = baseFontSize * 2.4;
+const double fontSizeH2 = baseFontSize * 1.6;
+const double fontSizeH3 = baseFontSize * 1.3;
+const double fontSizeH4 = baseFontSize * 1.1;
+const double fontSizeH5 = baseFontSize * 1.05;
+const double fontSizeH6 = baseFontSize * 1.0;
 
 const TextTheme textTheme = TextTheme(
   headline1: TextStyle(fontSize: fontSizeH1),
@@ -77,16 +78,16 @@ const TextTheme textTheme = TextTheme(
   headline5: TextStyle(fontSize: fontSizeH5),
   headline6: TextStyle(fontSize: fontSizeH6),
   subtitle1: TextStyle(fontSize: fontSizeH5),
-  subtitle2: TextStyle(fontSize: fontSizeBody),
+  subtitle2: TextStyle(fontSize: baseFontSize),
   bodyText1: TextStyle(fontSize: fontSizeH5),
-  bodyText2: TextStyle(fontSize: fontSizeBody),
-  button: TextStyle(fontSize: fontSizeBody),
-  caption: TextStyle(fontSize: fontSizeBody),
-  overline: TextStyle(fontSize: fontSizeBody * 0.9),
+  bodyText2: TextStyle(fontSize: baseFontSize),
+  button: TextStyle(fontSize: baseFontSize),
+  caption: TextStyle(fontSize: baseFontSize),
+  overline: TextStyle(fontSize: baseFontSize * 0.9),
 );
 
 final buttonMinimumSize = MaterialStateProperty.all<Size>(
-  const Size(fontSizeBody * 8, fontSizeBody * 3),
+  const Size(baseFontSize * 8, baseFontSize * 3),
 );
 
 final elevatedButtonTheme = ElevatedButtonThemeData(

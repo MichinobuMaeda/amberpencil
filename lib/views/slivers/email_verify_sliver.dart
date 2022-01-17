@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../models/app_state_provider.dart';
 import '../../utils/time_ticker_bloc.dart';
-import '../widgets/box_sliver.dart';
-import '../widgets/wrapped_row.dart';
+import '../theme_widgets/box_sliver.dart';
+import '../theme_widgets/wrapped_row.dart';
 
 class SendCubit extends Cubit<bool> {
   SendCubit(bool initialState) : super(initialState);

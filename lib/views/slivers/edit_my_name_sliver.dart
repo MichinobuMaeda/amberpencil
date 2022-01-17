@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
 import '../../services/accounts_service.dart';
-import '../widgets/box_sliver.dart';
-import '../widgets/text_form.dart';
-import '../widgets/single_field_form_bloc.dart';
+import '../theme_widgets/box_sliver.dart';
+import '../theme_widgets/text_form.dart';
+import '../theme_widgets/single_field_form_bloc.dart';
 
 class EditMyNameSliver extends StatelessWidget {
   const EditMyNameSliver({Key? key}) : super(key: key);

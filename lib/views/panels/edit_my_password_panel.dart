@@ -4,15 +4,15 @@ import '../../services/auth_service.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/text_form.dart';
-import '../widgets/single_field_form_bloc.dart';
+import '../theme_widgets/text_form.dart';
+import '../theme_widgets/single_field_form_bloc.dart';
 
-class EditMyPasswordSection extends StatelessWidget {
-  const EditMyPasswordSection({Key? key}) : super(key: key);
+class EditMyPasswordPanel extends StatelessWidget {
+  const EditMyPasswordPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        key: ValueKey('${(EditMyPasswordSection).toString()}:password'),
+        key: ValueKey('${(EditMyPasswordPanel).toString()}:password'),
         create: (context) => SingleFieldFormBloc(
           '',
           validator: passwordValidator,

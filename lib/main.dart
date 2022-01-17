@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'blocs/route_bloc.dart';
 import 'config/app_info.dart';
 import 'config/firebase_options.dart';
 import 'config/theme.dart';
@@ -48,34 +50,40 @@ void main() async {
   );
 
   runApp(
-    MultiProvider(
-      // Change notifiers that listen service providers
+    MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => ThemeModeProvider(
-            accountsService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => AppStateProvider(
-            confService,
-            authService,
-            accountsService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ConfProvider(
-            confService,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => AppRouterDelegate(),
-        ),
-        Provider(
-          create: (_) => AppRouteInformationParser(),
-        ),
+        BlocProvider(create: (_) => RouteBloc()),
       ],
-      child: const MyApp(),
+      child: MultiProvider(
+        // Change notifiers that listen service providers
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => ThemeModeProvider(
+              accountsService,
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => AppStateProvider(
+              context,
+              confService,
+              authService,
+              accountsService,
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ConfProvider(
+              confService,
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => AppRouterDelegate(context),
+          ),
+          Provider(
+            create: (_) => AppRouteInformationParser(),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -84,31 +92,22 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    AppRouterDelegate routerDelegate = context.read<AppRouterDelegate>();
-    AppRouteInformationParser routeInformationParser =
-        context.read<AppRouteInformationParser>();
-    AppStateProvider appStateProvider = context.read<AppStateProvider>();
-
-    appStateProvider.routeStateListener = routerDelegate;
-
-    return MaterialApp.router(
-      title: appName,
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: context.watch<ThemeModeProvider>().themeMode,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', ''),
-        Locale('ja', ''),
-      ],
-      locale: const Locale('ja', 'JP'),
-      routerDelegate: routerDelegate,
-      routeInformationParser: routeInformationParser,
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp.router(
+        title: appName,
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: context.watch<ThemeModeProvider>().themeMode,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', ''),
+          Locale('ja', ''),
+        ],
+        locale: const Locale('ja', 'JP'),
+        routerDelegate: context.read<AppRouterDelegate>(),
+        routeInformationParser: context.read<AppRouteInformationParser>(),
+      );
 }

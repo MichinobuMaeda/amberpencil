@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../config/theme.dart';
 import '../../models/app_state_provider.dart';
 import '../../utils/time_ticker_bloc.dart';
-import '../widgets/box_sliver.dart';
-import '../widgets/wrapped_row.dart';
-import '../panels/confirm_my_email_section.dart';
-import '../panels/confirm_my_password_section.dart';
-import '../panels/edit_my_email_section.dart';
-import '../panels/edit_my_password_section.dart';
+import '../theme_widgets/box_sliver.dart';
+import '../theme_widgets/wrapped_row.dart';
+import '../panels/confirm_my_email_panel.dart';
+import '../panels/confirm_my_password_panel.dart';
+import '../panels/edit_my_email_panel.dart';
+import '../panels/edit_my_password_panel.dart';
 
 bool isExpired(
   DateTime ticker,
@@ -55,7 +56,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                         ? Column(
                             children: const [
                               WrappedRow(
-                                width: 480,
+                                width: fieldWidth,
                                 children: [
                                   Text(
                                     'メールアドレスまたはパスワードを変更する場合、'
@@ -63,15 +64,15 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              ConfirmMyEmailSection(),
-                              ConfirmMyPasswordSection(),
+                              ConfirmMyEmailPanel(),
+                              ConfirmMyPasswordPanel(),
                               ExpirationTestSwitch(),
                             ],
                           )
                         : Column(
                             children: const [
-                              EditMyEmailSection(),
-                              EditMyPasswordSection(),
+                              EditMyEmailPanel(),
+                              EditMyPasswordPanel(),
                               ExpirationTestSwitch(),
                             ],
                           ),

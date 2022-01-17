@@ -12,7 +12,7 @@ class PageTitileSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SliverPadding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(spacing / 4),
         sliver: SliverToBoxAdapter(
           child: ColoredBox(
             color: Theme.of(context).backgroundColor,

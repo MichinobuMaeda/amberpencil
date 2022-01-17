@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/box_sliver.dart';
+import '../theme_widgets/box_sliver.dart';
 
 class HomeSliver extends StatelessWidget {
   const HomeSliver({Key? key}) : super(key: key);

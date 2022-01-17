@@ -193,19 +193,17 @@ class TextFormSaveButton extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: context.watch<_Bloc>().state.buttonEnabled
-          ? () {
-              context.read<_Bloc>().add(
-                    SingleFieldFormSave(onSave, onError),
-                  );
-            }
-          : null,
-      label: Text(saveButtonName),
-      icon: saveButtonIcon,
-    );
-  }
+  Widget build(BuildContext context) => ElevatedButton.icon(
+        onPressed: context.watch<_Bloc>().state.buttonEnabled
+            ? () {
+                context.read<_Bloc>().add(
+                      SingleFieldFormSave(onSave, onError),
+                    );
+              }
+            : null,
+        label: Text(saveButtonName),
+        icon: saveButtonIcon,
+      );
 }
 
 @visibleForTesting

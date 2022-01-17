@@ -1,22 +1,19 @@
-import 'package:amberpencil/utils/platform_web.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/route_bloc.dart';
 import '../config/app_info.dart';
 import '../config/routes.dart';
 import '../models/auth_user.dart';
 import '../models/account.dart';
 import '../models/conf.dart';
-import '../models/app_route.dart';
+import '../utils/platform_web.dart';
 import '../services/service_listener.dart';
 import '../services/conf_service.dart';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
 
-mixin RouteStateListener {
-  setClientState(ClientState clientState) {}
-  setRoute(AppRoute appRoute) {}
-}
-
 class AppStateProvider extends ChangeNotifier with ServiceListener {
+  final BuildContext context;
   final ConfService confService;
   final AuthService authService;
   final AccountsService accountsService;
@@ -26,10 +23,9 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   Account? _me;
 
   DateTime? _reauthedAt;
-  ClientState _clientState = initialClientState;
-  RouteStateListener? _routeStateListener;
 
   AppStateProvider(
+    this.context,
     this.confService,
     this.authService,
     this.accountsService,
@@ -99,35 +95,25 @@ class AppStateProvider extends ChangeNotifier with ServiceListener {
   }
 
   void updateClientState() {
-    late ClientState state;
+    late ClientState newState;
     if (_conf == null || !_autChecked) {
-      state = ClientState.loading;
+      newState = ClientState.loading;
     } else if (_me == null) {
-      state = ClientState.guest;
+      newState = ClientState.guest;
     } else if (_authUser?.emailVerified != true) {
-      state = ClientState.pending;
+      newState = ClientState.pending;
     } else {
-      state = ClientState.authenticated;
+      newState = ClientState.authenticated;
     }
 
-    if (_clientState != state) {
-      _clientState = state;
-      _routeStateListener?.setClientState(_clientState);
-      if (_clientState == ClientState.authenticated && loadReauthMode()) {
-        _reauthedAt = DateTime.now();
-        goRoute(const AppRoute(name: RouteName.prefs));
-      }
+    context.read<RouteBloc>().add(ClientStateChangedEvent(newState));
+
+    if (newState == ClientState.authenticated && loadReauthMode()) {
+      _reauthedAt = DateTime.now();
+      context.read<RouteBloc>().add(
+            GoRouteEvent(const AppRoute(name: RouteName.prefs)),
+          );
     }
-  }
-
-  ClientState get clientState => _clientState;
-
-  set routeStateListener(RouteStateListener routeStateListener) {
-    _routeStateListener ??= routeStateListener;
-  }
-
-  void goRoute(AppRoute appRoute) {
-    _routeStateListener?.setRoute(appRoute);
   }
 
   bool get updateIsAvailable => _conf != null && _conf!.version != version;

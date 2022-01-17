@@ -1,3 +1,4 @@
+import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 
 class LoadingSliver extends StatelessWidget {
@@ -9,8 +10,8 @@ class LoadingSliver extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
             SizedBox(
-              width: 64,
-              height: 64,
+              width: baseFontSize * 4,
+              height: baseFontSize * 4,
               child: CircularProgressIndicator(),
             ),
             SizedBox(height: 32),

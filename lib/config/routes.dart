@@ -40,54 +40,54 @@ const Map<ClientState, List<RouteName>> autorizedRoutes = {
 };
 
 class MenuItem {
+  final RouteName routeName;
   final Icon icon;
   final String label;
-  final RouteName route;
   final bool admin;
   const MenuItem({
+    required this.routeName,
     required this.icon,
     required this.label,
-    required this.route,
     this.admin = false,
   });
 }
 
 const List<MenuItem> menuItems = [
   MenuItem(
+    routeName: RouteName.loading,
     icon: Icon(Icons.autorenew),
     label: '接続中',
-    route: RouteName.loading,
   ),
   MenuItem(
+    routeName: RouteName.signin,
     icon: Icon(Icons.login),
     label: 'ログイン',
-    route: RouteName.signin,
   ),
   MenuItem(
+    routeName: RouteName.verify,
     icon: Icon(Icons.mark_email_read),
     label: 'メールアドレスの確認',
-    route: RouteName.verify,
   ),
   MenuItem(
+    routeName: RouteName.home,
     icon: Icon(Icons.home),
     label: 'ホーム',
-    route: RouteName.home,
   ),
   MenuItem(
+    routeName: RouteName.prefs,
     icon: Icon(Icons.settings),
     label: '設定',
-    route: RouteName.prefs,
   ),
   MenuItem(
+    routeName: RouteName.admin,
     icon: Icon(Icons.handyman),
     label: '管理',
-    route: RouteName.admin,
     admin: true,
   ),
   MenuItem(
+    routeName: RouteName.info,
     icon: Icon(Icons.info),
     label: 'アプリについて',
-    route: RouteName.info,
   ),
 ];
 

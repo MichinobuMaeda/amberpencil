@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../models/conf_provider.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/box_sliver.dart';
-import '../widgets/multi_line_text_form.dart';
-import '../widgets/single_field_form_bloc.dart';
-import '../widgets/wrapped_row.dart';
+import '../theme_widgets/box_sliver.dart';
+import '../theme_widgets/multi_line_text_form.dart';
+import '../theme_widgets/single_field_form_bloc.dart';
+import '../theme_widgets/wrapped_row.dart';
 
 class PolicySliver extends StatelessWidget {
   const PolicySliver({Key? key}) : super(key: key);

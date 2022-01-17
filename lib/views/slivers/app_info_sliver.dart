@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
-import '../widgets/box_sliver.dart';
+import '../theme_widgets/box_sliver.dart';
 
 class AppInfoPSliver extends StatelessWidget {
   const AppInfoPSliver({Key? key}) : super(key: key);
@@ -15,8 +15,8 @@ class AppInfoPSliver extends StatelessWidget {
                 context: context,
                 applicationIcon: const Image(
                   image: logoAsset,
-                  width: 48,
-                  height: 48,
+                  width: baseFontSize * 3,
+                  height: baseFontSize * 3,
                 ),
                 applicationName: appName,
                 applicationVersion: version,

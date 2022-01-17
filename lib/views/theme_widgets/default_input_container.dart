@@ -10,14 +10,12 @@ class DefaultInputContainer extends StatelessWidget {
     Key? key,
     required this.child,
     this.width = fieldWidth,
-    this.height = 84.0,
+    this.height = baseFontSize * 5.25,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints.tight(Size(width, height)),
-      child: child,
-    );
-  }
+  Widget build(BuildContext context) => ConstrainedBox(
+        constraints: BoxConstraints.tight(Size(width, height)),
+        child: child,
+      );
 }

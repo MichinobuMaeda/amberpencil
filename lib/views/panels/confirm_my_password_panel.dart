@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
-import '../widgets/text_form.dart';
-import '../widgets/single_field_form_bloc.dart';
+import '../theme_widgets/text_form.dart';
+import '../theme_widgets/single_field_form_bloc.dart';
 
-class ConfirmMyPasswordSection extends StatelessWidget {
-  const ConfirmMyPasswordSection({Key? key}) : super(key: key);
+class ConfirmMyPasswordPanel extends StatelessWidget {
+  const ConfirmMyPasswordPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        key: ValueKey('${(ConfirmMyPasswordSection).toString()}:password'),
+        key: ValueKey('${(ConfirmMyPasswordPanel).toString()}:password'),
         create: (context) => SingleFieldFormBloc(
           '',
           validator: requiredValidator,

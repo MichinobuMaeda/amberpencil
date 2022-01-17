@@ -4,15 +4,15 @@ import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../models/app_state_provider.dart';
 import '../../services/accounts_service.dart';
-import '../widgets/text_form.dart';
-import '../widgets/single_field_form_bloc.dart';
+import '../theme_widgets/text_form.dart';
+import '../theme_widgets/single_field_form_bloc.dart';
 
-class EditMyEmailSection extends StatelessWidget {
-  const EditMyEmailSection({Key? key}) : super(key: key);
+class EditMyEmailPanel extends StatelessWidget {
+  const EditMyEmailPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        key: ValueKey('${(EditMyEmailSection).toString()}:email'),
+        key: ValueKey('${(EditMyEmailPanel).toString()}:email'),
         create: (context) => SingleFieldFormBloc(
           '',
           validator: emailValidator,
