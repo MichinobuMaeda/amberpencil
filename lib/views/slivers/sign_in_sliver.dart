@@ -33,30 +33,13 @@ class SignInSliver extends StatelessWidget {
                           decoration: InputDecoration(
                             labelText: 'メールアドレス',
                             suffixIcon: IconButton(
-                                icon: const Icon(Icons.cancel),
-                                onPressed: () {
-                                  context
-                                      .read<EmailFieldFormBloc>()
-                                      .add(SingleFieldFormReset());
-                                  resetController(
-                                    context
-                                        .read<EmailFieldFormBloc>()
-                                        .controller,
-                                    context
-                                        .read<EmailFieldFormBloc>()
-                                        .initialValue,
-                                  );
-                                }),
+                              icon: const Icon(Icons.cancel),
+                              onPressed: onResetEmail(context),
+                            ),
                           ),
                           style:
                               const TextStyle(fontFamily: fontFamilyMonoSpace),
-                          onChanged: (value) {
-                            context
-                                .read<EmailFieldFormBloc>()
-                                .add(SingleFieldFormChanged(value));
-                            ScaffoldMessenger.of(context)
-                                .removeCurrentSnackBar();
-                          },
+                          onChanged: onEmailChanged(context),
                         ),
                       ),
                     ],
@@ -71,31 +54,8 @@ class SignInSliver extends StatelessWidget {
                             ? () {
                                 context.read<EmailFieldFormBloc>().add(
                                       SingleFieldFormSave(
-                                        (value) async {
-                                          await context
-                                              .read<AppStateProvider>()
-                                              .authService
-                                              .sendSignInLinkToEmail(value);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'ログイン用のリンクをメールで送信しました。',
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        () {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'メールが送信できませんでした。'
-                                                '通信の状態を確認してやり直してください。',
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                        onSendEmailLink(context),
+                                        onErrorSendEmailLink(context),
                                       ),
                                     );
                               }
@@ -124,13 +84,7 @@ class SignInSliver extends StatelessWidget {
                               },
                             ),
                           ),
-                          onChanged: (value) {
-                            context
-                                .read<PasswordFieldFormBloc>()
-                                .add(SingleFieldFormChanged(value));
-                            ScaffoldMessenger.of(context)
-                                .removeCurrentSnackBar();
-                          },
+                          onChanged: onPasswordChanged(context),
                           style:
                               const TextStyle(fontFamily: fontFamilyMonoSpace),
                           obscureText:
@@ -153,27 +107,8 @@ class SignInSliver extends StatelessWidget {
                             ? () {
                                 context.read<PasswordFieldFormBloc>().add(
                                       SingleFieldFormSave(
-                                        (value) => context
-                                            .read<AppStateProvider>()
-                                            .authService
-                                            .signInWithEmailAndPassword(
-                                              context
-                                                  .watch<EmailFieldFormBloc>()
-                                                  .state
-                                                  .value,
-                                              value,
-                                            ),
-                                        () {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'ログインできませんでした。'
-                                                'メールアドレスとパスワードを確認してやり直してください。',
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                        onSignInWithPassword(context),
+                                        onErrorSinInWithPassword(context),
                                       ),
                                     );
                               }
@@ -187,15 +122,7 @@ class SignInSliver extends StatelessWidget {
                     WrappedRow(
                       children: [
                         ElevatedButton(
-                          onPressed: () async {
-                            await context
-                                .read<AppStateProvider>()
-                                .authService
-                                .signInWithEmailAndPassword(
-                                  'primary@example.com',
-                                  'password',
-                                );
-                          },
+                          onPressed: onTestLogin(context),
                           child: const Text('Test'),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
@@ -215,16 +142,90 @@ class SignInSliver extends StatelessWidget {
         ],
       );
 
-  void resetController(
-    TextEditingController controller,
-    String initialValue,
-  ) {
-    controller.text = initialValue;
-    controller.selection = TextSelection(
-      baseOffset: controller.text.length,
-      extentOffset: controller.text.length,
-    );
-  }
+  void Function(String) onEmailChanged(BuildContext context) => (String value) {
+        context.read<EmailFieldFormBloc>().add(SingleFieldFormChanged(value));
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      };
+
+  void Function(String) onPasswordChanged(BuildContext context) =>
+      (String value) {
+        context
+            .read<PasswordFieldFormBloc>()
+            .add(SingleFieldFormChanged(value));
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      };
+
+  VoidCallback onResetEmail(BuildContext context) => () {
+        context.read<EmailFieldFormBloc>().add(SingleFieldFormReset());
+
+        String initValue = context.read<EmailFieldFormBloc>().initialValue;
+        TextEditingController controller =
+            context.read<EmailFieldFormBloc>().controller;
+
+        controller.text = initValue;
+        controller.selection = TextSelection(
+          baseOffset: controller.text.length,
+          extentOffset: controller.text.length,
+        );
+      };
+
+  Future<void> Function(String) onSendEmailLink(BuildContext context) =>
+      (String value) async {
+        await context
+            .read<AppStateProvider>()
+            .authService
+            .sendSignInLinkToEmail(value);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'ログイン用のリンクをメールで送信しました。',
+            ),
+          ),
+        );
+      };
+
+  Future<void> Function(String) onSignInWithPassword(BuildContext context) =>
+      (String value) async {
+        await context
+            .read<AppStateProvider>()
+            .authService
+            .signInWithEmailAndPassword(
+              context.watch<EmailFieldFormBloc>().state.value,
+              value,
+            );
+      };
+
+  VoidCallback onErrorSendEmailLink(BuildContext context) => () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'メールが送信できませんでした。'
+              '通信の状態を確認してやり直してください。',
+            ),
+          ),
+        );
+      };
+
+  VoidCallback onErrorSinInWithPassword(BuildContext context) => () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'ログインできませんでした。'
+              'メールアドレスとパスワードを確認してやり直してください。',
+            ),
+          ),
+        );
+      };
+
+  Future<void> Function() onTestLogin(BuildContext context) => () async {
+        await context
+            .read<AppStateProvider>()
+            .authService
+            .signInWithEmailAndPassword(
+              'primary@example.com',
+              'password',
+            );
+      };
 }
 
 @visibleForTesting

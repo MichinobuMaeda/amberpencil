@@ -14,7 +14,7 @@ class LoadingSliver extends StatelessWidget {
               height: baseFontSize * 4,
               child: CircularProgressIndicator(),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: spacing * 2),
             Flexible(child: Text('しばらくお待ちください')),
           ],
         ),

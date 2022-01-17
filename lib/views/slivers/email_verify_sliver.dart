@@ -32,14 +32,13 @@ class EmailVerifySliver extends StatelessWidget {
             child: Builder(
               builder: (context) => Column(
                 children: [
-                  WrappedRow(
+                  const WrappedRow(
                     width: fieldWidth,
                     children: [
                       Text(
                         '初めて使うメールアドレスの確認が必要です。'
                         '下の「送信」ボタンを押してください。'
-                        '${context.watch<AppStateProvider>().me!.email}'
-                        ' に確認のためのメールを送信しますので、'
+                        '登録されたメールアドレスに確認のためのメールを送信しますので、'
                         'そのメールに記載された確認のためのボタンを押してください。',
                       ),
                     ],
