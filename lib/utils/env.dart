@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+bool isTestMode(String version) => version == 'for test';
+
 Future<void> useFirebaseEmulators(
   String version,
   FirebaseAuth auth,
@@ -11,7 +13,7 @@ Future<void> useFirebaseEmulators(
   FirebaseFunctions functions,
   firebase_storage.FirebaseStorage storage,
 ) async {
-  if (version == "for test") {
+  if (isTestMode(version)) {
     debugPrint('Use emulators.');
     try {
       await auth.useAuthEmulator('localhost', 9099);
@@ -19,7 +21,7 @@ Future<void> useFirebaseEmulators(
       functions.useFunctionsEmulator('localhost', 5001);
       await storage.useStorageEmulator('localhost', 9199);
     } catch (e) {
-      debugPrint('Firestore has already been started.');
+      debugPrint('Firebase has already been started.');
     }
   }
 }

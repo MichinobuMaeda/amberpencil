@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
 
 typedef SingleFieldValidate<T> = String? Function(T?)?;

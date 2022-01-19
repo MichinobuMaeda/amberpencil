@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/route_bloc.dart';
 import '../models/auth_user.dart';
@@ -6,6 +6,7 @@ import '../models/account.dart';
 import '../repositories/accounts_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/conf_repository.dart';
+import '../repositories/groups_repository.dart';
 import 'theme_mode_bloc.dart';
 
 class MyAccountStatus {
@@ -17,18 +18,10 @@ class MyAccountStatus {
 
 abstract class MeEvent {}
 
-class OnSignedIn extends MeEvent {
-  final AuthUser authUser;
-
-  OnSignedIn(this.authUser);
-}
-
-class OnSignedOut extends MeEvent {}
-
-class OnAuthUserReloaded extends MeEvent {
+class OnAuthUserUpdated extends MeEvent {
   final AuthUser? authUser;
 
-  OnAuthUserReloaded(this.authUser);
+  OnAuthUserUpdated(this.authUser);
 }
 
 class OnAccountsUpdated extends MeEvent {
@@ -45,86 +38,105 @@ class MyAccountBloc extends Bloc<MeEvent, MyAccountStatus> {
   MyAccountBloc(BuildContext context)
       : _context = context,
         super(MyAccountStatus(null, null)) {
-    on<OnSignedIn>((event, emit) async {
-      Account? me =
-          await context.read<AccountsRepository>().restoreMe(event.authUser);
-      if (me == null || !me.valid || me.deletedAt != null) {
-        add(OnSingOutRequired());
-      } else if (state.me != null &&
-          (state.me!.id != me.id ||
-              state.me!.admin != me.admin ||
-              state.me!.tester != me.tester)) {
-        add(OnSingOutRequired());
-      } else {
-        emit(MyAccountStatus(event.authUser, me));
-        context.read<AccountsRepository>().subscribe(me);
-      }
-    });
-
-    on<OnSignedOut>((event, emit) {
-      emit(MyAccountStatus(null, null));
-      discardAllUserData(context);
-    });
-
-    on<OnAuthUserReloaded>((event, emit) {
-      if (event.authUser?.uid != state.me?.id) {
-        add(OnSingOutRequired());
-      } else {
-        emit(MyAccountStatus(event.authUser, state.me));
-      }
+    on<OnAuthUserUpdated>((event, emit) async {
+      validateAndEmitState(
+        event.authUser,
+        event.authUser == null
+            ? null
+            : event.authUser?.uid == state.me?.id
+                ? state.me
+                : await context
+                    .read<AccountsRepository>()
+                    .restoreMe(event.authUser!),
+        emit,
+      );
+      _context.read<RouteBloc>().add(OnAuthStateChecked());
     });
 
     on<OnAccountsUpdated>((event, emit) {
       try {
-        Account me = (event.accounts ?? []).singleWhere(
-          (account) => account.id == state.me?.id,
+        validateAndEmitState(
+          state.authUser,
+          state.authUser == null
+              ? null
+              : (event.accounts ?? []).singleWhere(
+                  (account) => account.id == state.authUser?.uid,
+                ),
+          emit,
         );
-        if (state.authUser?.uid != me.id) {
-          add(OnSingOutRequired());
-        } else if (!me.valid || me.deletedAt != null) {
-          add(OnSingOutRequired());
-        } else if (state.me != null &&
-            (state.me!.id != me.id ||
-                state.me!.admin != me.admin ||
-                state.me!.tester != me.tester)) {
-          add(OnSingOutRequired());
-        } else {
-          emit(MyAccountStatus(state.authUser, me));
-        }
       } catch (e) {
-        if (state.authUser != null) {
-          add(OnSingOutRequired());
-        }
+        emit(MyAccountStatus(null, null));
       }
     });
 
     on<OnSingOutRequired>((event, emit) async {
       emit(MyAccountStatus(null, null));
-      discardAllUserData(context);
-      await context.read<AuthRepository>().signOut();
     });
   }
 
-  void discardAllUserData(BuildContext context) {
-    context.read<AccountsRepository>().unsubscribe();
+  void validateAndEmitState(
+    AuthUser? authUser,
+    Account? me,
+    Emitter emit,
+  ) {
+    if (validateState(authUser, me)) {
+      emit(MyAccountStatus(authUser, me));
+    } else {
+      emit(MyAccountStatus(null, null));
+    }
   }
 
+  bool validateState(
+    AuthUser? authUser,
+    Account? me,
+  ) =>
+      (authUser == null && me == null) ||
+      (authUser?.uid == me?.id &&
+          (me?.valid ?? false) &&
+          me?.deletedAt == null &&
+          (state.me == null ||
+              (state.me?.admin == me?.admin &&
+                  state.me?.tester == me?.tester)));
+
   @override
-  void onChange(Change<MyAccountStatus> change) {
-    super.onChange(change);
-    _context.read<RouteBloc>().add(OnMyAccountUpdated(
-          change.nextState.authUser,
-          change.nextState.me,
-        ));
-    _context.read<ThemeModeBloc>().add(ThemeModeUpdated(change.nextState.me));
+  Future<void> onChange(
+    Change<MyAccountStatus> change,
+  ) async {
+    _context.read<RouteBloc>().add(
+          OnMyAccountUpdated(
+            change.nextState.authUser,
+            change.nextState.me,
+          ),
+        );
+    _context.read<ThemeModeBloc>().add(
+          ThemeModeUpdated(
+            change.nextState.me,
+          ),
+        );
+
     if (change.nextState.me != null) {
-      _context.read<ConfRepository>().subscribe(change.nextState.me!);
-      // TODO: GroupsRepository
-      // TODO: PeopleRepository
+      if (change.currentState.me == null) {
+        restoreAllUserData(change.nextState.me!);
+      }
     } else {
-      _context.read<ConfRepository>().unsubscribe();
-      // TODO: GroupsRepository
-      // TODO: PeopleRepository
+      if (change.currentState.me != null) {
+        await discardAllUserData();
+        await _context.read<AuthRepository>().signOut();
+      }
     }
+
+    super.onChange(change);
+  }
+
+  void restoreAllUserData(Account me) {
+    _context.read<AccountsRepository>().subscribe(me);
+    _context.read<ConfRepository>().subscribe(me);
+    _context.read<GroupsRepository>().subscribe(me);
+  }
+
+  Future<void> discardAllUserData() async {
+    await _context.read<GroupsRepository>().unsubscribe();
+    await _context.read<ConfRepository>().unsubscribe();
+    await _context.read<AccountsRepository>().unsubscribe();
   }
 }

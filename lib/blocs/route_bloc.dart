@@ -1,11 +1,11 @@
-import 'package:amberpencil/models/conf.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../config/routes.dart';
 import '../models/account.dart';
 import '../models/auth_user.dart';
+import '../models/conf.dart';
 
 class AppRoute extends Equatable {
   final RouteName name;

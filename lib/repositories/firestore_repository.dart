@@ -16,22 +16,25 @@ abstract class FireStoreRepository {
 
   String? get uid => _uid;
 
-  void subscribe(Account me) {
+  Future<void> subscribe(Account me) async {
     _uid = me.id;
   }
 
-  void unsubscribe() {
+  Future<void> unsubscribe() async {
     _uid = null;
   }
 
-  void listen(StreamSubscription sub) {
-    _sub?.cancel();
+  Future<void> listen(StreamSubscription sub) async {
+    await cancel();
     _sub = sub;
   }
 
-  void cancel() {
-    _sub?.cancel();
-    _sub = null;
+  Future<void> cancel() async {
+    if (_sub != null) {
+      StreamSubscription sub = _sub!;
+      _sub = null;
+      await sub.cancel();
+    }
   }
 
   Future<void> updateDocument(

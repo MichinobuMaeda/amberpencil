@@ -18,10 +18,12 @@ import 'config/theme.dart';
 import 'models/account.dart';
 import 'models/auth_user.dart';
 import 'models/conf.dart';
+import 'models/group.dart';
 import 'repositories/accounts_repository.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/conf_repository.dart';
-import 'repositories/local_repository.dart';
+import 'repositories/groups_repository.dart';
+import 'repositories/platform_repository.dart';
 import 'utils/env.dart';
 import 'router.dart';
 
@@ -29,7 +31,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase
-  final String deepLink = LocalRepository.getCurrentUrl();
+  final String deepLink = PlatformRepository.getCurrentUrl();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -45,7 +47,7 @@ void main() async {
     MultiProvider(
       providers: [
         Provider(
-          create: (_) => LocalRepository(
+          create: (_) => PlatformRepository(
             window: html.window,
             deepLink: deepLink,
           ),
@@ -62,6 +64,11 @@ void main() async {
         ),
         Provider(
           create: (_) => AccountsRepository(
+            db: FirebaseFirestore.instance,
+          ),
+        ),
+        Provider(
+          create: (_) => GroupsRepository(
             db: FirebaseFirestore.instance,
           ),
         ),
@@ -91,14 +98,11 @@ void main() async {
               builder: (context) {
                 context.read<AuthRepository>().start(
                   (AuthUser? authUser) {
-                    context.read<MyAccountBloc>().add(
-                          authUser == null
-                              ? OnSignedOut()
-                              : OnSignedIn(authUser),
-                        );
-                    context.read<RouteBloc>().add(OnAuthStateChecked());
+                    context
+                        .read<MyAccountBloc>()
+                        .add(OnAuthUserUpdated(authUser));
                   },
-                  context.read<LocalRepository>(),
+                  context.read<PlatformRepository>(),
                 );
 
                 context.read<ConfRepository>().start(
@@ -118,6 +122,10 @@ void main() async {
                         .add(OnAccountsUpdated(accounts));
                   },
                 );
+
+                context.read<GroupsRepository>().start(
+                      (List<Group> accounts) {},
+                    );
                 return const MyApp();
               },
             ),

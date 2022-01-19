@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/route_bloc.dart';
 import 'config/routes.dart';
 import 'views/base_screen.dart';
+import 'views/theme_widgets/no_animation_route_transition_deligate.dart';
 
 class AppRouterDelegate extends RouterDelegate<AppRoute>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<AppRoute> {
+  final TransitionDelegate transitionDelegate = NoAnimationTransitionDelegate();
   final BuildContext context;
 
   @override
@@ -25,6 +27,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
   @override
   Widget build(BuildContext context) => Navigator(
         key: navigatorKey,
+        transitionDelegate: transitionDelegate,
         pages: context
             .watch<RouteBloc>()
             .state

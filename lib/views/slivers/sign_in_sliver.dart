@@ -4,6 +4,7 @@ import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../repositories/auth_repository.dart';
+import '../../utils/env.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/default_input_container.dart';
 import '../theme_widgets/wrapped_row.dart';
@@ -119,7 +120,7 @@ class SignInSliver extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (version == 'for test')
+                  if (isTestMode(version))
                     WrappedRow(
                       children: [
                         ElevatedButton(

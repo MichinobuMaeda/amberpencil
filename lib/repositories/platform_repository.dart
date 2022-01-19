@@ -1,12 +1,12 @@
 import 'package:universal_html/html.dart' as html;
 
-class LocalRepository {
+class PlatformRepository {
   final html.Window _window;
   final String _deepLink;
 
   static String getCurrentUrl() => html.window.location.href;
 
-  LocalRepository({
+  PlatformRepository({
     required html.Window window,
     required String deepLink,
   })  : _window = window,

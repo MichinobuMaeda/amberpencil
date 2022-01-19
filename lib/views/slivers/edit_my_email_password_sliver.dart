@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../blocs/time_ticker_bloc.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../../repositories/auth_repository.dart';
+import '../../utils/env.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
 import '../panels/confirm_my_email_panel.dart';
@@ -88,7 +89,7 @@ class ExpirationTestSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Visibility(
-        visible: version == 'for test',
+        visible: isTestMode(version),
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [

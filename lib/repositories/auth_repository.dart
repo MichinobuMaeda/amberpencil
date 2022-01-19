@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/auth_user.dart';
-import 'local_repository.dart';
+import 'platform_repository.dart';
 
 const String reauthenticateParam = '?reauthenticate=yes';
 const String emailKey = 'amberpencil_email';
@@ -9,7 +10,7 @@ const String signedInAtKey = 'amberpencil_signedInAtKey';
 class AuthRepository {
   final FirebaseAuth _auth;
   late void Function(AuthUser?) _listener;
-  late LocalRepository _localRepository;
+  late PlatformRepository _platformRepository;
   DateTime? _signedInAt;
   String? _url;
 
@@ -23,7 +24,7 @@ class AuthRepository {
 
   DateTime get signedInAt {
     if (_signedInAt == null) {
-      String? saved = _localRepository.load(signedInAtKey, reset: false);
+      String? saved = _platformRepository.load(signedInAtKey, reset: false);
       int msec = saved == null ? 0 : int.parse(saved);
       _signedInAt = DateTime.fromMillisecondsSinceEpoch(msec);
     }
@@ -32,7 +33,7 @@ class AuthRepository {
 
   void setSignedInAt() {
     _signedInAt = DateTime.now();
-    _localRepository.save(
+    _platformRepository.save(
       signedInAtKey,
       _signedInAt!.millisecondsSinceEpoch.toString(),
     );
@@ -40,18 +41,18 @@ class AuthRepository {
 
   void start(
     void Function(AuthUser?) listener,
-    LocalRepository localRepository,
+    PlatformRepository localRepository,
   ) {
     _listener = listener;
-    _localRepository = localRepository;
+    _platformRepository = localRepository;
 
     // Handle deeplink
-    if (_auth.isSignInWithEmailLink(_localRepository.deepLink)) {
-      final String? email = _localRepository.load(emailKey, reset: true);
+    if (_auth.isSignInWithEmailLink(_platformRepository.deepLink)) {
+      final String? email = _platformRepository.load(emailKey, reset: true);
       if (email != null) {
         signInWithEmailLink(
           email: email,
-          emailLink: _localRepository.deepLink,
+          emailLink: _platformRepository.deepLink,
         );
       }
     }
@@ -101,7 +102,7 @@ class AuthRepository {
         handleCodeInApp: true,
       ),
     );
-    _localRepository.save(emailKey, email);
+    _platformRepository.save(emailKey, email);
   }
 
   Future<void> sendEmailVerification() async {
@@ -119,7 +120,7 @@ class AuthRepository {
         handleCodeInApp: true,
       ),
     );
-    _localRepository.save(emailKey, email);
+    _platformRepository.save(emailKey, email);
   }
 
   Future<void> reauthenticateWithPassword(String password) async {
@@ -139,7 +140,7 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
-    await reload();
+    debugPrint('${(AuthRepository).toString()}:signOut');
     if (_auth.currentUser != null) {
       await _auth.signOut();
     }

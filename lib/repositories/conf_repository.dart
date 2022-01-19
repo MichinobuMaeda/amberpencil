@@ -23,11 +23,13 @@ class ConfRepository extends FireStoreRepository {
   }
 
   void onListenError(Object error, StackTrace stackTrace) {
-    debugPrint('$error\n$stackTrace');
+    debugPrint(
+      '${(ConfRepository).toString()}:onListenError\n$error\n$stackTrace',
+    );
     _listener(null);
   }
 
-  Future<void> updateField(
+  Future<void> update(
     Map<String, dynamic> data,
   ) =>
       updateDocument(_ref, data);

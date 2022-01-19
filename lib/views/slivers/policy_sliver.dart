@@ -46,7 +46,7 @@ Future<void> Function(String) onSave(
   ConfRepository confRepository,
 ) =>
     (String value) async {
-      await confRepository.updateField(
+      await confRepository.update(
         {Conf.fieldPolicy: value},
       );
     };

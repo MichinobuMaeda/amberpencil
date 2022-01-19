@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/account.dart';
 import '../models/auth_user.dart';
@@ -22,7 +22,8 @@ class AccountsRepository extends FireStoreRepository {
   }
 
   @override
-  void subscribe(Account me) {
+  Future<void> subscribe(Account me) async {
+    debugPrint('${(AccountsRepository).toString()}:subscribe');
     super.subscribe(me);
     listen(
       me.admin
@@ -46,14 +47,17 @@ class AccountsRepository extends FireStoreRepository {
   }
 
   void onListenError(Object error, StackTrace stackTrace) {
-    debugPrint('$error\n$stackTrace');
+    debugPrint(
+      '${(AccountsRepository).toString()}:onListenError\n$error\n$stackTrace',
+    );
     _listener([]);
   }
 
   @override
-  void unsubscribe() {
-    cancel();
+  Future<void> unsubscribe() async {
+    debugPrint('${(AccountsRepository).toString()}:unsubscribe');
     super.unsubscribe();
+    await cancel();
   }
 
   Future<void> updateMe(

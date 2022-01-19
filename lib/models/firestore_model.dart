@@ -21,16 +21,29 @@ abstract class FirestoreModel extends Equatable {
   DateTime? get deletedAt => getValue<DateTime?>(fieldDeletedAt, null);
   String? get deletedBy => getValue<String?>(fieldDeletedBy, null);
 
-  Type getValue<Type>(String key, Type defaultValue) {
+  T getValue<T>(String key, T defaultValue) {
     try {
-      final val = snap.get(key);
-      if (Type == DateTime) {
-        return val is Timestamp ? (val.toDate() as Type) : defaultValue;
-      } else {
-        return val is Type ? val : defaultValue;
-      }
+      return castValue(snap.get(key), defaultValue);
     } catch (e) {
       return defaultValue;
+    }
+  }
+
+  List<T> getListValue<T>(String key, T defaultValue) {
+    try {
+      return ((snap.get(key) ?? []) as List<dynamic>)
+          .map<T>((val) => castValue(val, defaultValue))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  T castValue<T>(dynamic val, T defaultValue) {
+    if (T == DateTime) {
+      return val is Timestamp ? (val.toDate() as T) : defaultValue;
+    } else {
+      return val is T ? val : defaultValue;
     }
   }
 

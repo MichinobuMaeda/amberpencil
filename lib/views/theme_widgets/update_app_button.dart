@@ -1,7 +1,7 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../repositories/local_repository.dart';
+import '../../repositories/platform_repository.dart';
 
 class UpdateAppButton extends StatelessWidget {
   const UpdateAppButton({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class UpdateAppButton extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: context.read<LocalRepository>().reloadWebAapp,
+            onPressed: context.read<PlatformRepository>().reloadWebAapp,
             iconSize: baseFontSize * 2,
             icon: Ink(
               padding: const EdgeInsets.all(4.0),
@@ -29,7 +29,7 @@ class UpdateAppButton extends StatelessWidget {
                 size: 24.0,
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.amber.shade900
-                    : Colors.amber.shade400,
+                    : Colors.white,
               ),
             ),
           )
