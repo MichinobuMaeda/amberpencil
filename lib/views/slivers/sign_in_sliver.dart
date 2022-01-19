@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../models/app_state_provider.dart';
+import '../../repositories/auth_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/default_input_container.dart';
 import '../theme_widgets/wrapped_row.dart';
@@ -118,7 +119,7 @@ class SignInSliver extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (context.read<AppStateProvider>().isTest)
+                  if (version == 'for test')
                     WrappedRow(
                       children: [
                         ElevatedButton(
@@ -171,10 +172,7 @@ class SignInSliver extends StatelessWidget {
 
   Future<void> Function(String) onSendEmailLink(BuildContext context) =>
       (String value) async {
-        await context
-            .read<AppStateProvider>()
-            .authService
-            .sendSignInLinkToEmail(value);
+        await context.read<AuthRepository>().sendSignInLinkToEmail(value);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -186,10 +184,7 @@ class SignInSliver extends StatelessWidget {
 
   Future<void> Function(String) onSignInWithPassword(BuildContext context) =>
       (String value) async {
-        await context
-            .read<AppStateProvider>()
-            .authService
-            .signInWithEmailAndPassword(
+        await context.read<AuthRepository>().signInWithEmailAndPassword(
               context.watch<EmailFieldFormBloc>().state.value,
               value,
             );
@@ -218,10 +213,7 @@ class SignInSliver extends StatelessWidget {
       };
 
   Future<void> Function() onTestLogin(BuildContext context) => () async {
-        await context
-            .read<AppStateProvider>()
-            .authService
-            .signInWithEmailAndPassword(
+        await context.read<AuthRepository>().signInWithEmailAndPassword(
               'primary@example.com',
               'password',
             );

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/my_account_bloc.dart';
 import '../../config/validators.dart';
-import '../../models/app_state_provider.dart';
-import '../../services/accounts_service.dart';
+import '../../models/account.dart';
+import '../../repositories/accounts_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/text_form.dart';
 import '../theme_widgets/single_field_form_bloc.dart';
@@ -16,18 +17,18 @@ class EditMyNameSliver extends StatelessWidget {
           BlocProvider(
             key: ValueKey(
               '${(EditMyNameSliver).toString()}:name:'
-              '${context.watch<AppStateProvider>().me!.name}',
+              '${context.watch<MyAccountBloc>().state.me!.name}',
             ),
             create: (context) => SingleFieldFormBloc(
-              context.read<AppStateProvider>().me!.name,
+              context.read<MyAccountBloc>().state.me!.name,
               validator: requiredValidator,
             ),
             child: Builder(
               builder: (context) => TextForm(
                 label: '表示名',
                 onSave: onSaveName(
-                  context.read<AppStateProvider>().accountsService,
-                  context.read<AppStateProvider>().me!.id,
+                  context.read<AccountsRepository>(),
+                  context.read<MyAccountBloc>().state.me!.id,
                 ),
               ),
             ),
@@ -37,9 +38,11 @@ class EditMyNameSliver extends StatelessWidget {
 }
 
 TextFormOnSave onSaveName(
-  AccountsService accountsService,
+  AccountsRepository accountsRepository,
   String uid,
 ) =>
     (String value) async {
-      await accountsService.updateAccountProperties(uid, {"name": value});
+      await accountsRepository.updateMe(
+        {Account.fieldName: value},
+      );
     };

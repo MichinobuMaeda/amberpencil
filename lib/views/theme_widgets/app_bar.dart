@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/route_bloc.dart';
+import '../../blocs/conf_bloc.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
-import '../../models/app_state_provider.dart';
+import '../../config/app_info.dart';
 import 'vertical_label_icon_button.dart';
 import 'update_app_button.dart';
 
@@ -16,7 +17,7 @@ class AppBarSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SliverAppBar(
-        pinned: context.watch<AppStateProvider>().updateIsAvailable,
+        pinned: context.watch<VersionCubit>().state != version,
         snap: false,
         floating: true,
         forceElevated: forceElevated,
@@ -37,13 +38,13 @@ class AppBarSliver extends StatelessWidget {
                     ? null
                     : () {
                         context.read<RouteBloc>().add(
-                              GoRouteEvent(AppRoute(name: item.routeName)),
+                              GoRoute(AppRoute(name: item.routeName)),
                             );
                       },
               ),
             )
             .toList(),
-        bottom: context.watch<AppStateProvider>().updateIsAvailable
+        bottom: context.watch<VersionCubit>().state != version
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(54.0),
                 child: UpdateAppButton(),

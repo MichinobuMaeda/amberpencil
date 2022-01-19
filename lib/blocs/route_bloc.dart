@@ -1,8 +1,11 @@
+import 'package:amberpencil/models/conf.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../config/routes.dart';
+import '../models/account.dart';
+import '../models/auth_user.dart';
 
 class AppRoute extends Equatable {
   final RouteName name;
@@ -72,91 +75,118 @@ class RouteState {
 
 abstract class RouteEvent {}
 
-class GoRouteEvent extends RouteEvent {
+class GoRoute extends RouteEvent {
   final AppRoute route;
 
-  GoRouteEvent(this.route);
+  GoRoute(this.route);
 }
 
 class PopRouteEvent extends RouteEvent {}
 
-class ClientStateChangedEvent extends RouteEvent {
-  final ClientState clientState;
+class OnConfUpdated extends RouteEvent {
+  final Conf? conf;
 
-  ClientStateChangedEvent(this.clientState);
+  OnConfUpdated(this.conf);
+}
+
+class OnAuthStateChecked extends RouteEvent {
+  OnAuthStateChecked();
+}
+
+class OnMyAccountUpdated extends RouteEvent {
+  final AuthUser? authUser;
+  final Account? me;
+  OnMyAccountUpdated(this.authUser, this.me);
 }
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
-  RouteBloc()
+  bool _confReceived = false;
+  bool _authStateChecked = false;
+  bool _signIned = false;
+  bool _emailVerified = false;
+
+  RouteBloc(BuildContext context)
       : super(
           RouteState(
             clientState: ClientState.loading,
             history: const [AppRoute(name: RouteName.loading)],
           ),
         ) {
-    on<ClientStateChangedEvent>(onClientStateChangedEvent);
-    on<GoRouteEvent>(onGoRouteEvent);
-    on<PopRouteEvent>(onPopRouteEvent);
-  }
+    on<OnConfUpdated>(
+      (
+        OnConfUpdated event,
+        Emitter<RouteState> emit,
+      ) {
+        _confReceived = event.conf != null;
+        updateClientState(emit);
+      },
+    );
 
-  void onClientStateChangedEvent(
-    ClientStateChangedEvent event,
-    Emitter<RouteState> emit,
-  ) {
-    // go the top route of the given client state.
-    if (state.clientState != event.clientState) {
-      final List<RouteName> authorized = getAuthorizedRoutes(event.clientState);
-      emit(
-        RouteState(
-          clientState: event.clientState,
-          history: [
-            AppRoute(name: _getTopRouteName(authorized)),
-          ],
-        ),
-      );
-    }
-  }
+    on<OnAuthStateChecked>(
+      (
+        OnAuthStateChecked event,
+        Emitter<RouteState> emit,
+      ) {
+        _authStateChecked = true;
+        updateClientState(emit);
+      },
+    );
 
-  void onGoRouteEvent(
-    GoRouteEvent event,
-    Emitter<RouteState> emit,
-  ) {
-    // guard
-    final List<RouteName> authorized = getAuthorizedRoutes(state.clientState);
-    final AppRoute next = (authorized.contains(event.route.name))
-        ? event.route
-        : AppRoute(name: _getTopRouteName(authorized));
-    emit(
-      keepHistory
-          ? state.history.contains(next)
-              ? state.history.last == next
-                  ? state
+    on<OnMyAccountUpdated>(
+      (
+        OnMyAccountUpdated event,
+        Emitter<RouteState> emit,
+      ) {
+        _signIned = event.me != null;
+        _emailVerified = event.authUser?.emailVerified == true;
+        updateClientState(emit);
+      },
+    );
+
+    on<GoRoute>(
+      (
+        GoRoute event,
+        Emitter<RouteState> emit,
+      ) {
+        // guard
+        final List<RouteName> authorized =
+            getAuthorizedRoutes(state.clientState);
+        final AppRoute next = (authorized.contains(event.route.name))
+            ? event.route
+            : AppRoute(name: getTopRouteName(authorized));
+        emit(
+          keepHistory
+              ? state.history.contains(next)
+                  ? state.history.last == next
+                      ? state
+                      : state.copyWith(
+                          history: state.history.sublist(
+                            0,
+                            state.history.indexOf(next) - 1,
+                          ),
+                        )
                   : state.copyWith(
-                      history: state.history.sublist(
-                        0,
-                        state.history.indexOf(next) - 1,
-                      ),
+                      history: [...state.history, next],
                     )
               : state.copyWith(
-                  history: [...state.history, next],
-                )
-          : state.copyWith(
-              history: [next],
-            ),
+                  history: [next],
+                ),
+        );
+      },
     );
-  }
 
-  void onPopRouteEvent(
-    PopRouteEvent event,
-    Emitter<RouteState> emit,
-  ) {
-    if (state.history.length > 1) {
-      emit(
-        state.copyWith(
-          history: state.history.sublist(0, state.history.length - 1),
-        ),
-      );
-    }
+    on<PopRouteEvent>((
+      PopRouteEvent event,
+      Emitter<RouteState> emit,
+    ) {
+      if (state.history.length > 1) {
+        emit(
+          state.copyWith(
+            history: state.history.sublist(0, state.history.length - 1),
+          ),
+        );
+      }
+    });
   }
 
   AppRoute getCurrentRoute() => state.history.last;
@@ -164,6 +194,29 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   static List<RouteName> getAuthorizedRoutes(ClientState clientState) =>
       autorizedRoutes[clientState] ?? [];
 
-  RouteName _getTopRouteName(List<RouteName> authorized) =>
+  static RouteName getTopRouteName(List<RouteName> authorized) =>
       authorized.isNotEmpty ? authorized.first : RouteName.loading;
+
+  void updateClientState(Emitter emit) {
+    final ClientState clientState = _confReceived && _authStateChecked
+        ? _signIned
+            ? _emailVerified
+                ? ClientState.authenticated
+                : ClientState.pending
+            : ClientState.guest
+        : ClientState.loading;
+
+    if (state.clientState != clientState) {
+      // go to the top route of the given client state.
+      final List<RouteName> authorized = getAuthorizedRoutes(clientState);
+      emit(
+        RouteState(
+          clientState: clientState,
+          history: [
+            AppRoute(name: getTopRouteName(authorized)),
+          ],
+        ),
+      );
+    }
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/app_state_provider.dart';
+import '../../blocs/my_account_bloc.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/comfirm_danger_buton.dart';
 import '../theme_widgets/wrapped_row.dart';
@@ -30,7 +30,8 @@ class SignOutSliver extends StatelessWidget {
                     message: '本当にログアウトしますか？',
                     icon: const Icon(Icons.logout),
                     label: 'ログアウト',
-                    onPressed: context.read<AppStateProvider>().signOut,
+                    onPressed: () =>
+                        context.read<MyAccountBloc>().add(OnSingOutRequired()),
                   ),
                 ],
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
-import '../../models/app_state_provider.dart';
+import '../../repositories/auth_repository.dart';
 import '../theme_widgets/wrapped_row.dart';
 
 class ConfirmMyEmailPanel extends StatelessWidget {
@@ -20,10 +20,7 @@ class ConfirmMyEmailPanel extends StatelessWidget {
 
   Future<void> Function() onSendEmailLink(BuildContext context) => () async {
         try {
-          await context
-              .read<AppStateProvider>()
-              .authService
-              .reauthenticateWithEmail();
+          await context.read<AuthRepository>().reauthenticateWithEmail();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(

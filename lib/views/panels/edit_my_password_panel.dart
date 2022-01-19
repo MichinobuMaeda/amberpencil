@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../services/auth_service.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../models/app_state_provider.dart';
+import '../../repositories/auth_repository.dart';
 import '../theme_widgets/text_form.dart';
 import '../theme_widgets/single_field_form_bloc.dart';
 
@@ -23,14 +22,13 @@ class EditMyPasswordPanel extends StatelessWidget {
             label: 'パスワード',
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-            onSave: onSave(context.read<AppStateProvider>().authService),
+            onSave: onSave(context.read<AuthRepository>()),
           ),
         ),
       );
 
-  Future<void> Function(String) onSave(AuthService authService) =>
+  Future<void> Function(String) onSave(AuthRepository authRepository) =>
       (String value) async {
-        await authService.updateMyPassword(value);
-        await authService.reload();
+        await authRepository.updateMyPassword(value);
       };
 }

@@ -118,3 +118,9 @@ MarkdownStyleSheet markdownStyleSheet(BuildContext context) {
     ),
   );
 }
+
+List<ThemeMode> supportedThemeModes = [
+  ThemeMode.system,
+  ThemeMode.light,
+  ThemeMode.dark,
+];

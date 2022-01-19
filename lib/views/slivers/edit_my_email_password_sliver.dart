@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../config/app_info.dart';
 import '../../config/theme.dart';
-import '../../models/app_state_provider.dart';
-import '../../utils/time_ticker_bloc.dart';
+import '../../blocs/time_ticker_bloc.dart';
+import '../../blocs/my_account_bloc.dart';
+import '../../repositories/auth_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
 import '../panels/confirm_my_email_panel.dart';
@@ -28,7 +30,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BoxSliver(
-        children: (context.watch<AppStateProvider>().me?.email ?? '') == ''
+        children: (context.watch<MyAccountBloc>().state.me?.email ?? '') == ''
             ? [
                 const Text(
                   'メールアドレスとパスワードは設定されていません。'
@@ -49,8 +51,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                   child: Builder(
                     builder: (context) => isExpired(
                       context.watch<TimeTickerBloc>().state,
-                      context.watch<AppStateProvider>().reauthedAt ??
-                          DateTime(2000),
+                      context.read<AuthRepository>().signedInAt,
                       context.watch<TestModeCubit>().state,
                     )
                         ? Column(
@@ -87,7 +88,7 @@ class ExpirationTestSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Visibility(
-        visible: context.watch<AppStateProvider>().isTest,
+        visible: version == 'for test',
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [

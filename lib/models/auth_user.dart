@@ -1,5 +1,5 @@
-import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:equatable/equatable.dart';
 
 class AuthUser extends Equatable {
   final String uid;
@@ -7,14 +7,7 @@ class AuthUser extends Equatable {
   final String? email;
   final bool emailVerified;
 
-  const AuthUser({
-    required this.uid,
-    required this.displayName,
-    required this.email,
-    required this.emailVerified,
-  });
-
-  AuthUser.fromUser(User user)
+  AuthUser(User user)
       : uid = user.uid,
         displayName = user.displayName,
         email = user.email,

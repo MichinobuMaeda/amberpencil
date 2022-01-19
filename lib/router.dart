@@ -19,7 +19,7 @@ class AppRouterDelegate extends RouterDelegate<AppRoute>
 
   @override
   Future<void> setNewRoutePath(AppRoute configuration) async {
-    context.read<RouteBloc>().add(GoRouteEvent(configuration));
+    context.read<RouteBloc>().add(GoRoute(configuration));
   }
 
   @override

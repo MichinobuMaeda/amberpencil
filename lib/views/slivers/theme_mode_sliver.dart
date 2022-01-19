@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/theme_mode_provider.dart';
+import '../../blocs/theme_mode_bloc.dart';
 import '../theme_widgets/box_sliver.dart';
 
 const List<String> themeModeList = ['自動', 'ライト', 'ダーク'];
@@ -14,10 +14,10 @@ class ThemeModeSliver extends StatelessWidget {
           themeModeList.length,
           (int index) => ChoiceChip(
             label: Text(themeModeList[index]),
-            selected: context.watch<ThemeModeProvider>().selected == index,
+            selected: context.watch<ThemeModeBloc>().state == index,
             onSelected: (bool selected) {
               if (selected) {
-                context.read<ThemeModeProvider>().selected = index;
+                context.read<ThemeModeBloc>().add(ThemeModeChanged(index));
               }
             },
           ),

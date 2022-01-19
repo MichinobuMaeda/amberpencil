@@ -1,9 +1,9 @@
-import 'package:amberpencil/services/conf_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/conf_bloc.dart';
 import '../../config/theme.dart';
-import '../../models/conf_provider.dart';
-import '../../models/app_state_provider.dart';
+import '../../models/conf.dart';
+import '../../repositories/conf_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/multi_line_text_form.dart';
 import '../theme_widgets/single_field_form_bloc.dart';
@@ -20,19 +20,16 @@ class PolicySliver extends StatelessWidget {
               BlocProvider(
                 key: ValueKey(
                   '${(PolicySliver).toString()}:policy:'
-                  '${context.watch<ConfProvider>().data?.policy}',
+                  '${context.watch<PolicyCubit>().state}',
                 ),
                 create: (context) => SingleFieldFormBloc(
-                  context.read<ConfProvider>().data?.policy ?? '',
+                  context.read<PolicyCubit>().state,
                   withEditMode: true,
                 ),
                 child: Builder(
                   builder: (context) => MultiLineTextForm(
                     label: 'プライバシー・ポリシー',
-                    onSave: onSave(
-                      context.read<ConfProvider>().confService,
-                      context.watch<AppStateProvider>().me?.id,
-                    ),
+                    onSave: onSave(context.read<ConfRepository>()),
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     markdown: true,
                     markdownStyleSheet: markdownStyleSheet(context),
@@ -46,13 +43,10 @@ class PolicySliver extends StatelessWidget {
 }
 
 Future<void> Function(String) onSave(
-  ConfService confService,
-  String? uid,
+  ConfRepository confRepository,
 ) =>
     (String value) async {
-      assert(uid != null, 'Before sign-in.');
-      await confService.updateConfProperties(
-        uid!,
-        {"policy": value},
+      await confRepository.updateField(
+        {Conf.fieldPolicy: value},
       );
     };

@@ -96,127 +96,134 @@ class SingleFieldFormBloc<T>
     controller = TextEditingController(text: this.convertFrom(initialValue));
     confirmationController = TextEditingController(text: '');
 
-    on<SingleFieldFormChanged<T>>(onSingleFieldFormChanged);
-    on<SingleFieldFormSave<T>>(onSingleFieldFormSave);
-    on<SingleFieldFormReset<T>>(onSingleFieldFormReset);
-    on<SingleFieldFormSetEditMode<T>>(onSingleFieldFormSetEditMode);
-    on<SingleFieldFormConfirmed<T>>(onSingleFieldFormConfirmed);
-    on<SingleFieldFormConfirmationReset<T>>(onSingleFieldFormConfirmationReset);
-  }
-
-  void onSingleFieldFormChanged(SingleFieldFormChanged<T> event, emit) {
-    final String? validationError =
-        (event.value == initialValue || validator == null)
-            ? null
-            : validator!(event.value);
-    final String? confirmationError = confirm(event.value, state.confirmation);
-    emit(
-      SingleFieldFormState<T>(
-        value: event.value,
-        validationError: validationError,
-        buttonEnabled: validate(
-          event.value,
-          validationError,
-          confirmationError,
-        ),
-        editMode: state.editMode,
-        confirmation: state.confirmation,
-        confirmationError: confirmationError,
-      ),
+    on<SingleFieldFormChanged<T>>(
+      (event, Emitter emit) {
+        final String? validationError =
+            (event.value == initialValue || validator == null)
+                ? null
+                : validator!(event.value);
+        final String? confirmationError =
+            confirm(event.value, state.confirmation);
+        emit(
+          SingleFieldFormState<T>(
+            value: event.value,
+            validationError: validationError,
+            buttonEnabled: validate(
+              event.value,
+              validationError,
+              confirmationError,
+            ),
+            editMode: state.editMode,
+            confirmation: state.confirmation,
+            confirmationError: confirmationError,
+          ),
+        );
+      },
     );
-  }
 
-  void onSingleFieldFormSave(SingleFieldFormSave<T> event, emit) async {
-    if (state.value != initialValue) {
-      try {
+    on<SingleFieldFormSave<T>>(
+      (event, Emitter emit) async {
+        if (state.value != initialValue) {
+          try {
+            emit(
+              SingleFieldFormState<T>(
+                value: state.value,
+                validationError: state.validationError,
+                buttonEnabled: false,
+                editMode: state.editMode,
+                confirmation: state.confirmation,
+                confirmationError: state.confirmationError,
+              ),
+            );
+            await event.onSave(state.value);
+          } catch (e, s) {
+            debugPrint(
+              '\nInvoked event.onSaveError() on SingleFieldFormSave:'
+              '\n$e\n$s',
+            );
+            emit(
+              SingleFieldFormState<T>(
+                value: state.value,
+                validationError: state.validationError,
+                buttonEnabled: state.value != initialValue,
+                editMode: state.editMode,
+                confirmation: state.confirmation,
+                confirmationError: state.confirmationError,
+              ),
+            );
+            event.onSaveError();
+          }
+        }
+      },
+    );
+
+    on<SingleFieldFormReset<T>>(
+      (event, Emitter emit) async {
+        final String? confirmationError =
+            confirm(initialValue, state.confirmation);
+        emit(
+          SingleFieldFormState<T>(
+            value: initialValue,
+            validationError: null,
+            buttonEnabled: false,
+            editMode: !withEditMode,
+            confirmation: state.confirmation,
+            confirmationError: confirmationError,
+          ),
+        );
+      },
+    );
+
+    on<SingleFieldFormSetEditMode<T>>(
+      (event, Emitter emit) {
+        emit(
+          SingleFieldFormState<T>(
+            value: initialValue,
+            validationError: null,
+            buttonEnabled: false,
+            editMode: true,
+            confirmation: null,
+            confirmationError: null,
+          ),
+        );
+      },
+    );
+
+    on<SingleFieldFormConfirmed<T>>(
+      (event, Emitter emit) {
+        final String? confirmationError =
+            confirm(state.value, event.confirmation);
+        emit(
+          SingleFieldFormState<T>(
+            value: state.value,
+            validationError: state.validationError,
+            buttonEnabled: validate(
+              state.value,
+              state.validationError,
+              confirmationError,
+            ),
+            editMode: state.editMode,
+            confirmation: event.confirmation,
+            confirmationError: confirmationError,
+          ),
+        );
+      },
+    );
+
+    on<SingleFieldFormConfirmationReset<T>>(
+      (event, emit) async {
+        final String? confirmationError = confirm(initialValue, null);
         emit(
           SingleFieldFormState<T>(
             value: state.value,
             validationError: state.validationError,
             buttonEnabled: false,
             editMode: state.editMode,
-            confirmation: state.confirmation,
-            confirmationError: state.confirmationError,
+            confirmation: null,
+            confirmationError: confirmationError,
           ),
         );
-        await event.onSave(state.value);
-      } catch (e, s) {
-        debugPrint(
-          '\nInvoked event.onSaveError() on SingleFieldFormSave:'
-          '\n$e\n$s',
-        );
-        emit(
-          SingleFieldFormState<T>(
-            value: state.value,
-            validationError: state.validationError,
-            buttonEnabled: state.value != initialValue,
-            editMode: state.editMode,
-            confirmation: state.confirmation,
-            confirmationError: state.confirmationError,
-          ),
-        );
-        event.onSaveError();
-      }
-    }
-  }
-
-  void onSingleFieldFormReset(SingleFieldFormReset<T> event, emit) async {
-    final String? confirmationError = confirm(initialValue, state.confirmation);
-    emit(
-      SingleFieldFormState<T>(
-        value: initialValue,
-        validationError: null,
-        buttonEnabled: false,
-        editMode: !withEditMode,
-        confirmation: state.confirmation,
-        confirmationError: confirmationError,
-      ),
-    );
-  }
-
-  void onSingleFieldFormSetEditMode(SingleFieldFormSetEditMode<T> event, emit) {
-    emit(
-      SingleFieldFormState<T>(
-        value: initialValue,
-        validationError: null,
-        buttonEnabled: false,
-        editMode: true,
-        confirmation: null,
-        confirmationError: null,
-      ),
-    );
-  }
-
-  void onSingleFieldFormConfirmed(SingleFieldFormConfirmed<T> event, emit) {
-    final String? confirmationError = confirm(state.value, event.confirmation);
-    emit(
-      SingleFieldFormState<T>(
-        value: state.value,
-        validationError: state.validationError,
-        buttonEnabled: validate(
-          state.value,
-          state.validationError,
-          confirmationError,
-        ),
-        editMode: state.editMode,
-        confirmation: event.confirmation,
-        confirmationError: confirmationError,
-      ),
-    );
-  }
-
-  void onSingleFieldFormConfirmationReset(
-      SingleFieldFormConfirmationReset<T> event, emit) async {
-    final String? confirmationError = confirm(initialValue, null);
-    emit(
-      SingleFieldFormState<T>(
-        value: state.value,
-        validationError: state.validationError,
-        buttonEnabled: false,
-        editMode: state.editMode,
-        confirmation: null,
-        confirmationError: confirmationError,
-      ),
+      },
     );
   }
 
