@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/route_bloc.dart';
 import 'config/routes.dart';
 import 'views/base_screen.dart';
-import 'views/theme_widgets/no_animation_route_transition_deligate.dart';
+import 'views/deligates/no_animation_route_transition_deligate.dart';
 
 class AppRouterDelegate extends RouterDelegate<AppRoute>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<AppRoute> {

@@ -5,11 +5,12 @@ import '../../blocs/conf_bloc.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../config/app_info.dart';
+import '../theme_widgets/update_app_button.dart';
 import 'vertical_label_icon_button.dart';
-import 'update_app_button.dart';
 
 class AppBarSliver extends StatelessWidget {
   final bool forceElevated;
+
   const AppBarSliver({
     Key? key,
     required this.forceElevated,
@@ -17,7 +18,7 @@ class AppBarSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SliverAppBar(
-        pinned: context.watch<VersionCubit>().state != version,
+        pinned: true,
         snap: false,
         floating: true,
         forceElevated: forceElevated,
@@ -44,13 +45,28 @@ class AppBarSliver extends StatelessWidget {
               ),
             )
             .toList(),
-        bottom: context.watch<VersionCubit>().state != version
-            ? const PreferredSize(
-                preferredSize: Size.fromHeight(54.0),
-                child: UpdateAppButton(),
-              )
-            : null,
+        bottom: buildMenuBottom(context),
       );
+
+  PreferredSizeWidget? buildMenuBottom(BuildContext context) {
+    try {
+      final MenuItem menuItem = menuItems.singleWhere(
+        (item) =>
+            item.routeName ==
+            context.watch<RouteBloc>().state.history.last.name,
+      );
+      final bool isAppUpdate = context.watch<VersionCubit>().state != version;
+      return PreferredSize(
+        preferredSize: Size.fromHeight(
+          isAppUpdate ? 54.0 : 2,
+        ),
+        child:
+            isAppUpdate ? const UpdateAppButton() : const SizedBox(height: 2.0),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 
   bool isMobile(BuildContext context) =>
       MediaQuery.of(context).size.width < fieldWidth;
