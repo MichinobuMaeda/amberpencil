@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/route_bloc.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
-import '../deligates/sticky_header_delegate.dart';
+import '../helpers/sticky_header_delegate.dart';
 
 class PageTitileSliver extends StatelessWidget {
   const PageTitileSliver({Key? key}) : super(key: key);

@@ -9,14 +9,14 @@ class Group extends FirestoreModel {
   const Group(DocumentSnapshot<Map<String, dynamic>> snap) : super(snap);
 
   String get name => getValue<String>(fieldName, '');
-  String get email => getValue<String>(fieldDesc, '');
-  List<String> get group => getListValue<String>(fieldAccounts, '');
+  String get desc => getValue<String>(fieldDesc, '');
+  List<String> get accounts => getListValue<String>(fieldAccounts, '');
 
   @override
   List<Object?> get props => super.props
     ..addAll([
-      fieldName,
-      fieldDesc,
-      fieldAccounts,
+      name,
+      desc,
+      accounts.join('\t'),
     ]);
 }

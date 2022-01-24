@@ -3,25 +3,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/account.dart';
 import '../models/firestore_model.dart';
 
-abstract class FireStoreRepository {
+class FireStorereDeligate {
   final FirebaseFirestore _db;
-  String? _uid;
+  Account? _me;
   StreamSubscription? _sub;
 
-  FireStoreRepository({
-    required FirebaseFirestore db,
-  }) : _db = db;
+  FireStorereDeligate(
+    FirebaseFirestore db,
+  ) : _db = db;
 
   FirebaseFirestore get db => _db;
 
-  String? get uid => _uid;
+  Account? get me => _me;
 
   Future<void> subscribe(Account me) async {
-    _uid = me.id;
+    _me = me;
   }
 
   Future<void> unsubscribe() async {
-    _uid = null;
+    _me = null;
   }
 
   Future<void> listen(StreamSubscription sub) async {
@@ -37,25 +37,39 @@ abstract class FireStoreRepository {
     }
   }
 
+  Future<void> createDocument(
+    CollectionReference<Map<String, dynamic>> ref,
+    Map<String, dynamic> data,
+  ) async {
+    assert(_me?.id != null, 'Not authorized');
+    await ref.add({
+      ...data,
+      FirestoreModel.fieldCreatedAt: DateTime.now(),
+      FirestoreModel.fieldCreatedBy: _me!.id,
+      FirestoreModel.fieldUpdatedAt: DateTime.now(),
+      FirestoreModel.fieldUpdatedBy: _me!.id,
+    });
+  }
+
   Future<void> updateDocument(
     DocumentReference<Map<String, dynamic>> ref,
     Map<String, dynamic> data,
   ) async {
-    assert(_uid != null, 'Not authorized');
+    assert(_me?.id != null, 'Not authorized');
     await ref.update({
       ...data,
       FirestoreModel.fieldUpdatedAt: DateTime.now(),
-      FirestoreModel.fieldUpdatedBy: _uid,
+      FirestoreModel.fieldUpdatedBy: _me!.id,
     });
   }
 
   Future<void> deleteDocument(
     DocumentReference<Map<String, dynamic>> ref,
   ) async {
-    assert(_uid != null, 'Not authorized');
+    assert(_me?.id != null, 'Not authorized');
     await ref.update({
       FirestoreModel.fieldDeletedAt: DateTime.now(),
-      FirestoreModel.fieldDeletedBy: _uid,
+      FirestoreModel.fieldDeletedBy: _me!.id,
     });
   }
 }

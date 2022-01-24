@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
-import '../deligates/sticky_header_delegate.dart';
+import '../helpers/sticky_header_delegate.dart';
 
 class SectionHeaderSliver extends StatelessWidget {
   final String title;

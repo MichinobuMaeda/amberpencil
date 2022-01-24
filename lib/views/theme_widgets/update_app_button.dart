@@ -1,7 +1,7 @@
 import 'package:amberpencil/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../repositories/platform_repository.dart';
+import '../../blocs/platform_bloc.dart';
 
 class UpdateAppButton extends StatelessWidget {
   const UpdateAppButton({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class UpdateAppButton extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: context.read<PlatformRepository>().reloadWebAapp,
+            onPressed: () => context.read<PlatformBloc>().add(AppReloaded()),
             iconSize: baseFontSize * 2,
             icon: Ink(
               padding: const EdgeInsets.all(4.0),

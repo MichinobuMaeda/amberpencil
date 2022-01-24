@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 import 'text_form.dart';
 import 'wrapped_row.dart';
 
@@ -75,7 +75,7 @@ class MultiLineTextForm extends TextForm {
                     ElevatedButton.icon(
                       onPressed: () {
                         context.read<_Bloc>().controller.text =
-                            context.read<_Bloc>().initialValue;
+                            context.read<_Bloc>().state.initialValue;
                         context.read<_Bloc>().add(SingleFieldFormReset());
                       },
                       label: const Text('中止'),
@@ -98,13 +98,13 @@ class MultiLineTextForm extends TextForm {
             children: [
               markdown
                   ? MarkdownBody(
-                      data: context.read<_Bloc>().initialValue,
+                      data: context.read<_Bloc>().state.initialValue,
                       selectable: true,
                       styleSheet: markdownStyleSheet,
                       onTapLink: onTapLink,
                     )
                   : Text(
-                      context.read<_Bloc>().initialValue,
+                      context.read<_Bloc>().state.initialValue,
                       style: style,
                     ),
               Visibility(

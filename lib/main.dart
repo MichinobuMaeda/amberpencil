@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import "package:universal_html/html.dart" as html;
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,22 +9,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'blocs/all_blocs_observer.dart';
+import 'blocs/accounts_bloc.dart';
 import 'blocs/conf_bloc.dart';
+import 'blocs/groups_bloc.dart';
 import 'blocs/my_account_bloc.dart';
 import 'blocs/route_bloc.dart';
-import 'blocs/theme_mode_bloc.dart';
+import 'blocs/platform_bloc.dart';
 import 'config/app_info.dart';
 import 'config/firebase_options.dart';
 import 'config/theme.dart';
-import 'models/account.dart';
-import 'models/auth_user.dart';
-import 'models/conf.dart';
-import 'models/group.dart';
-import 'repositories/accounts_repository.dart';
-import 'repositories/auth_repository.dart';
-import 'repositories/conf_repository.dart';
-import 'repositories/groups_repository.dart';
-import 'repositories/platform_repository.dart';
+import 'blocs/auth_bloc.dart';
 import 'utils/env.dart';
 import 'router.dart';
 
@@ -31,7 +27,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase
-  final String deepLink = PlatformRepository.getCurrentUrl();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -43,93 +38,36 @@ void main() async {
     firebase_storage.FirebaseStorage.instance,
   );
 
+  final SharedPreferences localPreferences =
+      await SharedPreferences.getInstance();
+
   runApp(
-    MultiProvider(
+    MultiBlocProvider(
       providers: [
-        Provider(
-          create: (_) => PlatformRepository(
-            window: html.window,
-            deepLink: deepLink,
-          ),
+        BlocProvider(
+          create: (_) => PlatformBloc(html.window, localPreferences),
         ),
-        Provider(
-          create: (_) => ConfRepository(
-            db: FirebaseFirestore.instance,
-          ),
-        ),
-        Provider(
-          create: (_) => AuthRepository(
-            auth: FirebaseAuth.instance,
-          ),
-        ),
-        Provider(
-          create: (_) => AccountsRepository(
-            db: FirebaseFirestore.instance,
-          ),
-        ),
-        Provider(
-          create: (_) => GroupsRepository(
-            db: FirebaseFirestore.instance,
-          ),
-        ),
+        BlocProvider(create: (_) => ConfBloc()),
+        BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => MyAccountBloc()),
+        BlocProvider(create: (_) => AccountsBloc()),
+        BlocProvider(create: (_) => GroupsBloc()),
+        BlocProvider(create: (_) => RouteBloc()),
       ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => VersionCubit()),
-          BlocProvider(create: (_) => UrlCubit()),
-          BlocProvider(create: (_) => PolicyCubit()),
-          BlocProvider(create: (context) => ThemeModeBloc(context)),
-          BlocProvider(create: (context) => RouteBloc(context)),
-        ],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (context) => MyAccountBloc(context)),
-          ],
-          child: MultiProvider(
-            providers: [
-              ChangeNotifierProvider(
-                create: (context) => AppRouterDelegate(context),
-              ),
-              Provider(
-                create: (_) => AppRouteInformationParser(),
-              ),
-            ],
-            child: Builder(
-              builder: (context) {
-                context.read<AuthRepository>().start(
-                  (AuthUser? authUser) {
-                    context
-                        .read<MyAccountBloc>()
-                        .add(OnAuthUserUpdated(authUser));
-                  },
-                  context.read<PlatformRepository>(),
-                );
-
-                context.read<ConfRepository>().start(
-                  (Conf? conf) {
-                    context.read<VersionCubit>().set(conf?.version);
-                    context.read<UrlCubit>().set(conf?.url);
-                    context.read<PolicyCubit>().set(conf?.policy);
-                    context.read<AuthRepository>().url = conf?.url;
-                    context.read<RouteBloc>().add(OnConfUpdated(conf));
-                  },
-                );
-
-                context.read<AccountsRepository>().start(
-                  (List<Account> accounts) {
-                    context
-                        .read<MyAccountBloc>()
-                        .add(OnAccountsUpdated(accounts));
-                  },
-                );
-
-                context.read<GroupsRepository>().start(
-                      (List<Group> accounts) {},
-                    );
-                return const MyApp();
+      child: ChangeNotifierProvider(
+        create: (context) => AppRouterDelegate(context),
+        child: Builder(
+          builder: (context) {
+            BlocOverrides.runZoned(
+              () {
+                context.read<ConfBloc>().add(ConfListenStart());
+                context.read<AuthBloc>().add(AuthListenStart(context));
               },
-            ),
-          ),
+              blocObserver: AllBlocsObserver(context),
+            );
+
+            return const MyApp();
+          },
         ),
       ),
     ),
@@ -144,7 +82,9 @@ class MyApp extends StatelessWidget {
         title: appName,
         theme: lightTheme,
         darkTheme: darkTheme,
-        themeMode: supportedThemeModes[context.watch<ThemeModeBloc>().state],
+        themeMode: supportedThemeModes[context.select<PlatformBloc, int>(
+          (bloc) => bloc.state.themeMode,
+        )],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -156,6 +96,6 @@ class MyApp extends StatelessWidget {
         ],
         locale: const Locale('ja', 'JP'),
         routerDelegate: context.read<AppRouterDelegate>(),
-        routeInformationParser: context.read<AppRouteInformationParser>(),
+        routeInformationParser: AppRouteInformationParser(),
       );
 }

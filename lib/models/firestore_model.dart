@@ -49,11 +49,11 @@ abstract class FirestoreModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        fieldCreatedAt,
-        fieldCreatedBy,
-        fieldUpdatedAt,
-        fieldUpdatedBy,
-        fieldDeletedAt,
-        fieldDeletedBy,
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+        deletedAt,
+        deletedBy,
       ];
 }

@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../repositories/auth_repository.dart';
+import '../../blocs/auth_bloc.dart';
 import '../theme_widgets/text_form.dart';
-import '../theme_widgets/single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 
 class ConfirmMyPasswordPanel extends StatelessWidget {
   const ConfirmMyPasswordPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        key: ValueKey('${(ConfirmMyPasswordPanel).toString()}:password'),
+        key: ValueKey('$runtimeType:password'),
         create: (context) => SingleFieldFormBloc(
           '',
           validator: requiredValidator,
@@ -29,8 +29,16 @@ class ConfirmMyPasswordPanel extends StatelessWidget {
         ),
       );
 
-  Future<void> Function(String) onConfirm(BuildContext context) =>
-      (String value) async {
-        await context.read<AuthRepository>().reauthenticateWithPassword(value);
+  Future<void> Function(
+    String,
+    VoidCallback,
+  ) onConfirm(BuildContext context) => (
+        String value,
+        VoidCallback onError,
+      ) async {
+        await context.read<AuthBloc>().reauthenticateWithPassword(
+              value,
+              onError,
+            );
       };
 }

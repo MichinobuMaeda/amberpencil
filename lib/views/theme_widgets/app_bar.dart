@@ -48,25 +48,21 @@ class AppBarSliver extends StatelessWidget {
         bottom: buildMenuBottom(context),
       );
 
-  PreferredSizeWidget? buildMenuBottom(BuildContext context) {
-    try {
-      final MenuItem menuItem = menuItems.singleWhere(
-        (item) =>
-            item.routeName ==
-            context.watch<RouteBloc>().state.history.last.name,
-      );
-      final bool isAppUpdate = context.watch<VersionCubit>().state != version;
-      return PreferredSize(
+  bool isAppUpdate(BuildContext context) =>
+      (context.select<ConfBloc, String?>(
+            (bloc) => bloc.state?.version,
+          ) ??
+          version) !=
+      version;
+
+  PreferredSizeWidget? buildMenuBottom(BuildContext context) => PreferredSize(
         preferredSize: Size.fromHeight(
-          isAppUpdate ? 54.0 : 2,
+          isAppUpdate(context) ? 54.0 : 2,
         ),
-        child:
-            isAppUpdate ? const UpdateAppButton() : const SizedBox(height: 2.0),
+        child: isAppUpdate(context)
+            ? const UpdateAppButton()
+            : const SizedBox(height: 2.0),
       );
-    } catch (e) {
-      return null;
-    }
-  }
 
   bool isMobile(BuildContext context) =>
       MediaQuery.of(context).size.width < fieldWidth;

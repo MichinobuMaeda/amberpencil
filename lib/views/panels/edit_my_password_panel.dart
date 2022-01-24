@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../repositories/auth_repository.dart';
+import '../../blocs/auth_bloc.dart';
 import '../theme_widgets/text_form.dart';
-import '../theme_widgets/single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 
 class EditMyPasswordPanel extends StatelessWidget {
   const EditMyPasswordPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        key: ValueKey('${(EditMyPasswordPanel).toString()}:password'),
+        key: ValueKey('$runtimeType:password'),
         create: (context) => SingleFieldFormBloc(
           '',
           validator: passwordValidator,
@@ -22,13 +22,16 @@ class EditMyPasswordPanel extends StatelessWidget {
             label: 'パスワード',
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-            onSave: onSave(context.read<AuthRepository>()),
+            onSave: onSave(context.read<AuthBloc>()),
           ),
         ),
       );
 
-  Future<void> Function(String) onSave(AuthRepository authRepository) =>
-      (String value) async {
-        await authRepository.updateMyPassword(value);
+  Future<void> Function(String, VoidCallback) onSave(AuthBloc authRepository) =>
+      (
+        String value,
+        VoidCallback onError,
+      ) async {
+        await authRepository.updateMyPassword(value, onError);
       };
 }

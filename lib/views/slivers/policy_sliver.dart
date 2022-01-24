@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/conf_bloc.dart';
 import '../../config/theme.dart';
-import '../../models/conf.dart';
-import '../../repositories/conf_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/multi_line_text_form.dart';
-import '../theme_widgets/single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 import '../theme_widgets/wrapped_row.dart';
 
 class PolicySliver extends StatelessWidget {
@@ -19,17 +17,19 @@ class PolicySliver extends StatelessWidget {
             children: [
               BlocProvider(
                 key: ValueKey(
-                  '${(PolicySliver).toString()}:policy:'
-                  '${context.watch<PolicyCubit>().state}',
+                  '$runtimeType:policy:'
+                  '${context.select<ConfBloc, String?>(
+                    (confBloc) => confBloc.state?.policy,
+                  )}',
                 ),
                 create: (context) => SingleFieldFormBloc(
-                  context.read<PolicyCubit>().state,
+                  context.read<ConfBloc>().state?.policy ?? '',
                   withEditMode: true,
                 ),
                 child: Builder(
                   builder: (context) => MultiLineTextForm(
                     label: 'プライバシー・ポリシー',
-                    onSave: onSave(context.read<ConfRepository>()),
+                    onSave: onSave(context.read<ConfBloc>()),
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     markdown: true,
                     markdownStyleSheet: markdownStyleSheet(context),
@@ -42,11 +42,12 @@ class PolicySliver extends StatelessWidget {
       );
 }
 
-Future<void> Function(String) onSave(
-  ConfRepository confRepository,
+Future<void> Function(String, VoidCallback) onSave(
+  ConfBloc confBloc,
 ) =>
-    (String value) async {
-      await confRepository.update(
-        {Conf.fieldPolicy: value},
-      );
+    (
+      String value,
+      VoidCallback onError,
+    ) async {
+      confBloc.add(ConfChangedPolicy(value, onError));
     };

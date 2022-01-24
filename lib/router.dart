@@ -3,25 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/route_bloc.dart';
 import 'config/routes.dart';
 import 'views/base_screen.dart';
-import 'views/deligates/no_animation_route_transition_deligate.dart';
+import 'views/helpers/no_animation_route_transition_deligate.dart';
 
 class AppRouterDelegate extends RouterDelegate<AppRoute>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<AppRoute> {
   final TransitionDelegate transitionDelegate = NoAnimationTransitionDelegate();
-  final BuildContext context;
+  final BuildContext _context;
 
   @override
   final GlobalKey<NavigatorState> navigatorKey;
 
-  AppRouterDelegate(this.context) : navigatorKey = GlobalKey<NavigatorState>();
+  AppRouterDelegate(BuildContext context)
+      : _context = context,
+        navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   AppRoute get currentConfiguration =>
-      context.read<RouteBloc>().getCurrentRoute();
+      _context.read<RouteBloc>().getCurrentRoute();
 
   @override
   Future<void> setNewRoutePath(AppRoute configuration) async {
-    context.read<RouteBloc>().add(GoRoute(configuration));
+    _context.read<RouteBloc>().add(GoRoute(configuration));
   }
 
   @override

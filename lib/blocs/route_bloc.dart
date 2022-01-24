@@ -3,9 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../config/routes.dart';
-import '../models/account.dart';
-import '../models/auth_user.dart';
 import '../models/conf.dart';
+import 'my_account_bloc.dart';
 
 class AppRoute extends Equatable {
   final RouteName name;
@@ -94,9 +93,8 @@ class OnAuthStateChecked extends RouteEvent {
 }
 
 class OnMyAccountUpdated extends RouteEvent {
-  final AuthUser? authUser;
-  final Account? me;
-  OnMyAccountUpdated(this.authUser, this.me);
+  final MyAccountStatus state;
+  OnMyAccountUpdated(this.state);
 }
 
 class RouteBloc extends Bloc<RouteEvent, RouteState> {
@@ -105,7 +103,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
   bool _signIned = false;
   bool _emailVerified = false;
 
-  RouteBloc(BuildContext context)
+  RouteBloc()
       : super(
           RouteState(
             clientState: ClientState.loading,
@@ -137,8 +135,8 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
         OnMyAccountUpdated event,
         Emitter<RouteState> emit,
       ) {
-        _signIned = event.me != null;
-        _emailVerified = event.authUser?.emailVerified == true;
+        _signIned = event.state.me != null;
+        _emailVerified = event.state.authUser?.emailVerified == true;
         updateClientState(emit);
       },
     );

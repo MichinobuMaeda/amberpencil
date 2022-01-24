@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'default_input_container.dart';
-import 'single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 import 'wrapped_row.dart';
 
 typedef _Bloc = SingleFieldFormBloc<String>;
@@ -65,7 +65,7 @@ class TextForm extends StatelessWidget {
                                       .add(SingleFieldFormReset());
                                   resetController(
                                     context.read<_Bloc>().controller,
-                                    context.read<_Bloc>().initialValue,
+                                    context.read<_Bloc>().state.initialValue,
                                   );
                                 }),
                         errorText: context.watch<_Bloc>().state.validationError,
@@ -83,7 +83,7 @@ class TextForm extends StatelessWidget {
                   ),
                 ),
               ),
-              context.read<_Bloc>().confermationValidator == null
+              context.read<_Bloc>().state.confermationValidator == null
                   ? TextFormSaveButton(
                       onSave: _onSave,
                       onError: onError(context),
@@ -94,7 +94,7 @@ class TextForm extends StatelessWidget {
             ],
           ),
           Visibility(
-            visible: context.read<_Bloc>().confermationValidator != null,
+            visible: context.read<_Bloc>().state.confermationValidator != null,
             child: WrappedRow(
               children: [
                 DefaultInputContainer(

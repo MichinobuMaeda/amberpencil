@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/accounts_bloc.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../../config/validators.dart';
 import '../../models/account.dart';
-import '../../repositories/accounts_repository.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/text_form.dart';
-import '../theme_widgets/single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 
 class EditMyNameSliver extends StatelessWidget {
   const EditMyNameSliver({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class EditMyNameSliver extends StatelessWidget {
         children: [
           BlocProvider(
             key: ValueKey(
-              '${(EditMyNameSliver).toString()}:name:'
+              '$runtimeType:name:'
               '${context.watch<MyAccountBloc>().state.me!.name}',
             ),
             create: (context) => SingleFieldFormBloc(
@@ -27,7 +27,7 @@ class EditMyNameSliver extends StatelessWidget {
               builder: (context) => TextForm(
                 label: '表示名',
                 onSave: onSaveName(
-                  context.read<AccountsRepository>(),
+                  context.read<AccountsBloc>(),
                   context.read<MyAccountBloc>().state.me!.id,
                 ),
               ),
@@ -38,11 +38,9 @@ class EditMyNameSliver extends StatelessWidget {
 }
 
 TextFormOnSave onSaveName(
-  AccountsRepository accountsRepository,
+  AccountsBloc accountsBloc,
   String uid,
 ) =>
-    (String value) async {
-      await accountsRepository.updateMe(
-        {Account.fieldName: value},
-      );
+    (String value, VoidCallback onError) async {
+      accountsBloc.add(MyAccountChanged(Account.fieldName, value, onError));
     };

@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../repositories/auth_repository.dart';
+import '../../blocs/auth_bloc.dart';
 import '../../utils/env.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/default_input_container.dart';
 import '../theme_widgets/wrapped_row.dart';
-import '../theme_widgets/single_field_form_bloc.dart';
+import '../helpers/single_field_form_bloc.dart';
 
 class SignInSliver extends StatelessWidget {
   const SignInSliver({Key? key}) : super(key: key);
@@ -109,7 +109,13 @@ class SignInSliver extends StatelessWidget {
                             ? () {
                                 context.read<PasswordFieldFormBloc>().add(
                                       SingleFieldFormSave(
-                                        onSignInWithPassword(context),
+                                        onSignInWithPassword(
+                                          context,
+                                          context
+                                              .read<EmailFieldFormBloc>()
+                                              .state
+                                              .value,
+                                        ),
                                         onErrorSinInWithPassword(context),
                                       ),
                                     );
@@ -160,7 +166,8 @@ class SignInSliver extends StatelessWidget {
   VoidCallback onResetEmail(BuildContext context) => () {
         context.read<EmailFieldFormBloc>().add(SingleFieldFormReset());
 
-        String initValue = context.read<EmailFieldFormBloc>().initialValue;
+        String initValue =
+            context.read<EmailFieldFormBloc>().state.initialValue;
         TextEditingController controller =
             context.read<EmailFieldFormBloc>().controller;
 
@@ -171,9 +178,14 @@ class SignInSliver extends StatelessWidget {
         );
       };
 
-  Future<void> Function(String) onSendEmailLink(BuildContext context) =>
-      (String value) async {
-        await context.read<AuthRepository>().sendSignInLinkToEmail(value);
+  Future<void> Function(
+    String,
+    VoidCallback,
+  ) onSendEmailLink(BuildContext context) => (
+        String value,
+        VoidCallback onError,
+      ) async {
+        await context.read<AuthBloc>().sendSignInLinkToEmail(value, onError);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -183,11 +195,17 @@ class SignInSliver extends StatelessWidget {
         );
       };
 
-  Future<void> Function(String) onSignInWithPassword(BuildContext context) =>
-      (String value) async {
-        await context.read<AuthRepository>().signInWithEmailAndPassword(
-              context.watch<EmailFieldFormBloc>().state.value,
+  Future<void> Function(
+    String,
+    VoidCallback,
+  ) onSignInWithPassword(BuildContext context, String email) => (
+        String value,
+        VoidCallback onError,
+      ) async {
+        await context.read<AuthBloc>().signInWithEmailAndPassword(
+              email,
               value,
+              onError,
             );
       };
 
@@ -214,9 +232,10 @@ class SignInSliver extends StatelessWidget {
       };
 
   Future<void> Function() onTestLogin(BuildContext context) => () async {
-        await context.read<AuthRepository>().signInWithEmailAndPassword(
+        await context.read<AuthBloc>().signInWithEmailAndPassword(
               'primary@example.com',
               'password',
+              () {},
             );
       };
 }

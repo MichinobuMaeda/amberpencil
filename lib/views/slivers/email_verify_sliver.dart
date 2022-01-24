@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/time_ticker_bloc.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../../config/theme.dart';
-import '../../repositories/auth_repository.dart';
+import '../../blocs/auth_bloc.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
 
@@ -24,7 +24,7 @@ class EmailVerifySliver extends StatelessWidget {
               BlocProvider(
                 create: (context) => TimeTickerBloc(
                   interval: const Duration(seconds: 1),
-                  onTick: context.read<AuthRepository>().reload,
+                  onTick: authUserReload(context),
                   start: false,
                 ),
                 lazy: false,
@@ -50,7 +50,7 @@ class EmailVerifySliver extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: () async {
                           await context
-                              .read<AuthRepository>()
+                              .read<AuthBloc>()
                               .sendEmailVerification();
                           context.read<SendCubit>().set(true);
                           context.read<TimeTickerBloc>().activate();
@@ -77,7 +77,7 @@ class EmailVerifySliver extends StatelessWidget {
                       width: fieldWidth,
                       children: [
                         ElevatedButton(
-                          onPressed: context.read<AuthRepository>().reload,
+                          onPressed: authUserReload(context),
                           child: const Text('更新'),
                         ),
                       ],
@@ -107,4 +107,7 @@ class EmailVerifySliver extends StatelessWidget {
           ),
         ],
       );
+
+  VoidCallback authUserReload(BuildContext context) =>
+      () => context.read<AuthBloc>().add(AuthUserReloaded());
 }

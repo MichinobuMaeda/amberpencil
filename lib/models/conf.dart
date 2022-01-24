@@ -21,11 +21,11 @@ class Conf extends FirestoreModel {
   @override
   List<Object?> get props => super.props
     ..addAll([
-      fieldVersion,
-      fieldDataVersion,
-      fieldUrl,
-      fieldSeed,
-      fieldInvExpTime,
-      fieldPolicy,
+      version,
+      dataVersion,
+      url,
+      seed,
+      invExpTime,
+      policy,
     ]);
 }

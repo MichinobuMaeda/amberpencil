@@ -23,12 +23,12 @@ class Account extends FirestoreModel {
   @override
   List<Object?> get props => super.props
     ..addAll([
-      fieldName,
-      fieldEmail,
-      fieldGroup,
-      fieldValid,
-      fieldAdmin,
-      fieldTester,
-      fieldThemeMode,
+      name,
+      email,
+      group,
+      valid,
+      admin,
+      tester,
+      themeMode,
     ]);
 }
