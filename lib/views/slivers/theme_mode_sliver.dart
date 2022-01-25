@@ -1,8 +1,8 @@
-import 'package:amberpencil/blocs/accounts_bloc.dart';
-import 'package:amberpencil/blocs/my_account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import '../../blocs/accounts_bloc.dart';
+import '../../blocs/my_account_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../config/app_info.dart';
 import '../../models/account.dart';
