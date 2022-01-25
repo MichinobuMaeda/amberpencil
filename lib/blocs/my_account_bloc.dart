@@ -1,4 +1,4 @@
-// import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -67,6 +67,7 @@ class MyAccountBloc extends Bloc<MeEvent, MyAccountStatus> {
     });
 
     on<OnSingOutRequired>((event, emit) async {
+      debugPrint('on<OnSingOutRequired>');
       emit(const MyAccountStatus(null, null));
     });
   }

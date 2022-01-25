@@ -22,7 +22,7 @@ class EditMyNameSliver extends StatelessWidget {
             ),
             create: (context) => SingleFieldFormBloc(
               context.read<MyAccountBloc>().state.me!.name,
-              validator: requiredValidator,
+              validator: requiredValidator(context),
             ),
             child: Builder(
               builder: (context) => TextForm(

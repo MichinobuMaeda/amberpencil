@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:universal_html/html.dart' as html;
@@ -39,10 +40,21 @@ class PlatformStatue extends Equatable {
 
 abstract class PlatformEvent {}
 
+class MyThemeModeUpdated extends PlatformEvent {
+  final int themeMode;
+
+  MyThemeModeUpdated(this.themeMode);
+}
+
 class ThemeModeChanged extends PlatformEvent {
   final int themeMode;
 
   ThemeModeChanged(this.themeMode);
+}
+
+@visibleForTesting
+class ThemeModeReseted extends PlatformEvent {
+  ThemeModeReseted();
 }
 
 class SignInEmailChanged extends PlatformEvent {
@@ -80,9 +92,22 @@ class PlatformBloc extends Bloc<PlatformEvent, PlatformStatue> {
             signedInAt: localPreferences.getInt(keySignedInAt) ?? 0,
           ),
         ) {
+    on<MyThemeModeUpdated>((event, emit) {
+      if (event.themeMode > 0) {
+        _localPreferences.setInt(keyThemeMode, event.themeMode);
+        emit(state.copyWith(themeMode: event.themeMode));
+      }
+    });
+
     on<ThemeModeChanged>((event, emit) {
-      _localPreferences.setInt(keyThemeMode, event.themeMode);
-      emit(state.copyWith(themeMode: event.themeMode));
+      final int mode = event.themeMode == 0 ? 3 : event.themeMode;
+      _localPreferences.setInt(keyThemeMode, mode);
+      emit(state.copyWith(themeMode: mode));
+    });
+
+    on<ThemeModeReseted>((event, emit) {
+      _localPreferences.setInt(keyThemeMode, 0);
+      emit(state.copyWith(themeMode: 0));
     });
 
     on<SignInEmailChanged>((event, emit) {

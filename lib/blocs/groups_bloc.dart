@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/account.dart';
@@ -51,25 +51,27 @@ class GroupsBloc extends Bloc<GroupsEvent, List<Group>> {
 
     on<GroupsSubscribed>((event, emit) {
       _firestore.subscribe(event.me);
-      (event.me.admin
-              ? _ref
-              : _ref.where(Group.fieldAccounts, arrayContains: event.me.id))
-          .snapshots()
-          .listen(
-        (querySnap) {
-          add(GroupsSnapshot(querySnap));
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          debugPrint('$runtimeType:onError\n$error\n$stackTrace');
-          add(GroupsListenError());
-        },
+      _firestore.listen(
+        (event.me.admin
+                ? _ref
+                : _ref.where(Group.fieldAccounts, arrayContains: event.me.id))
+            .snapshots()
+            .listen(
+          (querySnap) {
+            add(GroupsSnapshot(querySnap));
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            debugPrint('$runtimeType:onError\n$error\n$stackTrace');
+            add(GroupsListenError());
+          },
+        ),
       );
     });
 
     on<GroupsUnsubscribed>((event, emit) async {
-      debugPrint('$runtimeType:unsubscribe');
-      _firestore.unsubscribe();
-      _firestore.cancel();
+      await _firestore.unsubscribe();
+      await _firestore.cancel();
+      emit([]);
     });
 
     on<GroupsChanged>((event, emit) async {

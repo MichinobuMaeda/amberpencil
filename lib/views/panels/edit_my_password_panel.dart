@@ -15,8 +15,8 @@ class EditMyPasswordPanel extends StatelessWidget {
         key: ValueKey('$runtimeType:password'),
         create: (context) => SingleFieldFormBloc(
           '',
-          validator: passwordValidator,
-          confermationValidator: confermationValidator,
+          validator: passwordValidator(context),
+          confermationValidator: confermationValidator(context),
         ),
         child: Builder(
           builder: (context) => TextForm(

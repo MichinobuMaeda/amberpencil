@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/account.dart';
@@ -24,7 +24,7 @@ class AccountsUnsubscribed extends AccountsEvent {}
 
 class MyAccountChanged extends AccountsEvent {
   final String field;
-  final String value;
+  final dynamic value;
   final VoidCallback onError;
 
   MyAccountChanged(this.field, this.value, this.onError);
@@ -33,7 +33,7 @@ class MyAccountChanged extends AccountsEvent {
 class AccountChanged extends AccountsEvent {
   final String id;
   final String field;
-  final String value;
+  final dynamic value;
   final VoidCallback onError;
 
   AccountChanged(this.id, this.field, this.value, this.onError);
@@ -49,6 +49,7 @@ class AccountDeleted extends AccountsEvent {
 class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
   final FireStorereDeligate _firestore;
   late CollectionReference<Map<String, dynamic>> _ref;
+  Account? _me;
 
   AccountsBloc({
     FirebaseFirestore? db,
@@ -65,9 +66,10 @@ class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
     on<AccountsListenError>((event, emit) => emit([]));
 
     on<AccountsSubscribed>((event, emit) {
-      _firestore.subscribe(event.me);
+      _me = event.me;
+      _firestore.subscribe(_me!);
       _firestore.listen(
-        event.me.admin
+        _me!.admin
             ? _ref.snapshots().listen(
                 (querySnap) {
                   add(AccountsSnapshot(querySnap.docs));
@@ -84,15 +86,16 @@ class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
     });
 
     on<AccountsUnsubscribed>((event, emit) async {
-      debugPrint('$runtimeType:unsubscribe');
-      _firestore.unsubscribe();
-      _firestore.cancel();
+      _me = null;
+      await _firestore.unsubscribe();
+      await _firestore.cancel();
+      emit([]);
     });
 
     on<MyAccountChanged>((event, emit) async {
       try {
         await _firestore.updateDocument(
-          _ref.doc(_firestore.me?.id),
+          _ref.doc(_me?.id),
           {event.field: event.value},
         );
       } catch (e, s) {

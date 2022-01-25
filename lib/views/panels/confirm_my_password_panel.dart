@@ -15,7 +15,7 @@ class ConfirmMyPasswordPanel extends StatelessWidget {
         key: ValueKey('$runtimeType:password'),
         create: (context) => SingleFieldFormBloc(
           '',
-          validator: requiredValidator,
+          validator: requiredValidator(context),
         ),
         child: Builder(
           builder: (context) => TextForm(

@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../config/routes.dart';
@@ -37,11 +35,11 @@ class AppRoute extends Equatable {
   List<Object?> get props => [name, id];
 }
 
-class RouteState {
+class RouteState extends Equatable {
   final ClientState _clientState;
   final List<AppRoute> _history;
 
-  RouteState({
+  const RouteState({
     required ClientState clientState,
     required List<AppRoute> history,
   })  : _clientState = clientState,
@@ -60,16 +58,7 @@ class RouteState {
       );
 
   @override
-  bool operator ==(Object other) =>
-      other is RouteState &&
-      other.clientState == clientState &&
-      listEquals<AppRoute>(other.history, _history);
-
-  @override
-  int get hashCode => hashValues(
-        clientState,
-        hashList(_history),
-      );
+  List<Object?> get props => [_clientState, _history];
 }
 
 abstract class RouteEvent {}
@@ -105,9 +94,9 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
 
   RouteBloc()
       : super(
-          RouteState(
+          const RouteState(
             clientState: ClientState.loading,
-            history: const [AppRoute(name: RouteName.loading)],
+            history: [AppRoute(name: RouteName.loading)],
           ),
         ) {
     on<OnConfUpdated>(

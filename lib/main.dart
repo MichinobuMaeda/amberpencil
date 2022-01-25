@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: supportedThemeModes[context.select<PlatformBloc, int>(
-          (bloc) => bloc.state.themeMode,
+          (bloc) => bloc.state.themeMode == 3 ? 0 : bloc.state.themeMode,
         )],
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

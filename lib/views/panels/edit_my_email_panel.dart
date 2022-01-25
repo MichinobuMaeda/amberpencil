@@ -16,8 +16,8 @@ class EditMyEmailPanel extends StatelessWidget {
         key: ValueKey('$runtimeType:email'),
         create: (context) => SingleFieldFormBloc(
           '',
-          validator: emailValidator,
-          confermationValidator: confermationValidator,
+          validator: emailValidator(context),
+          confermationValidator: confermationValidator(context),
         ),
         child: Builder(
           builder: (context) => TextForm(

@@ -19,8 +19,8 @@ class SignInSliver extends StatelessWidget {
         children: [
           MultiBlocProvider(
             providers: [
-              BlocProvider(create: (_) => EmailFieldFormBloc()),
-              BlocProvider(create: (_) => PasswordFieldFormBloc()),
+              BlocProvider(create: (context) => EmailFieldFormBloc(context)),
+              BlocProvider(create: (context) => PasswordFieldFormBloc(context)),
               BlocProvider(create: (_) => ShowPasswordCubit(false)),
             ],
             child: Builder(
@@ -245,12 +245,13 @@ class SignInSliver extends StatelessWidget {
 
 @visibleForTesting
 class EmailFieldFormBloc extends SingleFieldFormBloc<String> {
-  EmailFieldFormBloc() : super('', validator: emailValidator);
+  EmailFieldFormBloc(BuildContext context)
+      : super('', validator: emailValidator(context));
 }
 
 @visibleForTesting
 class PasswordFieldFormBloc extends SingleFieldFormBloc<String> {
-  PasswordFieldFormBloc() : super('');
+  PasswordFieldFormBloc(BuildContext context) : super('');
 }
 
 @visibleForTesting
