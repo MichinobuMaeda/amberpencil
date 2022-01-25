@@ -1,8 +1,8 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class UpdateAppButton extends StatelessWidget {
   const UpdateAppButton({Key? key}) : super(key: key);

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:universal_html/html.dart" as html;
@@ -11,6 +10,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'blocs/all_blocs_observer.dart';
 import 'blocs/accounts_bloc.dart';
+import 'blocs/auth_bloc.dart';
 import 'blocs/conf_bloc.dart';
 import 'blocs/groups_bloc.dart';
 import 'blocs/my_account_bloc.dart';
@@ -19,7 +19,7 @@ import 'blocs/platform_bloc.dart';
 import 'config/app_info.dart';
 import 'config/firebase_options.dart';
 import 'config/theme.dart';
-import 'blocs/auth_bloc.dart';
+import 'l10n/app_localizations.dart';
 import 'utils/env.dart';
 import 'router.dart';
 

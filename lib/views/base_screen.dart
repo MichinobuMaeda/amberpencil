@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/route_bloc.dart';
 import '../config/routes.dart';
+import '../l10n/app_localizations.dart';
 import 'slivers/app_info_sliver.dart';
 import 'slivers/edit_my_name_sliver.dart';
 import 'slivers/edit_my_email_password_sliver.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/auth_bloc.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
-import '../../blocs/auth_bloc.dart';
+import '../../l10n/app_localizations.dart';
 import '../../utils/env.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/default_input_container.dart';

@@ -1,6 +1,6 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoadingSliver extends StatelessWidget {
   const LoadingSliver({Key? key}) : super(key: key);

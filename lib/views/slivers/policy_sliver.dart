@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/conf_bloc.dart';
 import '../../config/theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/multi_line_text_form.dart';
 import '../helpers/single_field_form_bloc.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/auth_bloc.dart';
 import '../../blocs/time_ticker_bloc.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../../config/theme.dart';
-import '../../blocs/auth_bloc.dart';
+import '../../l10n/app_localizations.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
 
@@ -78,7 +78,7 @@ class EmailVerifySliver extends StatelessWidget {
                   WrappedRow(
                     width: fieldWidth,
                     children: [
-                      Text(AppLocalizations.of(context)!.sighOutForRetry),
+                      Text(AppLocalizations.of(context)!.signOutForRetry),
                     ],
                   ),
                   WrappedRow(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'default_input_container.dart';
+import '../../l10n/app_localizations.dart';
 import '../helpers/single_field_form_bloc.dart';
+import 'default_input_container.dart';
 import 'wrapped_row.dart';
 
 typedef _Bloc = SingleFieldFormBloc<String>;

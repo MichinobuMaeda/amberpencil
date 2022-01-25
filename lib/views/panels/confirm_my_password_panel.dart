@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../blocs/auth_bloc.dart';
+import '../../l10n/app_localizations.dart';
 import '../theme_widgets/text_form.dart';
 import '../helpers/single_field_form_bloc.dart';
 
