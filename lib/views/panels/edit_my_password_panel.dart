@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
@@ -19,7 +20,7 @@ class EditMyPasswordPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: 'パスワード',
+            label: AppLocalizations.of(context)!.password,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: onSave(context.read<AuthBloc>()),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../theme_widgets/box_sliver.dart';
@@ -16,7 +17,7 @@ class SignOutSliver extends StatelessWidget {
               WrappedRow(
                 children: [
                   Text(
-                    'このアプリの通常の使い方でログアウトする必要はありません。',
+                    AppLocalizations.of(context)!.alertSignOut,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),
@@ -27,9 +28,9 @@ class SignOutSliver extends StatelessWidget {
                 children: [
                   ComfirmDangerButon(
                     context: context,
-                    message: '本当にログアウトしますか？',
+                    message: AppLocalizations.of(context)!.confirmSignOut,
                     icon: const Icon(Icons.logout),
-                    label: 'ログアウト',
+                    label: AppLocalizations.of(context)!.signOut,
                     onPressed: () =>
                         context.read<MyAccountBloc>().add(OnSingOutRequired()),
                   ),

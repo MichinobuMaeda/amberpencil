@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/route_bloc.dart';
 import '../config/routes.dart';
@@ -49,7 +50,10 @@ class BaseScreen extends StatelessWidget {
                       context,
                     ),
                   ),
-                  ...contents(context.watch<RouteBloc>().state.history.last),
+                  ...contents(
+                    context.watch<RouteBloc>().state.history.last,
+                    AppLocalizations.of(context)!,
+                  ),
                 ],
               ),
             ),
@@ -57,7 +61,11 @@ class BaseScreen extends StatelessWidget {
         ),
       );
 
-  List<Widget> contents(AppRoute route) => [
+  List<Widget> contents(
+    AppRoute route,
+    AppLocalizations l10n,
+  ) =>
+      [
         const PageTitileSliver(),
         if (route.name == RouteName.loading) ...[
           const LoadingSliver(),
@@ -74,10 +82,10 @@ class BaseScreen extends StatelessWidget {
           const HomeSliver(),
         ],
         if (route.name == RouteName.admin) ...[
-          const SectionHeaderSliver('アカウント'),
-          const AccountsSliver(),
-          const SectionHeaderSliver('グループ'),
+          SectionHeaderSliver(l10n.groups),
           const GroupsSliver(),
+          SectionHeaderSliver(l10n.accounts),
+          const AccountsSliver(),
         ],
         if (route.name == RouteName.prefs) ...[
           const ThemeModeSliver(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
@@ -20,7 +21,7 @@ class EditMyEmailPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: 'メールアドレス',
+            label: AppLocalizations.of(context)!.email,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: onSaveEmail(
               context.read<AccountsBloc>(),

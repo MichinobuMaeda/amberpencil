@@ -8,7 +8,6 @@ class Account extends FirestoreModel {
   static const fieldValid = 'valid';
   static const fieldAdmin = 'admin';
   static const fieldTester = 'tester';
-  static const fieldThemeMode = 'themeMode';
 
   const Account(DocumentSnapshot<Map<String, dynamic>> snap) : super(snap);
 
@@ -18,7 +17,6 @@ class Account extends FirestoreModel {
   bool get valid => getValue<bool>(fieldValid, false);
   bool get admin => getValue<bool>(fieldAdmin, false);
   bool get tester => getValue<bool>(fieldTester, false);
-  int get themeMode => getValue<int>(fieldThemeMode, 0);
 
   @override
   List<Object?> get props => super.props
@@ -29,6 +27,5 @@ class Account extends FirestoreModel {
       valid,
       admin,
       tester,
-      themeMode,
     ]);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum ClientState { loading, guest, pending, authenticated }
 
@@ -52,43 +53,43 @@ class MenuItem {
   });
 }
 
-const List<MenuItem> menuItems = [
-  MenuItem(
-    routeName: RouteName.loading,
-    icon: Icon(Icons.autorenew),
-    label: '接続中',
-  ),
-  MenuItem(
-    routeName: RouteName.signin,
-    icon: Icon(Icons.login),
-    label: 'ログイン',
-  ),
-  MenuItem(
-    routeName: RouteName.verify,
-    icon: Icon(Icons.mark_email_read),
-    label: 'メールアドレスの確認',
-  ),
-  MenuItem(
-    routeName: RouteName.home,
-    icon: Icon(Icons.home),
-    label: 'ホーム',
-  ),
-  MenuItem(
-    routeName: RouteName.prefs,
-    icon: Icon(Icons.settings),
-    label: '設定',
-  ),
-  MenuItem(
-    routeName: RouteName.admin,
-    icon: Icon(Icons.handyman),
-    label: '管理',
-    admin: true,
-  ),
-  MenuItem(
-    routeName: RouteName.info,
-    icon: Icon(Icons.info),
-    label: 'アプリについて',
-  ),
-];
+List<MenuItem> menuItems(BuildContext context) => [
+      MenuItem(
+        routeName: RouteName.loading,
+        icon: const Icon(Icons.autorenew),
+        label: AppLocalizations.of(context)!.connecting,
+      ),
+      MenuItem(
+        routeName: RouteName.signin,
+        icon: const Icon(Icons.login),
+        label: AppLocalizations.of(context)!.signIn,
+      ),
+      MenuItem(
+        routeName: RouteName.verify,
+        icon: const Icon(Icons.mark_email_read),
+        label: AppLocalizations.of(context)!.verifyEmail,
+      ),
+      MenuItem(
+        routeName: RouteName.home,
+        icon: const Icon(Icons.home),
+        label: AppLocalizations.of(context)!.home,
+      ),
+      MenuItem(
+        routeName: RouteName.prefs,
+        icon: const Icon(Icons.settings),
+        label: AppLocalizations.of(context)!.settings,
+      ),
+      MenuItem(
+        routeName: RouteName.admin,
+        icon: const Icon(Icons.handyman),
+        label: AppLocalizations.of(context)!.admin,
+        admin: true,
+      ),
+      MenuItem(
+        routeName: RouteName.info,
+        icon: const Icon(Icons.info),
+        label: AppLocalizations.of(context)!.aboutApp,
+      ),
+    ];
 
 const bool keepHistory = false;

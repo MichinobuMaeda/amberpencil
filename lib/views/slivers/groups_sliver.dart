@@ -8,11 +8,23 @@ class GroupsSliver extends StatelessWidget {
   Widget build(BuildContext context) => SliverList(
         delegate: SliverChildListDelegate(
           [
-            Container(height: 150.0),
-            Container(color: Colors.grey, height: 150.0),
-            Container(height: 150.0),
-            Container(color: Colors.grey, height: 150.0),
-            Container(height: 150.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
+            Container(color: Colors.grey, height: 48.0),
+            Container(height: 48.0),
           ],
         ),
       );

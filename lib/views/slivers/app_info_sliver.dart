@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
 import '../theme_widgets/box_sliver.dart';
@@ -24,7 +25,7 @@ class AppInfoPSliver extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.copyright),
-            label: const Text('著作権とライセンス'),
+            label: Text(AppLocalizations.of(context)!.copyrightAndLicenses),
           ),
         ],
       );

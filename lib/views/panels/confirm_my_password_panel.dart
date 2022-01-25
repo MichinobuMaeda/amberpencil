@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
@@ -18,12 +19,12 @@ class ConfirmMyPasswordPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: 'パスワード',
+            label: AppLocalizations.of(context)!.password,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             saveButtonIcon: const Icon(Icons.check),
-            saveButtonName: '確認',
-            saveErrorMessage: 'パスワードの確認ができませんでした。',
+            saveButtonName: AppLocalizations.of(context)!.confirm,
+            saveErrorMessage: AppLocalizations.of(context)!.errorReauthPassword,
             onSave: onConfirm(context),
           ),
         ),

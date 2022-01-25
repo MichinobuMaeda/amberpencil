@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/conf_bloc.dart';
 import '../../config/theme.dart';
@@ -28,7 +29,7 @@ class PolicySliver extends StatelessWidget {
                 ),
                 child: Builder(
                   builder: (context) => MultiLineTextForm(
-                    label: 'プライバシー・ポリシー',
+                    label: AppLocalizations.of(context)!.privacyPolicy,
                     onSave: onSave(context.read<ConfBloc>()),
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     markdown: true,

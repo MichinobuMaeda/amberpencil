@@ -12,7 +12,7 @@ class PageTitileSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     MenuItem? menuItem;
     try {
-      menuItem = menuItems.singleWhere((item) =>
+      menuItem = menuItems(context).singleWhere((item) =>
           item.routeName == context.watch<RouteBloc>().state.history.last.name);
     } catch (e) {
       menuItem = null;
@@ -23,25 +23,27 @@ class PageTitileSliver extends StatelessWidget {
       delegate: StickyHeaderDelegate(
         minHeight: baseFontSize * 2.5,
         maxHeight: baseFontSize * 3.5,
-        child: ColoredBox(
+        child: Container(
           color: Theme.of(context).brightness == Brightness.light
               ? Colors.grey.shade300
               : Colors.grey.shade700,
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              SizedBox(
-                width: fontSizeH2 * 1.6,
-                height: fontSizeH2 * 1.6,
-                child: menuItem?.icon ?? const Icon(Icons.description),
-              ),
-              Text(
-                menuItem?.label ?? '',
-                style: const TextStyle(
-                  fontSize: fontSizeH2,
+          child: Center(
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                SizedBox(
+                  width: fontSizeH2 * 1.6,
+                  height: fontSizeH2 * 1.6,
+                  child: menuItem?.icon ?? const Icon(Icons.description),
                 ),
-              ),
-            ],
+                Text(
+                  menuItem?.label ?? '',
+                  style: const TextStyle(
+                    fontSize: fontSizeH2,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

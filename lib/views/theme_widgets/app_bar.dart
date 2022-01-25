@@ -81,7 +81,8 @@ class AppBarSliver extends StatelessWidget {
         context.watch<RouteBloc>().state.clientState,
       )
           .map<MenuItem>(
-            (route) => menuItems.singleWhere((item) => item.routeName == route),
+            (route) => menuItems(context)
+                .singleWhere((item) => item.routeName == route),
           )
           .where((item) =>
               item.routeName !=

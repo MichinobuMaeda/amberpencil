@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -69,7 +70,7 @@ class MultiLineTextForm extends TextForm {
                                   );
                             }
                           : null,
-                      label: const Text('保存'),
+                      label: Text(AppLocalizations.of(context)!.save),
                       icon: const Icon(Icons.save_alt),
                     ),
                     ElevatedButton.icon(
@@ -78,7 +79,7 @@ class MultiLineTextForm extends TextForm {
                             context.read<_Bloc>().state.initialValue;
                         context.read<_Bloc>().add(SingleFieldFormReset());
                       },
-                      label: const Text('中止'),
+                      label: Text(AppLocalizations.of(context)!.cancel),
                       icon: const Icon(Icons.cancel),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(

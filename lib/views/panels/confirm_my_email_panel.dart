@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../blocs/auth_bloc.dart';
@@ -12,7 +13,7 @@ class ConfirmMyEmailPanel extends StatelessWidget {
         children: [
           OutlinedButton(
             onPressed: onSendEmailLink(context),
-            child: const Text('確認用のURLをメールで受け取る'),
+            child: Text(AppLocalizations.of(context)!.reauthWithEmail),
             style: ButtonStyle(minimumSize: buttonMinimumSize),
           ),
         ],
@@ -22,20 +23,14 @@ class ConfirmMyEmailPanel extends StatelessWidget {
         try {
           await context.read<AuthBloc>().reauthenticateWithEmail();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                '登録されたアドレスにメールを送信しました。'
-                'メールに記載された手順で再ログインしてください。',
-              ),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.sentReauthUrl),
             ),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'メールが送信できませんでした。'
-                '通信の状態を確認してやり直してください。',
-              ),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.erroSendEmail),
             ),
           );
         }

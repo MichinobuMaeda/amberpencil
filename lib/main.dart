@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:universal_html/html.dart" as html;
 import 'package:provider/provider.dart';
@@ -85,15 +85,8 @@ class MyApp extends StatelessWidget {
         themeMode: supportedThemeModes[context.select<PlatformBloc, int>(
           (bloc) => bloc.state.themeMode,
         )],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en', ''),
-          Locale('ja', ''),
-        ],
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('ja', 'JP'),
         routerDelegate: context.read<AppRouterDelegate>(),
         routeInformationParser: AppRouteInformationParser(),

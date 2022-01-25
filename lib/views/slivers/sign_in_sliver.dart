@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
@@ -33,7 +34,7 @@ class SignInSliver extends StatelessWidget {
                           controller:
                               context.read<EmailFieldFormBloc>().controller,
                           decoration: InputDecoration(
-                            labelText: 'メールアドレス',
+                            labelText: AppLocalizations.of(context)!.email,
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.cancel),
                               onPressed: onResetEmail(context),
@@ -62,7 +63,9 @@ class SignInSliver extends StatelessWidget {
                                     );
                               }
                             : null,
-                        child: const Text('ログイン用のURLをメールで受け取る'),
+                        child: Text(
+                          AppLocalizations.of(context)!.siginInWithEmail,
+                        ),
                         style: ButtonStyle(minimumSize: buttonMinimumSize),
                       ),
                     ],
@@ -74,7 +77,7 @@ class SignInSliver extends StatelessWidget {
                           controller:
                               context.read<PasswordFieldFormBloc>().controller,
                           decoration: InputDecoration(
-                            labelText: 'パスワード',
+                            labelText: AppLocalizations.of(context)!.password,
                             suffixIcon: IconButton(
                               icon: Icon(
                                 context.watch<ShowPasswordCubit>().state
@@ -121,7 +124,9 @@ class SignInSliver extends StatelessWidget {
                                     );
                               }
                             : null,
-                        child: const Text('メールアドレスとパスワードでログインする'),
+                        child: Text(
+                          AppLocalizations.of(context)!.siginInWithPasword,
+                        ),
                         style: ButtonStyle(minimumSize: buttonMinimumSize),
                       ),
                     ],
@@ -187,9 +192,9 @@ class SignInSliver extends StatelessWidget {
       ) async {
         await context.read<AuthBloc>().sendSignInLinkToEmail(value, onError);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'ログイン用のリンクをメールで送信しました。',
+              AppLocalizations.of(context)!.sentUrlForSignIn,
             ),
           ),
         );
@@ -211,10 +216,9 @@ class SignInSliver extends StatelessWidget {
 
   VoidCallback onErrorSendEmailLink(BuildContext context) => () {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'メールが送信できませんでした。'
-              '通信の状態を確認してやり直してください。',
+              AppLocalizations.of(context)!.erroSendEmail,
             ),
           ),
         );
@@ -222,10 +226,9 @@ class SignInSliver extends StatelessWidget {
 
   VoidCallback onErrorSinInWithPassword(BuildContext context) => () {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'ログインできませんでした。'
-              'メールアドレスとパスワードを確認してやり直してください。',
+              AppLocalizations.of(context)!.errorSignInWithPassword,
             ),
           ),
         );

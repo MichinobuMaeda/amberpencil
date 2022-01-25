@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'default_input_container.dart';
 import '../helpers/single_field_form_bloc.dart';
@@ -13,9 +14,9 @@ class TextForm extends StatelessWidget {
   final TextFormOnSave _onSave;
   final TextStyle? style;
   final bool password;
-  final String saveButtonName;
+  final String? saveButtonName;
   final Icon saveButtonIcon;
-  final String saveErrorMessage;
+  final String? saveErrorMessage;
 
   const TextForm({
     Key? key,
@@ -23,13 +24,10 @@ class TextForm extends StatelessWidget {
     required TextFormOnSave onSave,
     this.style,
     this.password = false,
-    this.saveButtonName = '保存',
+    this.saveButtonName,
     this.saveButtonIcon = const Icon(Icons.save_alt),
-    String? saveErrorMessage,
+    this.saveErrorMessage,
   })  : _onSave = onSave,
-        saveErrorMessage = saveErrorMessage ??
-            '$labelが保存できませんでした。'
-                '通信の状態を確認してやり直してください。',
         super(key: key);
 
   @override
@@ -87,7 +85,8 @@ class TextForm extends StatelessWidget {
                   ? TextFormSaveButton(
                       onSave: _onSave,
                       onError: onError(context),
-                      saveButtonName: saveButtonName,
+                      saveButtonName:
+                          saveButtonName ?? AppLocalizations.of(context)!.save,
                       saveButtonIcon: saveButtonIcon,
                     )
                   : const SizedBox(width: 120.0),
@@ -105,7 +104,8 @@ class TextForm extends StatelessWidget {
                         controller:
                             context.read<_Bloc>().confirmationController,
                         decoration: InputDecoration(
-                          labelText: '$labelの確認',
+                          labelText:
+                              AppLocalizations.of(context)!.confirmation(label),
                           suffixIcon: password
                               ? IconButton(
                                   icon: Icon(
@@ -145,7 +145,8 @@ class TextForm extends StatelessWidget {
                 TextFormSaveButton(
                   onSave: _onSave,
                   onError: onError(context),
-                  saveButtonName: saveButtonName,
+                  saveButtonName:
+                      saveButtonName ?? AppLocalizations.of(context)!.save,
                   saveButtonIcon: saveButtonIcon,
                 ),
               ],
@@ -160,7 +161,10 @@ class TextForm extends StatelessWidget {
       () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(saveErrorMessage),
+            content: Text(
+              saveErrorMessage ??
+                  AppLocalizations.of(context)!.errorSave(label),
+            ),
           ),
         );
       };

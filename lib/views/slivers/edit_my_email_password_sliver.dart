@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
@@ -33,10 +34,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
   Widget build(BuildContext context) => BoxSliver(
         children: (context.watch<MyAccountBloc>().state.me?.email ?? '') == ''
             ? [
-                const Text(
-                  'メールアドレスとパスワードは設定されていません。'
-                  'メールアドレスとパスワードの設定は管理者に依頼してください。',
-                ),
+                Text(AppLocalizations.of(context)!.noEmailAndPassword),
               ]
             : [
                 MultiBlocProvider(
@@ -58,19 +56,19 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                       context.watch<TestModeCubit>().state,
                     )
                         ? Column(
-                            children: const [
+                            children: [
                               WrappedRow(
                                 width: fieldWidth,
                                 children: [
                                   Text(
-                                    'メールアドレスまたはパスワードを変更する場合、'
-                                    '現在のメールアドレスまたはパスワードの確認が必要です。',
+                                    AppLocalizations.of(context)!
+                                        .reauthRequired,
                                   ),
                                 ],
                               ),
-                              ConfirmMyEmailPanel(),
-                              ConfirmMyPasswordPanel(),
-                              ExpirationTestSwitch(),
+                              const ConfirmMyEmailPanel(),
+                              const ConfirmMyPasswordPanel(),
+                              const ExpirationTestSwitch(),
                             ],
                           )
                         : Column(

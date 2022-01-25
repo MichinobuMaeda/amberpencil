@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ComfirmDangerButon extends Widget {
   final BuildContext context;
@@ -40,7 +41,7 @@ class ComfirmDangerButon extends Widget {
                   onPressed: onPressed,
                 ),
                 TextButton.icon(
-                  label: const Text('中止'),
+                  label: Text(AppLocalizations.of(context)!.cancel),
                   icon: const Icon(Icons.close),
                   style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all<Color>(
