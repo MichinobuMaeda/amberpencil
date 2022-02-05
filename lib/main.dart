@@ -19,7 +19,7 @@ import 'blocs/platform_bloc.dart';
 import 'config/app_info.dart';
 import 'config/firebase_options.dart';
 import 'config/theme.dart';
-import 'l10n/app_localizations.dart';
+import 'config/l10n.dart';
 import 'utils/env.dart';
 import 'router.dart';
 
@@ -85,8 +85,8 @@ class MyApp extends StatelessWidget {
         themeMode: supportedThemeModes[context.select<PlatformBloc, int>(
           (bloc) => bloc.state.themeMode == 3 ? 0 : bloc.state.themeMode,
         )],
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
         locale: const Locale('ja', 'JP'),
         routerDelegate: context.read<AppRouterDelegate>(),
         routeInformationParser: AppRouteInformationParser(),

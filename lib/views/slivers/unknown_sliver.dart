@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
 
 class UnknownSliver extends StatelessWidget {
@@ -8,7 +8,7 @@ class UnknownSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BoxSliver(
         children: [
-          Text(AppLocalizations.of(context)!.notFound),
+          Text(L10n.of(context)!.notFound),
         ],
       );
 }

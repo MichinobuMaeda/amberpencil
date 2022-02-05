@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
 
 class AppInfoPSliver extends StatelessWidget {
@@ -25,7 +25,7 @@ class AppInfoPSliver extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.copyright),
-            label: Text(AppLocalizations.of(context)!.copyrightAndLicenses),
+            label: Text(L10n.of(context)!.copyrightAndLicenses),
           ),
         ],
       );

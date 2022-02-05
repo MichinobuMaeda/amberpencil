@@ -116,7 +116,7 @@ class PlatformBloc extends Bloc<PlatformEvent, PlatformStatue> {
     });
 
     on<SignedInAtChanged>((event, emit) {
-      int sinedInAt = DateTime.now().microsecondsSinceEpoch;
+      int sinedInAt = DateTime.now().millisecondsSinceEpoch;
       _localPreferences.setInt(keySignedInAt, sinedInAt);
       emit(state.copyWith(signedInAt: sinedInAt));
     });

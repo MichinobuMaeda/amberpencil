@@ -102,6 +102,11 @@ final outlinedButtonTheme = OutlinedButtonThemeData(
   ),
 );
 
+Color listOddEvenItemColor(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.light
+        ? Colors.blueGrey.shade50
+        : Colors.blueGrey.shade800;
+
 MarkdownStyleSheet markdownStyleSheet(BuildContext context) {
   final theme = Theme.of(context);
   return MarkdownStyleSheet(

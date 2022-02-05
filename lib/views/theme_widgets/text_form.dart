@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../l10n/app_localizations.dart';
+import '../../blocs/repository_request_delegate_bloc.dart';
+import '../../config/l10n.dart';
 import '../helpers/single_field_form_bloc.dart';
 import 'default_input_container.dart';
 import 'wrapped_row.dart';
 
 typedef _Bloc = SingleFieldFormBloc<String>;
 
-typedef TextFormOnSave = SingleFieldOnSave<String>;
-
 class TextForm extends StatelessWidget {
   final String label;
-  final TextFormOnSave _onSave;
+  final Future<void> Function() Function(String) onSave;
   final TextStyle? style;
   final bool password;
   final String? saveButtonName;
@@ -21,14 +20,13 @@ class TextForm extends StatelessWidget {
   const TextForm({
     Key? key,
     required this.label,
-    required TextFormOnSave onSave,
+    required this.onSave,
     this.style,
     this.password = false,
     this.saveButtonName,
     this.saveButtonIcon = const Icon(Icons.save_alt),
     this.saveErrorMessage,
-  })  : _onSave = onSave,
-        super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Column(
@@ -38,7 +36,7 @@ class TextForm extends StatelessWidget {
             children: [
               DefaultInputContainer(
                 child: BlocProvider(
-                  create: (_) => ShowPasswordCubit(false),
+                  create: (_) => _ShowPasswordCubit(false),
                   child: Builder(
                     builder: (context) => TextField(
                       controller: context.read<_Bloc>().controller,
@@ -47,12 +45,12 @@ class TextForm extends StatelessWidget {
                         suffixIcon: password
                             ? IconButton(
                                 icon: Icon(
-                                  context.watch<ShowPasswordCubit>().state
+                                  context.watch<_ShowPasswordCubit>().state
                                       ? Icons.visibility
                                       : Icons.visibility_off,
                                 ),
                                 onPressed: () {
-                                  context.read<ShowPasswordCubit>().toggle();
+                                  context.read<_ShowPasswordCubit>().toggle();
                                 },
                               )
                             : IconButton(
@@ -69,8 +67,8 @@ class TextForm extends StatelessWidget {
                         errorText: context.watch<_Bloc>().state.validationError,
                       ),
                       style: style,
-                      obscureText:
-                          password && !context.watch<ShowPasswordCubit>().state,
+                      obscureText: password &&
+                          !context.watch<_ShowPasswordCubit>().state,
                       onChanged: (value) {
                         context
                             .read<_Bloc>()
@@ -83,10 +81,8 @@ class TextForm extends StatelessWidget {
               ),
               context.read<_Bloc>().state.confermationValidator == null
                   ? TextFormSaveButton(
-                      onSave: _onSave,
-                      onError: onError(context),
-                      saveButtonName:
-                          saveButtonName ?? AppLocalizations.of(context)!.save,
+                      onSave: onSave,
+                      saveButtonName: saveButtonName ?? L10n.of(context)!.save,
                       saveButtonIcon: saveButtonIcon,
                     )
                   : const SizedBox(width: 120.0),
@@ -98,23 +94,22 @@ class TextForm extends StatelessWidget {
               children: [
                 DefaultInputContainer(
                   child: BlocProvider(
-                    create: (_) => ShowPasswordCubit(false),
+                    create: (_) => _ShowPasswordCubit(false),
                     child: Builder(
                       builder: (context) => TextField(
                         controller:
                             context.read<_Bloc>().confirmationController,
                         decoration: InputDecoration(
-                          labelText:
-                              AppLocalizations.of(context)!.confirmation(label),
+                          labelText: L10n.of(context)!.confirmation(label),
                           suffixIcon: password
                               ? IconButton(
                                   icon: Icon(
-                                    context.watch<ShowPasswordCubit>().state
+                                    context.watch<_ShowPasswordCubit>().state
                                         ? Icons.visibility
                                         : Icons.visibility_off,
                                   ),
                                   onPressed: () {
-                                    context.read<ShowPasswordCubit>().toggle();
+                                    context.read<_ShowPasswordCubit>().toggle();
                                   },
                                 )
                               : IconButton(
@@ -132,7 +127,7 @@ class TextForm extends StatelessWidget {
                         ),
                         style: style,
                         obscureText: password &&
-                            !context.watch<ShowPasswordCubit>().state,
+                            !context.watch<_ShowPasswordCubit>().state,
                         onChanged: (value) {
                           context
                               .read<_Bloc>()
@@ -143,10 +138,8 @@ class TextForm extends StatelessWidget {
                   ),
                 ),
                 TextFormSaveButton(
-                  onSave: _onSave,
-                  onError: onError(context),
-                  saveButtonName:
-                      saveButtonName ?? AppLocalizations.of(context)!.save,
+                  onSave: onSave,
+                  saveButtonName: saveButtonName ?? L10n.of(context)!.save,
                   saveButtonIcon: saveButtonIcon,
                 ),
               ],
@@ -162,8 +155,7 @@ class TextForm extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              saveErrorMessage ??
-                  AppLocalizations.of(context)!.errorSave(label),
+              saveErrorMessage ?? L10n.of(context)!.errorSave(label),
             ),
           ),
         );
@@ -183,35 +175,33 @@ class TextForm extends StatelessWidget {
 
 @visibleForTesting
 class TextFormSaveButton extends StatelessWidget {
-  final TextFormOnSave onSave;
-  final VoidCallback onError;
+  final Future<void> Function() Function(String) onSave;
   final String saveButtonName;
   final Icon saveButtonIcon;
 
   const TextFormSaveButton({
     Key? key,
     required this.onSave,
-    required this.onError,
     required this.saveButtonName,
     required this.saveButtonIcon,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => ElevatedButton.icon(
-        onPressed: context.watch<_Bloc>().state.buttonEnabled
-            ? () {
-                context.read<_Bloc>().add(
-                      SingleFieldFormSave(onSave, onError),
-                    );
-              }
+        onPressed: context.watch<_Bloc>().state.ready &&
+                !context.watch<RepositoryRequestBloc>().state
+            ? () => context.read<RepositoryRequestBloc>().add(
+                  RepositoryRequest(
+                    request: onSave(context.read<_Bloc>().state.value),
+                  ),
+                )
             : null,
         label: Text(saveButtonName),
         icon: saveButtonIcon,
       );
 }
 
-@visibleForTesting
-class ShowPasswordCubit extends Cubit<bool> {
-  ShowPasswordCubit(bool initialState) : super(initialState);
+class _ShowPasswordCubit extends Cubit<bool> {
+  _ShowPasswordCubit(bool initialState) : super(initialState);
   void toggle() => emit(!state);
 }

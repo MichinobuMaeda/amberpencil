@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/conf_bloc.dart';
 import '../../config/theme.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
+import '../../models/conf.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/multi_line_text_form.dart';
 import '../helpers/single_field_form_bloc.dart';
@@ -29,8 +30,10 @@ class PolicySliver extends StatelessWidget {
                 ),
                 child: Builder(
                   builder: (context) => MultiLineTextForm(
-                    label: AppLocalizations.of(context)!.privacyPolicy,
-                    onSave: onSave(context.read<ConfBloc>()),
+                    label: L10n.of(context)!.privacyPolicy,
+                    onSave: (value) => () => context.read<ConfBloc>().update({
+                          Conf.fieldPolicy: value,
+                        }),
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     markdown: true,
                     markdownStyleSheet: markdownStyleSheet(context),
@@ -42,13 +45,3 @@ class PolicySliver extends StatelessWidget {
         ],
       );
 }
-
-Future<void> Function(String, VoidCallback) onSave(
-  ConfBloc confBloc,
-) =>
-    (
-      String value,
-      VoidCallback onError,
-    ) async {
-      confBloc.add(ConfChangedPolicy(value, onError));
-    };

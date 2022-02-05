@@ -37,7 +37,7 @@ class FireStorereDeligate {
     }
   }
 
-  Future<void> createDocument(
+  Future<void> addDocument(
     CollectionReference<Map<String, dynamic>> ref,
     Map<String, dynamic> data,
   ) async {
@@ -70,6 +70,18 @@ class FireStorereDeligate {
     await ref.update({
       FirestoreModel.fieldDeletedAt: DateTime.now(),
       FirestoreModel.fieldDeletedBy: _me!.id,
+    });
+  }
+
+  Future<void> restoreDocument(
+    DocumentReference<Map<String, dynamic>> ref,
+  ) async {
+    assert(_me?.id != null, 'Not authorized');
+    await ref.update({
+      FirestoreModel.fieldUpdatedAt: DateTime.now(),
+      FirestoreModel.fieldUpdatedBy: _me!.id,
+      FirestoreModel.fieldDeletedAt: null,
+      FirestoreModel.fieldDeletedBy: null,
     });
   }
 }

@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'app_localizations_en.dart';
-import 'app_localizations_ja.dart';
+import 'l10n_en.dart';
+import 'l10n_ja.dart';
 
 /// Callers can lookup localized strings with an instance of AppLocalizations returned
 /// by `AppLocalizations.of(context)`.
@@ -59,17 +59,17 @@ import 'app_localizations_ja.dart';
 /// you wish to add from the pop-up menu in the Value field. This list should
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
-abstract class AppLocalizations {
-  AppLocalizations(String locale)
+abstract class L10n {
+  L10n(String locale)
       : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static L10n? of(BuildContext context) {
+    return Localizations.of<L10n>(context, L10n);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
+  static const LocalizationsDelegate<L10n> delegate =
       _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
@@ -97,12 +97,17 @@ abstract class AppLocalizations {
   ];
 
   // Actions
+  String get edit;
+  String get add;
+  String get create;
   String get update;
   String get send;
   String get confirm;
   String get save;
   String get delete;
+  String get restore;
   String get cancel;
+  String get deleteOrRestor;
   String get updateApp;
   String get reauthWithEmail;
   String get siginInWithEmail;
@@ -126,20 +131,30 @@ abstract class AppLocalizations {
   String get light;
   String get dark;
   // Items
+  String get account;
+  String get group;
   String get email;
   String get password;
   String get displayName;
+  String get themeMode;
   String confirmation(String label);
-  // Messages: complete
+  // Messages: confirmation
+  String confirmDelete(String collection, String item);
+  String confirmRestore(String collection, String item);
+  String get alertSignOut;
+  String get confirmSignOut;
+  // Messages: completed
   String get sentReauthUrl;
   String get sentUrlForSignIn;
   String get sentUrlToVerify;
+  String get successRequest;
   // Messages: error
   String get errorRequired;
   String get errorEmailFormat;
   String get errorPasswordLength;
   String get errorPasswordChars;
   String get errorConfirmation;
+  String get errorRequest;
   String errorSave(String label);
   String get erroSendEmail;
   String get errorSignInWithPassword;
@@ -148,19 +163,16 @@ abstract class AppLocalizations {
   String get noEmailAndPassword;
   String get reauthRequired;
   String get emailVerificationRequired;
-  String get alertSignOut;
-  String get confirmSignOut;
   String get pleaseWait;
   String get notFound;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<L10n> {
   const _AppLocalizationsDelegate();
 
   @override
-  Future<AppLocalizations> load(Locale locale) {
-    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  Future<L10n> load(Locale locale) {
+    return SynchronousFuture<L10n>(lookupAppLocalizations(locale));
   }
 
   @override
@@ -171,13 +183,13 @@ class _AppLocalizationsDelegate
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
-AppLocalizations lookupAppLocalizations(Locale locale) {
+L10n lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':
-      return AppLocalizationsEn();
+      return L10nEn();
     case 'ja':
-      return AppLocalizationsJa();
+      return L10nJa();
   }
 
   throw FlutterError(

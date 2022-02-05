@@ -1,10 +1,19 @@
-import 'app_localizations.dart';
+import 'l10n.dart';
 
 /// The translations for Japanese (`ja`).
-class AppLocalizationsJa extends AppLocalizations {
-  AppLocalizationsJa([String locale = 'ja']) : super(locale);
+class L10nJa extends L10n {
+  L10nJa([String locale = 'ja']) : super(locale);
 
   // Actions
+
+  @override
+  String get edit => '編集';
+
+  @override
+  String get add => '追加';
+
+  @override
+  String get create => '作成';
 
   @override
   String get update => '更新';
@@ -22,7 +31,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get delete => '削除';
 
   @override
+  String get restore => '復活';
+
+  @override
   String get cancel => '中止';
+
+  @override
+  String get deleteOrRestor => '削除／復活';
 
   @override
   String get updateApp => 'アプリを更新してください';
@@ -91,20 +106,41 @@ class AppLocalizationsJa extends AppLocalizations {
   // Items
 
   @override
+  String get account => 'アカウント';
+
+  @override
+  String get group => 'グループ';
+
+  @override
   String get email => 'メールアドレス';
 
   @override
   String get password => 'パスワード';
 
   @override
+  String get themeMode => '表示テーマモード';
+
+  @override
   String get displayName => '表示名';
 
   @override
-  String confirmation(String label) {
-    return '$labelの確認';
-  }
+  String confirmation(String label) => '$labelの確認';
 
-  // Messages: complete
+  // Messages: confirmation
+
+  @override
+  String confirmDelete(String collection, String item) => '$collection$item';
+
+  @override
+  String confirmRestore(String collection, String item) => '$collection$item';
+
+  @override
+  String get alertSignOut => 'このアプリの通常の使い方でログアウトする必要はありません。';
+
+  @override
+  String get confirmSignOut => '本当にログアウトしますか？';
+
+  // Messages: completed
 
   @override
   String get sentReauthUrl => '登録されたアドレスにメールを送信しました。メールに記載された手順で再ログインしてください。';
@@ -115,6 +151,9 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get sentUrlToVerify =>
       '確認のためのメールを送信しました。そのメールに記載された確認のためのボタンを押してもこの表示が自動で切り替わらない場合は下の「更新」ボタンを押してください。';
+
+  @override
+  String get successRequest => '完了しました。';
 
   // Messages: error
 
@@ -134,9 +173,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get errorConfirmation => '確認の入力内容が一致しません。';
 
   @override
-  String errorSave(String label) {
-    return '$labelが保存できませんでした。通信の状態を確認してやり直してください。';
-  }
+  String get errorRequest => '処理に失敗しました。通信の状態を確認してやり直してください。';
+
+  @override
+  String errorSave(String label) => '$labelが保存できませんでした。通信の状態を確認してやり直してください。';
 
   @override
   String get erroSendEmail => 'メールが送信できませんでした。通信の状態を確認してやり直してください。';
@@ -161,12 +201,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get emailVerificationRequired =>
       '初めて使うメールアドレスの確認が必要です。下の「送信」ボタンを押してください。登録されたメールアドレスに確認のためのメールを送信しますので、そのメールに記載された確認のためのボタンを押してください。';
-
-  @override
-  String get alertSignOut => 'このアプリの通常の使い方でログアウトする必要はありません。';
-
-  @override
-  String get confirmSignOut => '本当にログアウトしますか？';
 
   @override
   String get pleaseWait => 'しばらくお待ちください';

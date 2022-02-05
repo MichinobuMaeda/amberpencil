@@ -5,7 +5,7 @@ import '../../config/theme.dart';
 import '../../blocs/my_account_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../blocs/time_ticker_bloc.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 import '../../utils/env.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
@@ -15,12 +15,13 @@ import '../panels/edit_my_email_panel.dart';
 import '../panels/edit_my_password_panel.dart';
 
 bool isExpired(
-  DateTime ticker,
-  DateTime reauthedAt,
+  int ticker,
+  int reauthedAt,
   bool testMode,
-) =>
-    ticker.difference(reauthedAt).inMilliseconds >
-    (testMode ? 10 * 1000 : 1800 * 1000);
+) {
+  // debugPrint('$ticker $reauthedAt $testMode');
+  return ticker - reauthedAt > (testMode ? 10 * 1000 : 1800 * 1000);
+}
 
 class TestModeCubit extends Cubit<bool> {
   TestModeCubit(bool initialState) : super(initialState);
@@ -34,7 +35,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
   Widget build(BuildContext context) => BoxSliver(
         children: (context.watch<MyAccountBloc>().state.me?.email ?? '') == ''
             ? [
-                Text(AppLocalizations.of(context)!.noEmailAndPassword),
+                Text(L10n.of(context)!.noEmailAndPassword),
               ]
             : [
                 MultiBlocProvider(
@@ -49,10 +50,11 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                   ],
                   child: Builder(
                     builder: (context) => isExpired(
-                      context.watch<TimeTickerBloc>().state,
-                      DateTime.fromMillisecondsSinceEpoch(
-                        context.read<PlatformBloc>().state.signedInAt,
-                      ),
+                      context
+                          .watch<TimeTickerBloc>()
+                          .state
+                          .millisecondsSinceEpoch,
+                      context.watch<PlatformBloc>().state.signedInAt,
                       context.watch<TestModeCubit>().state,
                     )
                         ? Column(
@@ -61,8 +63,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
                                 width: fieldWidth,
                                 children: [
                                   Text(
-                                    AppLocalizations.of(context)!
-                                        .reauthRequired,
+                                    L10n.of(context)!.reauthRequired,
                                   ),
                                 ],
                               ),

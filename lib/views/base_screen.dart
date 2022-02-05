@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/route_bloc.dart';
+import '../blocs/repository_request_delegate_bloc.dart';
 import '../config/routes.dart';
-import '../l10n/app_localizations.dart';
+import '../config/l10n.dart';
 import 'slivers/app_info_sliver.dart';
 import 'slivers/edit_my_name_sliver.dart';
 import 'slivers/edit_my_email_password_sliver.dart';
@@ -31,30 +32,36 @@ class BaseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         key: _scaffoldKey,
-        body: NestedScrollView(
-          headerSliverBuilder:
-              (BuildContext context, bool innerBoxIsScrolled) => [
-            SliverOverlapAbsorber(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: AppBarSliver(forceElevated: innerBoxIsScrolled),
-            ),
-          ],
-          body: SafeArea(
-            top: false,
-            bottom: false,
-            child: Builder(
-              builder: (BuildContext context) => CustomScrollView(
-                slivers: [
-                  SliverOverlapInjector(
-                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                      context,
-                    ),
+        body: BlocProvider(
+          create: (_) => RepositoryRequestBloc(context),
+          child: Builder(
+            builder: (context) => NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) => [
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: AppBarSliver(forceElevated: innerBoxIsScrolled),
+                ),
+              ],
+              body: SafeArea(
+                top: false,
+                bottom: false,
+                child: Builder(
+                  builder: (BuildContext context) => CustomScrollView(
+                    slivers: [
+                      SliverOverlapInjector(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context,
+                        ),
+                      ),
+                      ...contents(
+                        context.watch<RouteBloc>().state.history.last,
+                        L10n.of(context)!,
+                      ),
+                    ],
                   ),
-                  ...contents(
-                    context.watch<RouteBloc>().state.history.last,
-                    AppLocalizations.of(context)!,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -63,7 +70,7 @@ class BaseScreen extends StatelessWidget {
 
   List<Widget> contents(
     AppRoute route,
-    AppLocalizations l10n,
+    L10n l10n,
   ) =>
       [
         const PageTitileSliver(),

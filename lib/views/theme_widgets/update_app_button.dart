@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../config/theme.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 
 class UpdateAppButton extends StatelessWidget {
   const UpdateAppButton({Key? key}) : super(key: key);
@@ -10,7 +10,7 @@ class UpdateAppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialBanner(
         content: Text(
-          AppLocalizations.of(context)!.updateApp,
+          L10n.of(context)!.updateApp,
           textAlign: TextAlign.right,
         ),
         actions: [

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../blocs/auth_bloc.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/text_form.dart';
 import '../helpers/single_field_form_bloc.dart';
 
@@ -19,27 +19,15 @@ class ConfirmMyPasswordPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: AppLocalizations.of(context)!.password,
+            label: L10n.of(context)!.password,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             saveButtonIcon: const Icon(Icons.check),
-            saveButtonName: AppLocalizations.of(context)!.confirm,
-            saveErrorMessage: AppLocalizations.of(context)!.errorReauthPassword,
-            onSave: onConfirm(context),
+            saveButtonName: L10n.of(context)!.confirm,
+            saveErrorMessage: L10n.of(context)!.errorReauthPassword,
+            onSave: (value) => () =>
+                context.read<AuthBloc>().reauthenticateWithPassword(value),
           ),
         ),
       );
-
-  Future<void> Function(
-    String,
-    VoidCallback,
-  ) onConfirm(BuildContext context) => (
-        String value,
-        VoidCallback onError,
-      ) async {
-        await context.read<AuthBloc>().reauthenticateWithPassword(
-              value,
-              onError,
-            );
-      };
 }

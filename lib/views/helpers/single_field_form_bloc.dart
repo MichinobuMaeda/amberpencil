@@ -2,19 +2,14 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
 
-typedef SingleFieldValidate<T> = String? Function(T?)?;
-typedef SingleFieldOnSave<T> = Future<void> Function(T, VoidCallback);
-typedef SingleFieldConvertFrom<T> = String Function(T);
-
 class SingleFieldFormState<T> extends Equatable {
   final T initialValue;
   final bool withEditMode;
-  final SingleFieldValidate<T>? validator;
+  final String? Function(T?)? validator;
   final String? Function(T?, T?)? confermationValidator;
   final T value;
   final T confirmation;
   final bool editMode;
-  final bool waitProcess;
 
   const SingleFieldFormState({
     required this.initialValue,
@@ -23,8 +18,7 @@ class SingleFieldFormState<T> extends Equatable {
     required this.confermationValidator,
   })  : value = initialValue,
         confirmation = initialValue,
-        editMode = !withEditMode,
-        waitProcess = false;
+        editMode = !withEditMode;
 
   SingleFieldFormState.copyWith(
     SingleFieldFormState<T> current, {
@@ -38,8 +32,7 @@ class SingleFieldFormState<T> extends Equatable {
         editMode = editMode ?? current.editMode,
         confirmation = confirmation ?? current.confirmation,
         validator = current.validator,
-        confermationValidator = current.confermationValidator,
-        waitProcess = waitProcess ?? current.waitProcess;
+        confermationValidator = current.confermationValidator;
 
   String? get validationError =>
       (value == initialValue || validator == null) ? null : validator!(value);
@@ -48,8 +41,7 @@ class SingleFieldFormState<T> extends Equatable {
       ? null
       : confermationValidator!(value, confirmation);
 
-  bool get buttonEnabled =>
-      !waitProcess &&
+  bool get ready =>
       value != initialValue &&
       validationError == null &&
       confirmationError == null;
@@ -63,7 +55,6 @@ class SingleFieldFormState<T> extends Equatable {
         value,
         confirmation,
         editMode,
-        waitProcess,
       ];
 }
 
@@ -81,15 +72,6 @@ class SingleFieldFormConfirmed<T> extends SingleFieldFormEvent<T> {
   SingleFieldFormConfirmed(this.confirmation);
 }
 
-class SingleFieldFormSave<T> extends SingleFieldFormEvent<T> {
-  final SingleFieldOnSave<T> onSave;
-  final VoidCallback onSaveError;
-  SingleFieldFormSave(
-    this.onSave,
-    this.onSaveError,
-  );
-}
-
 class SingleFieldFormReset<T> extends SingleFieldFormEvent<T> {}
 
 class SingleFieldFormConfirmationReset<T> extends SingleFieldFormEvent<T> {}
@@ -98,19 +80,22 @@ class SingleFieldFormSetEditMode<T> extends SingleFieldFormEvent<T> {
   SingleFieldFormSetEditMode();
 }
 
+String defaultConvertFrom<T>(T value) => value.toString();
+
 class SingleFieldFormBloc<T>
     extends Bloc<SingleFieldFormEvent<T>, SingleFieldFormState<T>> {
-  late SingleFieldConvertFrom<T> convertFrom;
+  final String Function(T) convertFrom;
   late TextEditingController controller;
   late TextEditingController confirmationController;
 
   SingleFieldFormBloc(
     T initialValue, {
-    SingleFieldConvertFrom<T>? convertFrom,
+    String Function(T)? convertFrom,
     bool withEditMode = false,
-    SingleFieldValidate<T>? validator,
+    String? Function(T?)? validator,
     String? Function(T?, T?)? confermationValidator,
-  }) : super(
+  })  : convertFrom = convertFrom ?? defaultConvertFrom,
+        super(
           SingleFieldFormState<T>(
             initialValue: initialValue,
             withEditMode: withEditMode,
@@ -118,7 +103,6 @@ class SingleFieldFormBloc<T>
             confermationValidator: confermationValidator,
           ),
         ) {
-    this.convertFrom = convertFrom ?? (T value) => value.toString();
     controller = TextEditingController(text: this.convertFrom(initialValue));
     confirmationController = TextEditingController(text: '');
 
@@ -128,21 +112,14 @@ class SingleFieldFormBloc<T>
       },
     );
 
-    on<SingleFieldFormSave<T>>(
-      (event, Emitter emit) async {
-        if (state.value != initialValue) {
-          emit(SingleFieldFormState.copyWith(state, waitProcess: true));
-          await event.onSave(state.value, () {
-            emit(SingleFieldFormState.copyWith(state, waitProcess: false));
-            event.onSaveError();
-          });
-        }
-      },
-    );
-
     on<SingleFieldFormReset<T>>(
-      (event, Emitter emit) async {
-        emit(SingleFieldFormState.copyWith(state, value: state.initialValue));
+      (event, Emitter emit) {
+        emit(SingleFieldFormState.copyWith(
+          state,
+          value: state.initialValue,
+          editMode: false,
+        ));
+        controller.text = this.convertFrom(state.initialValue);
       },
     );
 

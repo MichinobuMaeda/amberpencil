@@ -9,13 +9,13 @@ abstract class ConfEvent {}
 
 class ConfListenStart extends ConfEvent {}
 
-class ConfSnapshot extends ConfEvent {
+class _ConfOnSnapshot extends ConfEvent {
   final DocumentSnapshot<Map<String, dynamic>> snap;
 
-  ConfSnapshot(this.snap);
+  _ConfOnSnapshot(this.snap);
 }
 
-class ConfListenError extends ConfEvent {}
+class _ConfOnError extends ConfEvent {}
 
 class ConfSubscribed extends ConfEvent {
   final Account me;
@@ -24,13 +24,6 @@ class ConfSubscribed extends ConfEvent {
 }
 
 class ConfUnsubscribed extends ConfEvent {}
-
-class ConfChangedPolicy extends ConfEvent {
-  final String value;
-  final VoidCallback onError;
-
-  ConfChangedPolicy(this.value, this.onError);
-}
 
 class ConfBloc extends Bloc<ConfEvent, Conf?> {
   final FireStorereDeligate _firestore;
@@ -46,40 +39,27 @@ class ConfBloc extends Bloc<ConfEvent, Conf?> {
       _firestore.listen(
         _ref.snapshots().listen(
           (DocumentSnapshot<Map<String, dynamic>> snap) {
-            add(ConfSnapshot(snap));
+            add(_ConfOnSnapshot(snap));
           },
           onError: (Object error, StackTrace stackTrace) {
             debugPrint('$runtimeType:onError\n$error\n$stackTrace');
-            add(ConfListenError());
+            add(_ConfOnError());
           },
         ),
       );
     });
 
-    on<ConfSnapshot>(
-      (event, emit) {
-        Conf? value = event.snap.exists ? Conf(event.snap) : null;
-        emit(value);
-      },
+    on<_ConfOnSnapshot>(
+      (event, emit) => emit(event.snap.exists ? Conf(event.snap) : null),
     );
 
-    on<ConfListenError>((event, emit) => emit(null));
+    on<_ConfOnError>((event, emit) => emit(null));
 
     on<ConfSubscribed>((event, emit) => _firestore.subscribe(event.me));
 
     on<ConfUnsubscribed>((event, emit) => _firestore.unsubscribe());
-
-    on<ConfChangedPolicy>(
-      (event, emit) async {
-        try {
-          await _firestore.updateDocument(_ref, {
-            Conf.fieldPolicy: event.value,
-          });
-        } catch (e, s) {
-          debugPrint('\non<ConfChangedPolicy>\n$e\n$s\n');
-          event.onError();
-        }
-      },
-    );
   }
+
+  Future<void> update(Map<String, dynamic> data) =>
+      _firestore.updateDocument(_ref, data);
 }

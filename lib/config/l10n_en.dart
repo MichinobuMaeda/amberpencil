@@ -1,10 +1,19 @@
-import 'app_localizations.dart';
+import 'l10n.dart';
 
 /// The translations for English (`en`).
-class AppLocalizationsEn extends AppLocalizations {
-  AppLocalizationsEn([String locale = 'en']) : super(locale);
+class L10nEn extends L10n {
+  L10nEn([String locale = 'en']) : super(locale);
 
   // Actions
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get create => 'Create';
 
   @override
   String get update => 'Update';
@@ -22,7 +31,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
+  String get restore => 'restore';
+
+  @override
   String get cancel => 'Cancel';
+
+  @override
+  String get deleteOrRestor => 'Delete/Restore';
 
   @override
   String get updateApp => 'Update this app.';
@@ -92,20 +107,44 @@ class AppLocalizationsEn extends AppLocalizations {
   // Items
 
   @override
+  String get account => 'Account';
+
+  @override
+  String get group => 'Group';
+
+  @override
   String get email => 'E-mail';
 
   @override
   String get password => 'Password';
 
   @override
+  String get themeMode => 'Theme mode';
+
+  @override
   String get displayName => 'Display name';
 
   @override
-  String confirmation(String label) {
-    return 'confirm $label';
-  }
+  String confirmation(String label) => 'confirm $label';
 
-  // Messages: complete
+  // Messages: confirmation
+
+  @override
+  String confirmDelete(String collection, String item) =>
+      'Delete the ${collection.toLowerCase()}: "$item".';
+
+  @override
+  String confirmRestore(String collection, String item) =>
+      'Restore the deleted ${collection.toLowerCase()}: "$item".';
+
+  @override
+  String get alertSignOut =>
+      'You do not need to sign out for normal usage of this app.';
+
+  @override
+  String get confirmSignOut => 'Do you really want to sign out?';
+
+  // Messages: completed
 
   @override
   String get sentReauthUrl =>
@@ -116,7 +155,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sentUrlToVerify =>
-      'An email for confirmation has been sent. If this display does not switch automatically even if you press the confirmation button described in the email, please press the \"Update\" button below.';
+      'An email for confirmation has been sent. If this display does not switch automatically even if you press the confirmation button described in the email, please press the "Update" button below.';
+
+  @override
+  String get successRequest => 'Completed.';
 
   // Messages: error
 
@@ -137,9 +179,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorConfirmation => 'The confirmation input does not match.';
 
   @override
-  String errorSave(String label) {
-    return 'Failed to save the $label. Please check the network status and try again.';
-  }
+  String get errorRequest =>
+      'Failed to complete the request. Please check the network status and try again.';
+
+  @override
+  String errorSave(String label) =>
+      'Failed to save the $label. Please check the network status and try again.';
 
   @override
   String get erroSendEmail =>
@@ -165,14 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailVerificationRequired =>
-      'You need to confirm the email address you use for the first time. Please press the \"Send\" button below. A confirmation e-mail will be sent to the registered e-mail address, so please press the confirmation e-mail described in the e-mail.';
-
-  @override
-  String get alertSignOut =>
-      'You do not need to sign out for normal usage of this app.';
-
-  @override
-  String get confirmSignOut => 'Do you really want to sign out?';
+      'You need to confirm the email address you use for the first time. Please press the "Send" button below. A confirmation e-mail will be sent to the registered e-mail address, so please press the confirmation e-mail described in the e-mail.';
 
   @override
   String get pleaseWait => 'Loading now';

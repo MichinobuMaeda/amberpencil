@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../blocs/auth_bloc.dart';
-import '../../l10n/app_localizations.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/wrapped_row.dart';
 
 class ConfirmMyEmailPanel extends StatelessWidget {
@@ -13,7 +13,7 @@ class ConfirmMyEmailPanel extends StatelessWidget {
         children: [
           OutlinedButton(
             onPressed: onSendEmailLink(context),
-            child: Text(AppLocalizations.of(context)!.reauthWithEmail),
+            child: Text(L10n.of(context)!.reauthWithEmail),
             style: ButtonStyle(minimumSize: buttonMinimumSize),
           ),
         ],
@@ -24,13 +24,13 @@ class ConfirmMyEmailPanel extends StatelessWidget {
           await context.read<AuthBloc>().reauthenticateWithEmail();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.sentReauthUrl),
+              content: Text(L10n.of(context)!.sentReauthUrl),
             ),
           );
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.erroSendEmail),
+              content: Text(L10n.of(context)!.erroSendEmail),
             ),
           );
         }

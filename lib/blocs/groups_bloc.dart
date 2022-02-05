@@ -7,14 +7,6 @@ import '../utils/firestore_deligate.dart';
 
 abstract class GroupsEvent {}
 
-class GroupsSnapshot extends GroupsEvent {
-  final QuerySnapshot<Map<String, dynamic>> querySnap;
-
-  GroupsSnapshot(this.querySnap);
-}
-
-class GroupsListenError extends GroupsEvent {}
-
 class GroupsSubscribed extends GroupsEvent {
   final Account me;
 
@@ -23,12 +15,19 @@ class GroupsSubscribed extends GroupsEvent {
 
 class GroupsUnsubscribed extends GroupsEvent {}
 
-class GroupsChanged extends GroupsEvent {
-  final String id;
-  final String field;
-  final String value;
+class _GroupsOnSnapshot extends GroupsEvent {
+  final List<DocumentSnapshot<Map<String, dynamic>>> docs;
 
-  GroupsChanged(this.id, this.field, this.value);
+  _GroupsOnSnapshot(this.docs);
+}
+
+class _GroupsOnError extends GroupsEvent {}
+
+class GroupAdded extends GroupsEvent {
+  final String name;
+  final VoidCallback onError;
+
+  GroupAdded(this.name, this.onError);
 }
 
 class GroupsBloc extends Bloc<GroupsEvent, List<Group>> {
@@ -41,14 +40,6 @@ class GroupsBloc extends Bloc<GroupsEvent, List<Group>> {
         super([]) {
     _ref = _firestore.db.collection('groups');
 
-    on<GroupsSnapshot>(
-      (event, emit) {
-        emit(event.querySnap.docs.map((snap) => Group(snap)).toList());
-      },
-    );
-
-    on<GroupsListenError>((event, emit) => emit([]));
-
     on<GroupsSubscribed>((event, emit) {
       _firestore.subscribe(event.me);
       _firestore.listen(
@@ -58,27 +49,36 @@ class GroupsBloc extends Bloc<GroupsEvent, List<Group>> {
             .snapshots()
             .listen(
           (querySnap) {
-            add(GroupsSnapshot(querySnap));
+            add(_GroupsOnSnapshot(querySnap.docs));
           },
           onError: (Object error, StackTrace stackTrace) {
             debugPrint('$runtimeType:onError\n$error\n$stackTrace');
-            add(GroupsListenError());
+            add(_GroupsOnError());
           },
         ),
       );
     });
+
+    on<_GroupsOnSnapshot>(
+      (event, emit) => emit(event.docs.map((snap) => Group(snap)).toList()),
+    );
+
+    on<_GroupsOnError>((event, emit) => emit([]));
 
     on<GroupsUnsubscribed>((event, emit) async {
       await _firestore.unsubscribe();
       await _firestore.cancel();
       emit([]);
     });
-
-    on<GroupsChanged>((event, emit) async {
-      _firestore.updateDocument(
-        _ref.doc(event.id),
-        {event.field: event.value},
-      );
-    });
   }
+
+  Future<void> create(Map<String, dynamic> data) =>
+      _firestore.addDocument(_ref, data);
+
+  Future<void> update(String id, Map<String, dynamic> data) =>
+      _firestore.updateDocument(_ref.doc(id), data);
+
+  Future<void> delete(String id) => _firestore.deleteDocument(_ref.doc(id));
+
+  Future<void> restore(String id) => _firestore.restoreDocument(_ref.doc(id));
 }
