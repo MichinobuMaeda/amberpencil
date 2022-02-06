@@ -148,6 +148,7 @@ abstract class L10n {
   String get sentUrlForSignIn;
   String get sentUrlToVerify;
   String get successRequest;
+  String successSave(String label);
   // Messages: error
   String get errorRequired;
   String get errorEmailFormat;

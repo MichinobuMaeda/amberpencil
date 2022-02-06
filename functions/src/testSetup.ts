@@ -58,11 +58,13 @@ export const mockDb: Partial<firestore.Firestore> = {
   collection: mockCollection,
 };
 
+export const mockGetUser = jest.fn();
 export const mockCreateUser = jest.fn();
 export const mockUpdateUser = jest.fn();
 export const mockDeleteUser = jest.fn();
 export const mockCreateCustomToken = jest.fn();
 export const mockAuth: Partial<auth.Auth> = {
+  getUser: mockGetUser,
   createUser: mockCreateUser,
   updateUser: mockUpdateUser,
   deleteUser: mockDeleteUser,

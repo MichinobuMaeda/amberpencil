@@ -121,6 +121,7 @@ export const invite = async (
     invitation,
     invitedBy,
     invitedAt: ts,
+    updatedBy: null,
     updatedAt: ts,
   });
   return code;
@@ -146,6 +147,7 @@ export const getToken = async (
       invitation: null,
       invitedBy: null,
       invitedAt: null,
+      updatedBy: null,
       updatedAt: new Date(),
     });
     throw new Error(
@@ -158,6 +160,7 @@ export const getToken = async (
       invitation: null,
       invitedBy: null,
       invitedAt: null,
+      updatedBy: null,
       updatedAt: new Date(),
     });
     throw new Error(`Invitation for account: ${account.id} is expired.`);
@@ -187,16 +190,18 @@ export const onAccountUpdate = async (
     change: Change<firestore.DocumentSnapshot>,
 ): Promise<void> => {
   const {before, after} = change;
-  if ((before.get("name") || null) !== (after.get("name") || null)) {
+  if ((before.get("name") ?? "") !== (after.get("name") ?? "")) {
     await firebase.auth().updateUser(
         after.id,
         {displayName: after.get("name") || null},
     );
   }
-  if ((before.get("email") || null) !== (after.get("email") || null)) {
-    await firebase.auth().updateUser(
-        after.id,
-        {email: after.get("email") || null},
-    );
+  const user = await firebase.auth().getUser(after.id);
+  if ((user?.email ?? "") !== (after.get("email") ?? "")) {
+    await firebase.firestore().collection("accounts").doc(after.id).update({
+      email: user?.email ?? null,
+      updatedBy: null,
+      updatedAt: new Date(),
+    });
   }
 };

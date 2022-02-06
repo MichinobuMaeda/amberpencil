@@ -117,9 +117,11 @@ class SingleFieldFormBloc<T>
         emit(SingleFieldFormState.copyWith(
           state,
           value: state.initialValue,
+          confirmation: state.initialValue,
           editMode: false,
         ));
         controller.text = this.convertFrom(state.initialValue);
+        confirmationController.text = this.convertFrom(state.initialValue);
       },
     );
 

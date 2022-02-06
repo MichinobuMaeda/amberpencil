@@ -1,3 +1,4 @@
+import 'package:amberpencil/blocs/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
@@ -24,11 +25,13 @@ class EditMyEmailPanel extends StatelessWidget {
             label: L10n.of(context)!.email,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: (value) => () async {
+              context.read<AuthBloc>().updateMyEmail(value);
               await context.read<AccountsBloc>().updateMyAccount(
                 {Account.fieldEmail: value},
               );
-              // context.read<SingleFieldFormBloc>().add(SingleFieldFormReset());
+              context.read<AuthBloc>().add(AuthUserReloaded());
             },
+            resetOnSave: true,
           ),
         ),
       );

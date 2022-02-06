@@ -25,8 +25,8 @@ class EditMyPasswordPanel extends StatelessWidget {
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: (value) => () async {
               await context.read<AuthBloc>().updateMyPassword(value);
-              // context.read<SingleFieldFormBloc>().add(SingleFieldFormReset());
             },
+            resetOnSave: true,
           ),
         ),
       );

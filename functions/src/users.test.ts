@@ -15,12 +15,14 @@ import {
   mockQueryGet,
   mockWhere,
   mockDoc,
+  // mockGetUser,
   mockCreateUser,
   mockUpdateUser,
   mockDeleteUser,
   mockCreateCustomToken,
   DocSnap,
   DocRef,
+  mockGetUser,
 } from "./testSetup";
 import {
   createAuthUser,
@@ -279,6 +281,7 @@ describe("invite()", () => {
       invitation: testInvitation(code, "test seed"),
       invitedBy: "admin",
       invitedAt: expect.any(Date),
+      updatedBy: null,
       updatedAt: expect.any(Date),
     }]]);
   });
@@ -344,6 +347,7 @@ describe("getToken()", () => {
       invitation: null,
       invitedBy: null,
       invitedAt: null,
+      updatedBy: null,
       updatedAt: expect.any(Date),
     }]]);
   });
@@ -386,6 +390,7 @@ describe("getToken()", () => {
       invitation: null,
       invitedBy: null,
       invitedAt: null,
+      updatedBy: null,
       updatedAt: expect.any(Date),
     }]]);
   });
@@ -430,6 +435,7 @@ describe("getToken()", () => {
       invitation: null,
       invitedBy: null,
       invitedAt: null,
+      updatedBy: null,
       updatedAt: expect.any(Date),
     }]]);
   });
@@ -540,8 +546,17 @@ describe("onAccountUpdate()", () => {
     ]);
   });
 
-  it("update email of its auth user " +
-  "on change the email of the account", async () => {
+  it("update email as same as auth user " +
+  "on change the any thinf of the account", async () => {
+    const user01: Partial<auth.UserInfo> = {email: "Email before"};
+    const user02: Partial<auth.UserInfo> = {email: "Email after"};
+    mockGetUser
+        .mockImplementationOnce(() => null)
+        .mockImplementationOnce(() => user01)
+        .mockImplementationOnce(() => user02)
+        .mockImplementationOnce(() => user01)
+        .mockImplementationOnce(() => user01);
+
     await onAccountUpdate(
         mockFirebase,
         {
@@ -560,7 +575,7 @@ describe("onAccountUpdate()", () => {
         mockFirebase,
         {
           before: test.firestore.makeDocumentSnapshot(
-              {email: null},
+              {email: "Email before"},
               "document/accounts/user01",
           ),
           after: test.firestore.makeDocumentSnapshot(
@@ -578,17 +593,69 @@ describe("onAccountUpdate()", () => {
               "document/accounts/user01",
           ),
           after: test.firestore.makeDocumentSnapshot(
-              {email: null},
+              {email: "Email after"},
               "document/accounts/user01",
           ),
         },
     );
 
-    expect(mockUpdateUser.mock.calls).toEqual([
-      ["user01", {email: "Email after"}],
-      ["user01", {email: "Email after"}],
-      ["user01", {email: null}],
-    ]);
+    await onAccountUpdate(
+        mockFirebase,
+        {
+          before: test.firestore.makeDocumentSnapshot(
+              {name: "Name before", email: null},
+              "document/accounts/user01",
+          ),
+          after: test.firestore.makeDocumentSnapshot(
+              {name: "Name after", email: null},
+              "document/accounts/user01",
+          ),
+        },
+    );
+
+    await onAccountUpdate(
+        mockFirebase,
+        {
+          before: test.firestore.makeDocumentSnapshot(
+              {name: "Name before", email: "Email old"},
+              "document/accounts/user01",
+          ),
+          after: test.firestore.makeDocumentSnapshot(
+              {name: "Name after", email: "Email old"},
+              "document/accounts/user01",
+          ),
+        },
+    );
+
+    expect(mockUpdate.mock.calls).toEqual([
+      [
+        {
+          email: null,
+          updatedBy: null,
+          updatedAt: expect.any(Date),
+        },
+      ],
+      [
+        {
+          email: "Email before",
+          updatedBy: null,
+          updatedAt: expect.any(Date),
+        },
+      ],
+      [
+        {
+          email: "Email before",
+          updatedBy: null,
+          updatedAt: expect.any(Date),
+        },
+      ],
+      [
+        {
+          email: "Email before",
+          updatedBy: null,
+          updatedAt: expect.any(Date),
+        },
+      ]]);
   });
 
   it("do nothing in all other cases.", async () => {

@@ -37,24 +37,28 @@ class AllBlocsObserver extends BlocObserver {
             restoreAllUserData(state.me!);
 
             if (_context.read<PlatformBloc>().state.themeMode > 0) {
-              _context.read<RepositoryRequestBloc>().add(
-                    RepositoryRequest(
-                      request: () =>
-                          _context.read<AccountsBloc>().updateMyAccount(
-                        {
-                          Account.fieldThemeMode:
-                              _context.read<PlatformBloc>().state.themeMode,
+              try {
+                _context.read<RepositoryRequestBloc>().add(
+                      RepositoryRequest(
+                        request: () =>
+                            _context.read<AccountsBloc>().updateMyAccount(
+                          {
+                            Account.fieldThemeMode:
+                                _context.read<PlatformBloc>().state.themeMode,
+                          },
+                        ),
+                        onSuccess: () {},
+                        onError: () {
+                          debugPrint(
+                            'error: on RepositoryRequest '
+                            'updateMyAccount themeMode',
+                          );
                         },
                       ),
-                      onSuccess: () {},
-                      onError: () {
-                        debugPrint(
-                          'error: on RepositoryRequest '
-                          'updateMyAccount themeMode',
-                        );
-                      },
-                    ),
-                  );
+                    );
+              } catch (e) {
+                debugPrint('RepositoryRequestBloc has not be initialized.');
+              }
             }
           }
 

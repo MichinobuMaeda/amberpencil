@@ -13,6 +13,7 @@ class TextForm extends StatelessWidget {
   final Future<void> Function() Function(String) onSave;
   final TextStyle? style;
   final bool password;
+  final bool resetOnSave;
   final String? saveButtonName;
   final Icon saveButtonIcon;
   final String? saveErrorMessage;
@@ -23,6 +24,7 @@ class TextForm extends StatelessWidget {
     required this.onSave,
     this.style,
     this.password = false,
+    this.resetOnSave = false,
     this.saveButtonName,
     this.saveButtonIcon = const Icon(Icons.save_alt),
     this.saveErrorMessage,
@@ -81,9 +83,11 @@ class TextForm extends StatelessWidget {
               ),
               context.read<_Bloc>().state.confermationValidator == null
                   ? TextFormSaveButton(
+                      context: context,
                       onSave: onSave,
                       saveButtonName: saveButtonName ?? L10n.of(context)!.save,
                       saveButtonIcon: saveButtonIcon,
+                      resetOnSave: resetOnSave,
                     )
                   : const SizedBox(width: 120.0),
             ],
@@ -138,9 +142,11 @@ class TextForm extends StatelessWidget {
                   ),
                 ),
                 TextFormSaveButton(
+                  context: context,
                   onSave: onSave,
                   saveButtonName: saveButtonName ?? L10n.of(context)!.save,
                   saveButtonIcon: saveButtonIcon,
+                  resetOnSave: resetOnSave,
                 ),
               ],
             ),
@@ -175,15 +181,19 @@ class TextForm extends StatelessWidget {
 
 @visibleForTesting
 class TextFormSaveButton extends StatelessWidget {
+  final BuildContext context;
   final Future<void> Function() Function(String) onSave;
   final String saveButtonName;
   final Icon saveButtonIcon;
+  final bool resetOnSave;
 
   const TextFormSaveButton({
     Key? key,
+    required this.context,
     required this.onSave,
     required this.saveButtonName,
     required this.saveButtonIcon,
+    required this.resetOnSave,
   }) : super(key: key);
 
   @override
@@ -192,7 +202,12 @@ class TextFormSaveButton extends StatelessWidget {
                 !context.watch<RepositoryRequestBloc>().state
             ? () => context.read<RepositoryRequestBloc>().add(
                   RepositoryRequest(
-                    request: onSave(context.read<_Bloc>().state.value),
+                    request: () async {
+                      await onSave(context.read<_Bloc>().state.value)();
+                      if (resetOnSave) {
+                        context.read<_Bloc>().add(SingleFieldFormReset());
+                      }
+                    },
                   ),
                 )
             : null,

@@ -114,6 +114,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthUser?> {
     _platformBloc.add(SignedInAtChanged());
   }
 
+  Future<void> updateMyEmail(String email) =>
+      _auth.currentUser!.updateEmail(email);
+
   Future<void> updateMyPassword(String password) =>
       _auth.currentUser!.updatePassword(password);
 

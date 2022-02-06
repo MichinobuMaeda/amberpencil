@@ -155,6 +155,9 @@ class L10nJa extends L10n {
   @override
   String get successRequest => '完了しました。';
 
+  @override
+  String successSave(String label) => '$labelを保存しました。';
+
   // Messages: error
 
   @override

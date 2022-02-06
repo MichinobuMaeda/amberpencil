@@ -160,6 +160,9 @@ class L10nEn extends L10n {
   @override
   String get successRequest => 'Completed.';
 
+  @override
+  String successSave(String label) => '$label has been saved.';
+
   // Messages: error
 
   @override
