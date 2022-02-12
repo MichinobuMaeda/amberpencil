@@ -65,7 +65,8 @@ const snackBarTheme = SnackBarThemeData(
   ),
 );
 
-Color listOddEvenItemColor = Colors.grey.withOpacity(0.1);
+Color listOddEvenItemColor(BuildContext context) =>
+    Theme.of(context).colorScheme.shadow.withOpacity(1 / 20);
 
 const TextTheme textTheme = TextTheme(
   headline1: TextStyle(fontSize: fontSizeH1),

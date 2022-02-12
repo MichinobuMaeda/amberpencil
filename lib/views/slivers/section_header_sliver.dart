@@ -17,7 +17,7 @@ class SectionHeaderSliver extends StatelessWidget {
           minHeight: fontSizeH3 * 1.5,
           maxHeight: fontSizeH3 * 2,
           child: Container(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
+            color: Theme.of(context).colorScheme.shadow.withOpacity(1 / 8),
             child: Center(
               child: Text(
                 title,
