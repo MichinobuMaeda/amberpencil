@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 const AssetImage logoAsset = AssetImage('images/logo.png');
@@ -10,55 +11,25 @@ const fieldWidth = 480.0;
 const double baseFontSize = 16.0;
 const double spacing = baseFontSize;
 
-final ThemeData baseLightTheme = ThemeData(
-  brightness: Brightness.light,
-  primarySwatch: Colors.brown,
-  errorColor: Colors.red,
+final ThemeData lightTheme = FlexColorScheme.light(
+  scheme: FlexScheme.amber,
   fontFamily: fontFamilySansSerif,
   textTheme: textTheme,
-  elevatedButtonTheme: elevatedButtonTheme,
-  outlinedButtonTheme: outlinedButtonTheme,
-  snackBarTheme: const SnackBarThemeData(
-    backgroundColor: Colors.brown,
-    contentTextStyle: TextStyle(
-      fontFamily: fontFamilySansSerif,
-      fontSize: baseFontSize,
-      color: Colors.white,
-    ),
-  ),
-);
+).toTheme.copyWith(
+      elevatedButtonTheme: elevatedButtonTheme,
+      outlinedButtonTheme: outlinedButtonTheme,
+      snackBarTheme: snackBarTheme,
+    );
 
-final ThemeData lightTheme = baseLightTheme.copyWith(
-  colorScheme: baseLightTheme.colorScheme.copyWith(
-    secondary: Colors.blueGrey,
-    onSecondary: baseLightTheme.colorScheme.onPrimary,
-  ),
-);
-
-final ThemeData baseDarkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primarySwatch: Colors.amber,
-  errorColor: Colors.pinkAccent,
+final ThemeData darkTheme = FlexColorScheme.dark(
+  scheme: FlexScheme.amber,
   fontFamily: fontFamilySansSerif,
   textTheme: textTheme,
-  elevatedButtonTheme: elevatedButtonTheme,
-  outlinedButtonTheme: outlinedButtonTheme,
-  snackBarTheme: const SnackBarThemeData(
-    backgroundColor: Colors.amber,
-    contentTextStyle: TextStyle(
-      fontFamily: fontFamilySansSerif,
-      fontSize: baseFontSize,
-      color: Colors.black,
-    ),
-  ),
-);
-
-final ThemeData darkTheme = baseDarkTheme.copyWith(
-  colorScheme: baseDarkTheme.colorScheme.copyWith(
-    secondary: Colors.cyan,
-    onSecondary: baseLightTheme.colorScheme.onSurface,
-  ),
-);
+).toTheme.copyWith(
+      elevatedButtonTheme: elevatedButtonTheme,
+      outlinedButtonTheme: outlinedButtonTheme,
+      snackBarTheme: snackBarTheme,
+    );
 
 const fontFamilySansSerif = 'NotoSansJP';
 const fontFamilyMonoSpace = 'RobotoMono';
@@ -69,22 +40,7 @@ const double fontSizeH3 = baseFontSize * 1.3;
 const double fontSizeH4 = baseFontSize * 1.1;
 const double fontSizeH5 = baseFontSize * 1.05;
 const double fontSizeH6 = baseFontSize * 1.0;
-
-const TextTheme textTheme = TextTheme(
-  headline1: TextStyle(fontSize: fontSizeH1),
-  headline2: TextStyle(fontSize: fontSizeH2),
-  headline3: TextStyle(fontSize: fontSizeH3),
-  headline4: TextStyle(fontSize: fontSizeH4),
-  headline5: TextStyle(fontSize: fontSizeH5),
-  headline6: TextStyle(fontSize: fontSizeH6),
-  subtitle1: TextStyle(fontSize: fontSizeH5),
-  subtitle2: TextStyle(fontSize: baseFontSize),
-  bodyText1: TextStyle(fontSize: fontSizeH5),
-  bodyText2: TextStyle(fontSize: baseFontSize),
-  button: TextStyle(fontSize: baseFontSize),
-  caption: TextStyle(fontSize: baseFontSize),
-  overline: TextStyle(fontSize: baseFontSize * 0.9),
-);
+const double fontSizeOverline = baseFontSize * 0.9;
 
 final buttonMinimumSize = MaterialStateProperty.all<Size>(
   const Size(baseFontSize * 8, baseFontSize * 3),
@@ -102,10 +58,30 @@ final outlinedButtonTheme = OutlinedButtonThemeData(
   ),
 );
 
-Color listOddEvenItemColor(BuildContext context) =>
-    Theme.of(context).brightness == Brightness.light
-        ? Colors.blueGrey.shade50
-        : Colors.blueGrey.shade800;
+const snackBarTheme = SnackBarThemeData(
+  contentTextStyle: TextStyle(
+    fontFamily: fontFamilySansSerif,
+    fontSize: baseFontSize,
+  ),
+);
+
+Color listOddEvenItemColor = Colors.grey.withOpacity(0.1);
+
+const TextTheme textTheme = TextTheme(
+  headline1: TextStyle(fontSize: fontSizeH1),
+  headline2: TextStyle(fontSize: fontSizeH2),
+  headline3: TextStyle(fontSize: fontSizeH3),
+  headline4: TextStyle(fontSize: fontSizeH4),
+  headline5: TextStyle(fontSize: fontSizeH5),
+  headline6: TextStyle(fontSize: fontSizeH6),
+  subtitle1: TextStyle(fontSize: fontSizeH5),
+  subtitle2: TextStyle(fontSize: baseFontSize),
+  bodyText1: TextStyle(fontSize: fontSizeH5),
+  bodyText2: TextStyle(fontSize: baseFontSize),
+  button: TextStyle(fontSize: baseFontSize),
+  caption: TextStyle(fontSize: baseFontSize),
+  overline: TextStyle(fontSize: fontSizeOverline),
+);
 
 MarkdownStyleSheet markdownStyleSheet(BuildContext context) {
   final theme = Theme.of(context);

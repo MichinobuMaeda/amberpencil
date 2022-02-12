@@ -12,7 +12,9 @@ class UpdateAppButton extends StatelessWidget {
         content: Text(
           L10n.of(context)!.updateApp,
           textAlign: TextAlign.right,
+          style: TextStyle(color: Theme.of(context).colorScheme.onError),
         ),
+        backgroundColor: Theme.of(context).colorScheme.error,
         actions: [
           IconButton(
             onPressed: () => context.read<PlatformBloc>().add(AppReloaded()),
@@ -20,23 +22,16 @@ class UpdateAppButton extends StatelessWidget {
             icon: Ink(
               padding: const EdgeInsets.all(4.0),
               decoration: ShapeDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.onError,
                 shape: const CircleBorder(),
               ),
               child: Icon(
                 Icons.get_app,
                 size: 24.0,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.amber.shade900
-                    : Colors.white,
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           )
         ],
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.amber.shade900
-            : Colors.amber.shade400,
       );
 }

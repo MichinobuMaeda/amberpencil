@@ -54,9 +54,7 @@ class GroupsSliver extends StatelessWidget {
                   .entries
                   .map(
                     (item) => Container(
-                      color: item.key % 2 == 0
-                          ? listOddEvenItemColor(context)
-                          : null,
+                      color: item.key % 2 == 0 ? listOddEvenItemColor : null,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Center(

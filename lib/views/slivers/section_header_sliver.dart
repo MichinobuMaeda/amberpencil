@@ -17,13 +17,11 @@ class SectionHeaderSliver extends StatelessWidget {
           minHeight: fontSizeH3 * 1.5,
           maxHeight: fontSizeH3 * 2,
           child: Container(
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.secondary.withOpacity(0.25),
             child: Center(
               child: Text(
                 title,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    fontSize: fontSizeH3),
+                style: const TextStyle(fontSize: fontSizeH3),
               ),
             ),
           ),

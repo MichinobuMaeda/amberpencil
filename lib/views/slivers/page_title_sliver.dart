@@ -24,9 +24,7 @@ class PageTitileSliver extends StatelessWidget {
         minHeight: baseFontSize * 2.5,
         maxHeight: baseFontSize * 3.5,
         child: Container(
-          color: Theme.of(context).brightness == Brightness.light
-              ? Colors.grey.shade300
-              : Colors.grey.shade700,
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
           child: Center(
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
