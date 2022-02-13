@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/auth_user.dart';
 import 'platform_bloc.dart';
-import 'route_bloc.dart';
+import 'user_bloc.dart';
 
 abstract class AuthEvent {}
 
@@ -55,7 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthUser?> {
 
       // Listen auth status
       _auth.authStateChanges().listen((User? user) {
-        event.context.read<RouteBloc>().add(OnAuthStateChecked());
+        event.context.read<UserBloc>().add(OnAuthStateChecked());
         add(_AuthUserChanged(user));
       });
     });

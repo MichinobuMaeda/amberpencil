@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/accounts_bloc.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../config/validators.dart';
 import '../../config/l10n.dart';
 import '../../models/account.dart';
@@ -18,10 +18,10 @@ class EditMyNameSliver extends StatelessWidget {
           BlocProvider(
             key: ValueKey(
               '$runtimeType:name:'
-              '${context.watch<MyAccountBloc>().state.me!.name}',
+              '${context.watch<UserBloc>().state.me?.name ?? ''}',
             ),
             create: (context) => SingleFieldFormBloc(
-              context.read<MyAccountBloc>().state.me!.name,
+              context.read<UserBloc>().state.me?.name ?? '',
               validator: requiredValidator(context),
             ),
             child: Builder(

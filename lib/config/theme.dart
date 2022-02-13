@@ -8,6 +8,9 @@ const pageWidth = 720.0;
 const columnWidth = 720.0;
 const fieldWidth = 480.0;
 
+bool isMobile(BuildContext context) =>
+    MediaQuery.of(context).size.width < 480.0;
+
 const double baseFontSize = 16.0;
 const double spacing = baseFontSize;
 

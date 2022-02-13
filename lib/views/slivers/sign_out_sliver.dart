@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/comfirm_danger_buton.dart';
@@ -32,7 +32,7 @@ class SignOutSliver extends StatelessWidget {
                     icon: const Icon(Icons.logout),
                     label: L10n.of(context)!.signOut,
                     onPressed: () =>
-                        context.read<MyAccountBloc>().add(OnSingOutRequired()),
+                        context.read<UserBloc>().add(OnSingOutRequired()),
                   ),
                 ],
               ),

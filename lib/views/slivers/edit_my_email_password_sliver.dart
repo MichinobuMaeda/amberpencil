@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/app_info.dart';
 import '../../config/theme.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../blocs/time_ticker_bloc.dart';
 import '../../config/l10n.dart';
@@ -33,7 +33,7 @@ class EditMyEmaiPasswordSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BoxSliver(
-        children: (context.watch<MyAccountBloc>().state.me?.email ?? '') == ''
+        children: (context.watch<UserBloc>().state.me?.email ?? '') == ''
             ? [
                 Text(L10n.of(context)!.noEmailAndPassword),
               ]

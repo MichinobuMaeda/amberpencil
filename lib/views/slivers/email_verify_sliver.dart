@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/auth_bloc.dart';
 import '../../blocs/time_ticker_bloc.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
@@ -85,9 +85,8 @@ class EmailVerifySliver extends StatelessWidget {
                     width: fieldWidth,
                     children: [
                       ElevatedButton(
-                        onPressed: () => context
-                            .read<MyAccountBloc>()
-                            .add(OnSingOutRequired()),
+                        onPressed: () =>
+                            context.read<UserBloc>().add(OnSingOutRequired()),
                         child: Text(L10n.of(context)!.signOut),
                       ),
                     ],

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../blocs/route_bloc.dart';
-import '../../config/routes.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
+import '../../router.dart';
 import '../helpers/sticky_header_delegate.dart';
 
 class PageTitileSliver extends StatelessWidget {
@@ -10,21 +9,15 @@ class PageTitileSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MenuItem? menuItem;
-    try {
-      menuItem = menuItems(context).singleWhere((item) =>
-          item.routeName == context.watch<RouteBloc>().state.history.last.name);
-    } catch (e) {
-      menuItem = null;
-    }
+    final PageItem item = getPage(context, GoRouter.of(context).location);
 
     return SliverPersistentHeader(
       pinned: true,
       delegate: StickyHeaderDelegate(
-        minHeight: baseFontSize * 2.5,
-        maxHeight: baseFontSize * 3.5,
+        minHeight: fontSizeH2 * 1.6,
+        maxHeight: fontSizeH2 * 2.2,
         child: Container(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+          color: Theme.of(context).colorScheme.primary.withOpacity(1 / 4),
           child: Center(
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -32,10 +25,10 @@ class PageTitileSliver extends StatelessWidget {
                 SizedBox(
                   width: fontSizeH2 * 1.6,
                   height: fontSizeH2 * 1.6,
-                  child: menuItem?.icon ?? const Icon(Icons.description),
+                  child: item.icon,
                 ),
                 Text(
-                  menuItem?.label ?? '',
+                  item.label,
                   style: const TextStyle(
                     fontSize: fontSizeH2,
                   ),

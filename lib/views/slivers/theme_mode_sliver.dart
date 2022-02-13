@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../blocs/accounts_bloc.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../blocs/repository_request_delegate_bloc.dart';
 import '../../config/app_info.dart';
@@ -31,7 +31,7 @@ class ThemeModeSliver extends StatelessWidget {
                     (index == 0 ? 3 : index),
                 onSelected: (bool selected) {
                   if (selected) {
-                    if (context.read<MyAccountBloc>().state.me == null) {
+                    if (context.read<UserBloc>().state.me == null) {
                       context.read<PlatformBloc>().add(
                             ThemeModeChanged(index == 0 ? 3 : index),
                           );
