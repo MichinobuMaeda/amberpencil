@@ -119,74 +119,88 @@ PageItem getPage(BuildContext context, String route) {
 final List<GoRoute> routes = [
   GoRoute(
     path: routeLoading,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        LoadingSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          LoadingSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routeSignin,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        SignInSliver(),
-        ThemeModeSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          SignInSliver(),
+          ThemeModeSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routeVerify,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        EmailVerifySliver(),
-        ThemeModeSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          EmailVerifySliver(),
+          ThemeModeSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routeHome,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        HomeSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          HomeSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routeAdmin,
-    builder: (context, state) => BaseScreen(
-      contents: [
-        const PageTitileSliver(),
-        SectionHeaderSliver(L10n.of(context)!.groups),
-        const GroupsSliver(),
-        SectionHeaderSliver(L10n.of(context)!.account),
-        const AccountsSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: [
+          const PageTitileSliver(),
+          SectionHeaderSliver(L10n.of(context)!.groups),
+          const GroupsSliver(),
+          SectionHeaderSliver(L10n.of(context)!.account),
+          const AccountsSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routePrefs,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        ThemeModeSliver(),
-        EditMyNameSliver(),
-        EditMyEmaiPasswordSliver(),
-        SignOutSliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          ThemeModeSliver(),
+          EditMyNameSliver(),
+          EditMyEmaiPasswordSliver(),
+          SignOutSliver(),
+        ],
+      ),
     ),
   ),
   GoRoute(
     path: routeInfo,
-    builder: (context, state) => BaseScreen(
-      contents: const [
-        PageTitileSliver(),
-        AppInfoPSliver(),
-        PolicySliver(),
-      ],
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      child: BaseScreen(
+        contents: const [
+          PageTitileSliver(),
+          AppInfoPSliver(),
+          PolicySliver(),
+        ],
+      ),
     ),
   ),
 ];

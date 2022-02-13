@@ -41,6 +41,8 @@ flutter:
     - family: RobotoMono
       fonts:
         - asset: fonts/RobotoMono-Regular.ttf
+# run: $ flutter pub run flutter_native_splash:create
 flutter_native_splash:
-  color: "#795548"
+  color: "#c0c0c0"
   image: images/logo.png
+  color_dark: "#303030"
