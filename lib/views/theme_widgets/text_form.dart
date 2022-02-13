@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/repository_request_delegate_bloc.dart';
 import '../../config/l10n.dart';
+import '../../config/theme.dart';
 import '../helpers/single_field_form_bloc.dart';
 import 'default_input_container.dart';
 import 'wrapped_row.dart';
@@ -13,21 +14,29 @@ class TextForm extends StatelessWidget {
   final Future<void> Function() Function(String) onSave;
   final TextStyle? style;
   final bool password;
+  final String? itemName;
+  final String? successMessage;
+  final String? errorMessage;
+  final VoidCallback? onSuccess;
+  final VoidCallback? onError;
   final bool resetOnSave;
   final String? saveButtonName;
   final Icon saveButtonIcon;
-  final String? saveErrorMessage;
 
   const TextForm({
     Key? key,
     required this.label,
+    this.itemName,
+    this.successMessage,
+    this.errorMessage,
+    this.onSuccess,
+    this.onError,
     required this.onSave,
     this.style,
     this.password = false,
     this.resetOnSave = false,
     this.saveButtonName,
     this.saveButtonIcon = const Icon(Icons.save_alt),
-    this.saveErrorMessage,
   }) : super(key: key);
 
   @override
@@ -40,56 +49,13 @@ class TextForm extends StatelessWidget {
                 child: BlocProvider(
                   create: (_) => _ShowPasswordCubit(false),
                   child: Builder(
-                    builder: (context) => TextField(
-                      controller: context.read<_Bloc>().controller,
-                      decoration: InputDecoration(
-                        labelText: label,
-                        suffixIcon: password
-                            ? IconButton(
-                                icon: Icon(
-                                  context.watch<_ShowPasswordCubit>().state
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  context.read<_ShowPasswordCubit>().toggle();
-                                },
-                              )
-                            : IconButton(
-                                icon: const Icon(Icons.cancel),
-                                onPressed: () {
-                                  context
-                                      .read<_Bloc>()
-                                      .add(SingleFieldFormReset());
-                                  resetController(
-                                    context.read<_Bloc>().controller,
-                                    context.read<_Bloc>().state.initialValue,
-                                  );
-                                }),
-                        errorText: context.watch<_Bloc>().state.validationError,
-                      ),
-                      style: style,
-                      obscureText: password &&
-                          !context.watch<_ShowPasswordCubit>().state,
-                      onChanged: (value) {
-                        context
-                            .read<_Bloc>()
-                            .add(SingleFieldFormChanged(value));
-                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      },
-                    ),
+                    builder: (context) => buildTextField(context),
                   ),
                 ),
               ),
               context.read<_Bloc>().state.confermationValidator == null
-                  ? TextFormSaveButton(
-                      context: context,
-                      onSave: onSave,
-                      saveButtonName: saveButtonName ?? L10n.of(context)!.save,
-                      saveButtonIcon: saveButtonIcon,
-                      resetOnSave: resetOnSave,
-                    )
-                  : const SizedBox(width: 120.0),
+                  ? buildSaveButton(context)
+                  : SizedBox(width: buttonMinimumSize.width),
             ],
           ),
           Visibility(
@@ -100,118 +66,101 @@ class TextForm extends StatelessWidget {
                   child: BlocProvider(
                     create: (_) => _ShowPasswordCubit(false),
                     child: Builder(
-                      builder: (context) => TextField(
-                        controller:
-                            context.read<_Bloc>().confirmationController,
-                        decoration: InputDecoration(
-                          labelText: L10n.of(context)!.confirmation(label),
-                          suffixIcon: password
-                              ? IconButton(
-                                  icon: Icon(
-                                    context.watch<_ShowPasswordCubit>().state
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                  onPressed: () {
-                                    context.read<_ShowPasswordCubit>().toggle();
-                                  },
-                                )
-                              : IconButton(
-                                  icon: const Icon(Icons.cancel),
-                                  onPressed: () {
-                                    context
-                                        .read<_Bloc>()
-                                        .confirmationController
-                                        .text = '';
-                                    context.read<_Bloc>().add(
-                                        SingleFieldFormConfirmationReset());
-                                  }),
-                          errorText:
-                              context.watch<_Bloc>().state.confirmationError,
-                        ),
-                        style: style,
-                        obscureText: password &&
-                            !context.watch<_ShowPasswordCubit>().state,
-                        onChanged: (value) {
-                          context
-                              .read<_Bloc>()
-                              .add(SingleFieldFormConfirmed(value));
-                        },
-                      ),
+                      builder: (context) => buildConfirmationField(context),
                     ),
                   ),
                 ),
-                TextFormSaveButton(
-                  context: context,
-                  onSave: onSave,
-                  saveButtonName: saveButtonName ?? L10n.of(context)!.save,
-                  saveButtonIcon: saveButtonIcon,
-                  resetOnSave: resetOnSave,
-                ),
+                buildSaveButton(context),
               ],
             ),
           ),
         ],
       );
 
-  VoidCallback onError(
-    BuildContext context,
-  ) =>
-      () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              saveErrorMessage ?? L10n.of(context)!.errorSave(label),
-            ),
-          ),
-        );
-      };
+  Widget buildTextField(BuildContext context) => TextField(
+        controller: context.read<_Bloc>().controller,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixIcon: password
+              ? IconButton(
+                  icon: Icon(
+                    context.watch<_ShowPasswordCubit>().state
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    context.read<_ShowPasswordCubit>().toggle();
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {
+                    context.read<_Bloc>().add(SingleFieldFormReset());
+                  }),
+          errorText: context.watch<_Bloc>().state.validationError,
+        ),
+        style: style,
+        obscureText: password && !context.watch<_ShowPasswordCubit>().state,
+        onChanged: (value) {
+          context.read<_Bloc>().add(SingleFieldFormChanged(value));
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        },
+      );
 
-  void resetController(
-    TextEditingController controller,
-    String initialValue,
-  ) {
-    controller.text = initialValue;
-    controller.selection = TextSelection(
-      baseOffset: controller.text.length,
-      extentOffset: controller.text.length,
-    );
-  }
-}
+  Widget buildConfirmationField(BuildContext context) => TextField(
+        controller: context.read<_Bloc>().confirmationController,
+        decoration: InputDecoration(
+          labelText: L10n.of(context)!.confirmation(label),
+          suffixIcon: password
+              ? IconButton(
+                  icon: Icon(
+                    context.watch<_ShowPasswordCubit>().state
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    context.read<_ShowPasswordCubit>().toggle();
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {
+                    context.read<_Bloc>().confirmationController.text = '';
+                    context
+                        .read<_Bloc>()
+                        .add(SingleFieldFormConfirmationReset());
+                  }),
+          errorText: context.watch<_Bloc>().state.confirmationError,
+        ),
+        style: style,
+        obscureText: password && !context.watch<_ShowPasswordCubit>().state,
+        onChanged: (value) {
+          context.read<_Bloc>().add(SingleFieldFormConfirmed(value));
+        },
+      );
 
-@visibleForTesting
-class TextFormSaveButton extends StatelessWidget {
-  final BuildContext context;
-  final Future<void> Function() Function(String) onSave;
-  final String saveButtonName;
-  final Icon saveButtonIcon;
-  final bool resetOnSave;
-
-  const TextFormSaveButton({
-    Key? key,
-    required this.context,
-    required this.onSave,
-    required this.saveButtonName,
-    required this.saveButtonIcon,
-    required this.resetOnSave,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => ElevatedButton.icon(
+  Widget buildSaveButton(BuildContext context) => ElevatedButton.icon(
         onPressed: context.watch<_Bloc>().state.ready &&
                 !context.watch<RepositoryRequestBloc>().state
             ? () => context.read<RepositoryRequestBloc>().add(
                   RepositoryRequest(
+                    itemName: itemName,
+                    successMessage: successMessage,
+                    errorMessage: errorMessage,
+                    onSuccess: onSuccess,
+                    onError: onError,
                     request: () async {
                       await onSave(context.read<_Bloc>().state.value)();
                       if (resetOnSave) {
-                        context.read<_Bloc>().add(SingleFieldFormReset());
+                        try {
+                          context.read<_Bloc>().add(SingleFieldFormReset());
+                        } catch (_) {}
                       }
                     },
                   ),
                 )
             : null,
-        label: Text(saveButtonName),
+        label: Text(saveButtonName ?? L10n.of(context)!.save),
         icon: saveButtonIcon,
       );
 }

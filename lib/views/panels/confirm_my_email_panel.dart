@@ -14,7 +14,7 @@ class ConfirmMyEmailPanel extends StatelessWidget {
           OutlinedButton(
             onPressed: onSendEmailLink(context),
             child: Text(L10n.of(context)!.reauthWithEmail),
-            style: ButtonStyle(minimumSize: buttonMinimumSize),
+            style: buttonStyle,
           ),
         ],
       );

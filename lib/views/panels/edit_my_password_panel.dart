@@ -21,6 +21,7 @@ class EditMyPasswordPanel extends StatelessWidget {
         child: Builder(
           builder: (context) => TextForm(
             label: L10n.of(context)!.password,
+            itemName: L10n.of(context)!.password,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: (value) => () async {

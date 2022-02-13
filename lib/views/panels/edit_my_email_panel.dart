@@ -23,13 +23,15 @@ class EditMyEmailPanel extends StatelessWidget {
         child: Builder(
           builder: (context) => TextForm(
             label: L10n.of(context)!.email,
+            itemName: L10n.of(context)!.email,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             onSave: (value) => () async {
-              context.read<AuthBloc>().updateMyEmail(value);
+              final AuthBloc authBloc = context.read<AuthBloc>();
+              authBloc.updateMyEmail(value);
               await context.read<AccountsBloc>().updateMyAccount(
                 {Account.fieldEmail: value},
               );
-              context.read<AuthBloc>().add(AuthUserReloaded());
+              authBloc.add(AuthUserReloaded());
             },
             resetOnSave: true,
           ),

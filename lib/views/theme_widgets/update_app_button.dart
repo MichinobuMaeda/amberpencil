@@ -20,7 +20,7 @@ class UpdateAppButton extends StatelessWidget {
             onPressed: () => context.read<PlatformBloc>().add(AppReloaded()),
             iconSize: baseFontSize * 2,
             icon: Ink(
-              padding: const EdgeInsets.all(spacing / 4),
+              padding: const EdgeInsets.all(baseFontSize / 4),
               decoration: ShapeDecoration(
                 color: Theme.of(context).colorScheme.onError,
                 shape: const CircleBorder(),

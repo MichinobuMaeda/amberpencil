@@ -13,6 +13,7 @@ typedef _Bloc = SingleFieldFormBloc<String>;
 class MultiLineTextForm extends TextForm {
   final int inputMaxLines;
   final bool markdown;
+  final bool editable;
   final MarkdownStyleSheet? markdownStyleSheet;
 
   const MultiLineTextForm({
@@ -22,6 +23,7 @@ class MultiLineTextForm extends TextForm {
     TextStyle? style,
     this.inputMaxLines = 12,
     this.markdown = false,
+    this.editable = false,
     this.markdownStyleSheet,
   }) : super(
           key: key,
@@ -105,7 +107,7 @@ class MultiLineTextForm extends TextForm {
                       style: style,
                     ),
               Visibility(
-                visible: !context.watch<_Bloc>().state.editMode,
+                visible: editable && !context.watch<_Bloc>().state.editMode,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

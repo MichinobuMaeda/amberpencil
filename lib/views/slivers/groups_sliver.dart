@@ -62,7 +62,7 @@ class GroupsSliver extends StatelessWidget {
                         child: Center(
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: baseFontSize,
+                            spacing: spacing,
                             children: buildRow(
                               context: context,
                               group: item.value,

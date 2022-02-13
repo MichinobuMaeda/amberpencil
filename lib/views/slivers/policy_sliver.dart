@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/conf_bloc.dart';
+import '../../blocs/user_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/l10n.dart';
 import '../../models/conf.dart';
@@ -36,6 +37,7 @@ class PolicySliver extends StatelessWidget {
                         }),
                     style: const TextStyle(fontFamily: fontFamilyMonoSpace),
                     markdown: true,
+                    editable: context.watch<UserBloc>().state.me?.admin == true,
                     markdownStyleSheet: markdownStyleSheet(context),
                   ),
                 ),

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:go_router/go_router.dart';
 import 'blocs/all_blocs_observer.dart';
 import 'blocs/accounts_bloc.dart';
@@ -46,13 +47,14 @@ void main() async {
         MultiBlocProvider(
           providers: [
             BlocProvider(
-                create: (_) => PlatformBloc(html.window, localPreferences),
-                lazy: false),
-            BlocProvider(create: (_) => ConfBloc(), lazy: false),
-            BlocProvider(create: (_) => AuthBloc(), lazy: false),
-            BlocProvider(create: (_) => UserBloc(), lazy: false),
-            BlocProvider(create: (_) => AccountsBloc(), lazy: false),
-            BlocProvider(create: (_) => GroupsBloc(), lazy: false),
+              lazy: false,
+              create: (_) => PlatformBloc(html.window, localPreferences),
+            ),
+            BlocProvider(lazy: false, create: (_) => ConfBloc()),
+            BlocProvider(lazy: false, create: (_) => AuthBloc()),
+            BlocProvider(lazy: false, create: (_) => UserBloc()),
+            BlocProvider(lazy: false, create: (_) => AccountsBloc()),
+            BlocProvider(lazy: false, create: (_) => GroupsBloc()),
           ],
           child: Builder(
             builder: (context) {
@@ -86,8 +88,24 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp.router(
       title: appName,
-      theme: lightTheme,
-      darkTheme: darkTheme,
+      theme: FlexColorScheme.light(
+        scheme: themeColorScheme,
+        fontFamily: fontFamilySansSerif,
+        textTheme: textTheme,
+      ).toTheme.copyWith(
+            elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
+            outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
+            snackBarTheme: snackBarTheme,
+          ),
+      darkTheme: FlexColorScheme.dark(
+        scheme: themeColorScheme,
+        fontFamily: fontFamilySansSerif,
+        textTheme: textTheme,
+      ).toTheme.copyWith(
+            elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
+            outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
+            snackBarTheme: snackBarTheme,
+          ),
       themeMode: supportedThemeModes[context.select<PlatformBloc, int>(
         (bloc) => bloc.state.themeMode == 3 ? 0 : bloc.state.themeMode,
       )],

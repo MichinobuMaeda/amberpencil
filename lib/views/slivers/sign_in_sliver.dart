@@ -20,9 +20,8 @@ class SignInSliver extends StatelessWidget {
         children: [
           MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => _EmailFieldFormBloc(context)),
-              BlocProvider(
-                  create: (context) => _PasswordFieldFormBloc(context)),
+              BlocProvider(create: (context) => _EmailFieldBloc(context)),
+              BlocProvider(create: (context) => _PasswordFieldBloc(context)),
               BlocProvider(create: (_) => _ShowPasswordCubit(false)),
             ],
             child: Builder(
@@ -34,17 +33,21 @@ class SignInSliver extends StatelessWidget {
                       DefaultInputContainer(
                         child: TextField(
                           controller:
-                              context.read<_EmailFieldFormBloc>().controller,
+                              context.read<_EmailFieldBloc>().controller,
                           decoration: InputDecoration(
                             labelText: L10n.of(context)!.email,
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.cancel),
-                              onPressed: onResetEmail(context),
+                              onPressed: () => context
+                                  .read<_EmailFieldBloc>()
+                                  .add(SingleFieldFormReset()),
                             ),
                           ),
                           style:
                               const TextStyle(fontFamily: fontFamilyMonoSpace),
-                          onChanged: onEmailChanged(context),
+                          onChanged: (value) => context
+                              .read<_EmailFieldBloc>()
+                              .add(SingleFieldFormChanged(value)),
                         ),
                       ),
                     ],
@@ -52,33 +55,11 @@ class SignInSliver extends StatelessWidget {
                   WrappedRow(
                     children: [
                       OutlinedButton(
-                        onPressed: context
-                                    .watch<_EmailFieldFormBloc>()
-                                    .state
-                                    .ready &&
-                                !context.watch<RepositoryRequestBloc>().state
-                            ? () {
-                                context.read<RepositoryRequestBloc>().add(
-                                      RepositoryRequest(
-                                        request: onSendEmailLink(
-                                          context,
-                                          context
-                                              .read<_EmailFieldFormBloc>()
-                                              .state
-                                              .value,
-                                        ),
-                                        successMessage:
-                                            L10n.of(context)!.sentUrlForSignIn,
-                                        errorMessage:
-                                            L10n.of(context)!.erroSendEmail,
-                                      ),
-                                    );
-                              }
-                            : null,
+                        onPressed: onSendEmalLinkPressed(context),
                         child: Text(
                           L10n.of(context)!.siginInWithEmail,
                         ),
-                        style: ButtonStyle(minimumSize: buttonMinimumSize),
+                        style: buttonStyle,
                       ),
                     ],
                   ),
@@ -87,7 +68,7 @@ class SignInSliver extends StatelessWidget {
                       DefaultInputContainer(
                         child: TextField(
                           controller:
-                              context.read<_PasswordFieldFormBloc>().controller,
+                              context.read<_PasswordFieldBloc>().controller,
                           decoration: InputDecoration(
                             labelText: L10n.of(context)!.password,
                             suffixIcon: IconButton(
@@ -101,7 +82,9 @@ class SignInSliver extends StatelessWidget {
                               },
                             ),
                           ),
-                          onChanged: onPasswordChanged(context),
+                          onChanged: (value) => context
+                              .read<_PasswordFieldBloc>()
+                              .add(SingleFieldFormChanged(value)),
                           style:
                               const TextStyle(fontFamily: fontFamilyMonoSpace),
                           obscureText:
@@ -113,39 +96,11 @@ class SignInSliver extends StatelessWidget {
                   WrappedRow(
                     children: [
                       OutlinedButton(
-                        onPressed: context
-                                    .watch<_EmailFieldFormBloc>()
-                                    .state
-                                    .ready &&
-                                context
-                                    .watch<_PasswordFieldFormBloc>()
-                                    .state
-                                    .ready
-                            ? () {
-                                context.read<RepositoryRequestBloc>().add(
-                                      RepositoryRequest(
-                                        request: onSignInWithPassword(
-                                          context,
-                                          context
-                                              .read<_EmailFieldFormBloc>()
-                                              .state
-                                              .value,
-                                          context
-                                              .read<_PasswordFieldFormBloc>()
-                                              .state
-                                              .value,
-                                        ),
-                                        onSuccess: () {},
-                                        errorMessage: L10n.of(context)!
-                                            .errorSignInWithPassword,
-                                      ),
-                                    );
-                              }
-                            : null,
+                        onPressed: onSignInWithPasswordPressed(context),
                         child: Text(
                           L10n.of(context)!.siginInWithPasword,
                         ),
-                        style: ButtonStyle(minimumSize: buttonMinimumSize),
+                        style: buttonStyle,
                       ),
                     ],
                   ),
@@ -172,56 +127,54 @@ class SignInSliver extends StatelessWidget {
           ),
         ],
       );
-
-  void Function(String) onEmailChanged(BuildContext context) => (String value) {
-        context.read<_EmailFieldFormBloc>().add(SingleFieldFormChanged(value));
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      };
-
-  void Function(String) onPasswordChanged(BuildContext context) =>
-      (String value) {
-        context
-            .read<_PasswordFieldFormBloc>()
-            .add(SingleFieldFormChanged(value));
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      };
-
-  VoidCallback onResetEmail(BuildContext context) => () {
-        context.read<_EmailFieldFormBloc>().add(SingleFieldFormReset());
-
-        String initValue =
-            context.read<_EmailFieldFormBloc>().state.initialValue;
-        TextEditingController controller =
-            context.read<_EmailFieldFormBloc>().controller;
-
-        controller.text = initValue;
-        controller.selection = TextSelection(
-          baseOffset: controller.text.length,
-          extentOffset: controller.text.length,
-        );
-      };
 }
 
-Future<void> Function() onSendEmailLink(
+VoidCallback? onSendEmalLinkPressed(
   BuildContext context,
-  String value,
 ) =>
-    () => context.read<AuthBloc>().sendSignInLinkToEmail(value);
+    context.watch<_EmailFieldBloc>().state.ready &&
+            !context.watch<RepositoryRequestBloc>().state
+        ? () {
+            context.read<RepositoryRequestBloc>().add(
+                  RepositoryRequest(
+                    request: () =>
+                        context.read<AuthBloc>().sendSignInLinkToEmail(
+                              context.read<_EmailFieldBloc>().state.value,
+                            ),
+                    successMessage: L10n.of(context)!.sentUrlForSignIn,
+                    errorMessage: L10n.of(context)!.erroSendEmail,
+                  ),
+                );
+          }
+        : null;
 
-Future<void> Function() onSignInWithPassword(
+VoidCallback? onSignInWithPasswordPressed(
   BuildContext context,
-  String email,
-  String value,
 ) =>
-    () => context.read<AuthBloc>().signInWithEmailAndPassword(email, value);
+    context.watch<_EmailFieldBloc>().state.ready &&
+            context.watch<_PasswordFieldBloc>().state.ready
+        ? () {
+            context.read<RepositoryRequestBloc>().add(
+                  RepositoryRequest(
+                    request: () =>
+                        context.read<AuthBloc>().signInWithEmailAndPassword(
+                              context.read<_EmailFieldBloc>().state.value,
+                              context.read<_PasswordFieldBloc>().state.value,
+                            ),
+                    onSuccess: () {},
+                    errorMessage: L10n.of(context)!.errorSignInWithPassword,
+                  ),
+                );
+          }
+        : null;
 
-class _EmailFieldFormBloc extends SingleFieldFormBloc<String> {
-  _EmailFieldFormBloc(BuildContext context)
+class _EmailFieldBloc extends SingleFieldFormBloc<String> {
+  _EmailFieldBloc(BuildContext context)
       : super('', validator: emailValidator(context));
 }
 
-class _PasswordFieldFormBloc extends SingleFieldFormBloc<String> {
-  _PasswordFieldFormBloc(BuildContext context) : super('');
+class _PasswordFieldBloc extends SingleFieldFormBloc<String> {
+  _PasswordFieldBloc(BuildContext context) : super('');
 }
 
 class _ShowPasswordCubit extends Cubit<bool> {

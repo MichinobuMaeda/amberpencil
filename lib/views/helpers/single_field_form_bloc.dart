@@ -121,7 +121,10 @@ class SingleFieldFormBloc<T>
           editMode: false,
         ));
         controller.text = this.convertFrom(state.initialValue);
-        confirmationController.text = this.convertFrom(state.initialValue);
+        controller.selection = TextSelection(
+          baseOffset: controller.text.length,
+          extentOffset: controller.text.length,
+        );
       },
     );
 
@@ -146,6 +149,7 @@ class SingleFieldFormBloc<T>
           state,
           confirmation: state.initialValue,
         ));
+        confirmationController.text = this.convertFrom(state.initialValue);
       },
     );
   }

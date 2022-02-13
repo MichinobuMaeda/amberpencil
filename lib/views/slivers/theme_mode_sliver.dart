@@ -42,7 +42,7 @@ class ThemeModeSliver extends StatelessWidget {
                                   context.read<AccountsBloc>().updateMyAccount({
                                 Account.fieldThemeMode: index == 0 ? 3 : index,
                               }),
-                              item: L10n.of(context)!.themeMode,
+                              itemName: L10n.of(context)!.themeMode,
                               onSuccess: () {},
                             ),
                           );

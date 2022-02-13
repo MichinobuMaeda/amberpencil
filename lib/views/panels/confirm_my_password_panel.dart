@@ -20,11 +20,11 @@ class ConfirmMyPasswordPanel extends StatelessWidget {
         child: Builder(
           builder: (context) => TextForm(
             label: L10n.of(context)!.password,
+            errorMessage: L10n.of(context)!.errorReauthPassword,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
             saveButtonIcon: const Icon(Icons.check),
             saveButtonName: L10n.of(context)!.confirm,
-            saveErrorMessage: L10n.of(context)!.errorReauthPassword,
             onSave: (value) => () =>
                 context.read<AuthBloc>().reauthenticateWithPassword(value),
           ),

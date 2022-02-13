@@ -4,7 +4,7 @@ import '../config/l10n.dart';
 
 class RepositoryRequest {
   final Future<void> Function() request;
-  final String? item;
+  final String? itemName;
   final String? successMessage;
   final String? errorMessage;
   final VoidCallback? onSuccess;
@@ -12,7 +12,7 @@ class RepositoryRequest {
 
   RepositoryRequest({
     required this.request,
-    this.item,
+    this.itemName,
     this.successMessage,
     this.errorMessage,
     this.onSuccess,
@@ -29,13 +29,20 @@ class RepositoryRequestBloc extends Bloc<RepositoryRequest?, bool> {
         await event.request();
         if (event.onSuccess != null) {
           event.onSuccess!();
-        } else if (event.successMessage != null) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(event.successMessage!)),
+            SnackBar(
+              content: Text(
+                event.successMessage ??
+                    (event.itemName != null
+                        ? L10n.of(context)!.successSave(event.itemName!)
+                        : L10n.of(context)!.successRequest),
+              ),
+            ),
           );
         }
       } catch (e, s) {
-        debugPrint('/n$runtimeType:on<MyAccountChanged>/n$e/n$s/n');
+        debugPrint('\n$runtimeType:on<RepositoryRequest>\n$e\n$s\n');
         if (event.onError != null) {
           event.onError!();
         } else {
@@ -43,8 +50,8 @@ class RepositoryRequestBloc extends Bloc<RepositoryRequest?, bool> {
             SnackBar(
               content: Text(
                 event.errorMessage ??
-                    (event.item != null
-                        ? L10n.of(context)!.errorSave(event.item!)
+                    (event.itemName != null
+                        ? L10n.of(context)!.errorSave(event.itemName!)
                         : L10n.of(context)!.errorRequest),
               ),
             ),
