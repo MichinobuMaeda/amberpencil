@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+typedef NullableDateTime = DateTime?;
+
 abstract class FirestoreModel extends Equatable {
   static const String fieldCreatedAt = 'createdAt';
   static const String fieldCreatedBy = 'createdBy';
@@ -23,7 +25,7 @@ abstract class FirestoreModel extends Equatable {
 
   T getValue<T>(String key, T defaultValue) {
     try {
-      return castValue(snap.get(key), defaultValue);
+      return castValue<T>(snap.get(key), defaultValue);
     } catch (e) {
       return defaultValue;
     }
@@ -40,7 +42,7 @@ abstract class FirestoreModel extends Equatable {
   }
 
   T castValue<T>(dynamic val, T defaultValue) {
-    if (T == DateTime) {
+    if (T == NullableDateTime) {
       return val is Timestamp ? (val.toDate() as T) : defaultValue;
     } else {
       return val is T ? val : defaultValue;

@@ -1,6 +1,6 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import '../../config/l10n.dart';
 
 class LoadingSliver extends StatelessWidget {
   const LoadingSliver({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class LoadingSliver extends StatelessWidget {
               child: CircularProgressIndicator(),
             ),
             const SizedBox(height: spacing * 2),
-            Flexible(child: Text(AppLocalizations.of(context)!.pleaseWait)),
+            Flexible(child: Text(L10n.of(context)!.pleaseWait)),
           ],
         ),
       );

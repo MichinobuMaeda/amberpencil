@@ -6,14 +6,6 @@ import '../utils/firestore_deligate.dart';
 
 abstract class AccountsEvent {}
 
-class AccountsSnapshot extends AccountsEvent {
-  final List<DocumentSnapshot<Map<String, dynamic>>> docs;
-
-  AccountsSnapshot(this.docs);
-}
-
-class AccountsListenError extends AccountsEvent {}
-
 class AccountsSubscribed extends AccountsEvent {
   final Account me;
 
@@ -22,29 +14,13 @@ class AccountsSubscribed extends AccountsEvent {
 
 class AccountsUnsubscribed extends AccountsEvent {}
 
-class MyAccountChanged extends AccountsEvent {
-  final String field;
-  final dynamic value;
-  final VoidCallback onError;
+class _AccountsOnSnapshot extends AccountsEvent {
+  final List<DocumentSnapshot<Map<String, dynamic>>> docs;
 
-  MyAccountChanged(this.field, this.value, this.onError);
+  _AccountsOnSnapshot(this.docs);
 }
 
-class AccountChanged extends AccountsEvent {
-  final String id;
-  final String field;
-  final dynamic value;
-  final VoidCallback onError;
-
-  AccountChanged(this.id, this.field, this.value, this.onError);
-}
-
-class AccountDeleted extends AccountsEvent {
-  final String id;
-  final VoidCallback onError;
-
-  AccountDeleted(this.id, this.onError);
-}
+class _AccountsOnError extends AccountsEvent {}
 
 class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
   final FireStorereDeligate _firestore;
@@ -57,14 +33,6 @@ class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
         super([]) {
     _ref = _firestore.db.collection('accounts');
 
-    on<AccountsSnapshot>(
-      (event, emit) {
-        emit(event.docs.map((snap) => Account(snap)).toList());
-      },
-    );
-
-    on<AccountsListenError>((event, emit) => emit([]));
-
     on<AccountsSubscribed>((event, emit) {
       _me = event.me;
       _firestore.subscribe(_me!);
@@ -72,18 +40,30 @@ class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
         _me!.admin
             ? _ref.snapshots().listen(
                 (querySnap) {
-                  add(AccountsSnapshot(querySnap.docs));
+                  add(_AccountsOnSnapshot(querySnap.docs));
                 },
-                onError: onListenError,
+                onError: (Object error, StackTrace stackTrace) {
+                  debugPrint('$runtimeType:onError\n$error\n$stackTrace');
+                  add(_AccountsOnError());
+                },
               )
             : _ref.doc(event.me.id).snapshots().listen(
                 (snap) {
-                  add(AccountsSnapshot(snap.exists ? [snap] : []));
+                  add(_AccountsOnSnapshot(snap.exists ? [snap] : []));
                 },
-                onError: onListenError,
+                onError: (Object error, StackTrace stackTrace) {
+                  debugPrint('$runtimeType:onError\n$error\n$stackTrace');
+                  add(_AccountsOnError());
+                },
               ),
       );
     });
+
+    on<_AccountsOnSnapshot>(
+      (event, emit) => emit(event.docs.map((snap) => Account(snap)).toList()),
+    );
+
+    on<_AccountsOnError>((event, emit) => emit([]));
 
     on<AccountsUnsubscribed>((event, emit) async {
       _me = null;
@@ -91,50 +71,15 @@ class AccountsBloc extends Bloc<AccountsEvent, List<Account>> {
       await _firestore.cancel();
       emit([]);
     });
-
-    on<MyAccountChanged>((event, emit) async {
-      try {
-        await _firestore.updateDocument(
-          _ref.doc(_me?.id),
-          {event.field: event.value},
-        );
-      } catch (e, s) {
-        debugPrint('/n$runtimeType:on<MyAccountChanged>/n$e/n$s/n');
-        event.onError();
-      }
-    });
-
-    on<AccountChanged>((event, emit) async {
-      try {
-        await _firestore.updateDocument(
-          _ref.doc(event.id),
-          {event.field: event.value},
-        );
-      } catch (e, s) {
-        debugPrint('/n$runtimeType:on<AccountChanged>/n$e/n$s/n');
-        event.onError();
-      }
-    });
-
-    on<AccountDeleted>((event, emit) async {
-      try {
-        await _firestore.deleteDocument(
-          _ref.doc(event.id),
-        );
-      } catch (e, s) {
-        debugPrint('/n$runtimeType:on<AccountDeleted>/n$e/n$s/n');
-        event.onError();
-      }
-    });
   }
 
-  void onListenError(Object error, StackTrace stackTrace) {
-    debugPrint('$runtimeType:onError\n$error\n$stackTrace');
-    add(AccountsListenError());
-  }
+  Future<void> updateMyAccount(Map<String, dynamic> data) =>
+      _firestore.updateDocument(_ref.doc(_me?.id), data);
 
-  Future<Account?> restoreMe(String uid) async {
-    final snap = await _ref.doc(uid).get();
-    return snap.exists ? Account(snap) : null;
-  }
+  Future<void> update(String id, Map<String, dynamic> data) =>
+      _firestore.updateDocument(_ref.doc(id), data);
+
+  Future<void> delete(String id) => _firestore.deleteDocument(_ref.doc(id));
+
+  Future<void> restore(String id) => _firestore.restoreDocument(_ref.doc(id));
 }

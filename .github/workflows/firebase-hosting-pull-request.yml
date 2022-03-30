@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: '16'
-      FLUTTER_VERSION: '2.8.1'
+      FLUTTER_VERSION: '2.10.1'
 
     steps:
       - uses: actions/checkout@v2

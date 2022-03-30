@@ -1,8 +1,8 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/platform_bloc.dart';
 import '../../config/theme.dart';
+import '../../config/l10n.dart';
 
 class UpdateAppButton extends StatelessWidget {
   const UpdateAppButton({Key? key}) : super(key: key);
@@ -10,33 +10,28 @@ class UpdateAppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialBanner(
         content: Text(
-          AppLocalizations.of(context)!.updateApp,
+          L10n.of(context)!.updateApp,
           textAlign: TextAlign.right,
+          style: TextStyle(color: Theme.of(context).colorScheme.onError),
         ),
+        backgroundColor: Theme.of(context).colorScheme.error,
         actions: [
           IconButton(
             onPressed: () => context.read<PlatformBloc>().add(AppReloaded()),
             iconSize: baseFontSize * 2,
             icon: Ink(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(baseFontSize / 4),
               decoration: ShapeDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.onError,
                 shape: const CircleBorder(),
               ),
               child: Icon(
                 Icons.get_app,
-                size: 24.0,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.amber.shade900
-                    : Colors.white,
+                size: baseFontSize * 1.5,
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           )
         ],
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.amber.shade900
-            : Colors.amber.shade400,
       );
 }

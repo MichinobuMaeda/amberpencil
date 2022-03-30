@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import '../../blocs/my_account_bloc.dart';
+import '../../blocs/user_bloc.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/comfirm_danger_buton.dart';
 import '../theme_widgets/wrapped_row.dart';
@@ -17,7 +17,7 @@ class SignOutSliver extends StatelessWidget {
               WrappedRow(
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.alertSignOut,
+                    L10n.of(context)!.alertSignOut,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),
@@ -28,11 +28,11 @@ class SignOutSliver extends StatelessWidget {
                 children: [
                   ComfirmDangerButon(
                     context: context,
-                    message: AppLocalizations.of(context)!.confirmSignOut,
+                    message: L10n.of(context)!.confirmSignOut,
                     icon: const Icon(Icons.logout),
-                    label: AppLocalizations.of(context)!.signOut,
+                    label: L10n.of(context)!.signOut,
                     onPressed: () =>
-                        context.read<MyAccountBloc>().add(OnSingOutRequired()),
+                        context.read<UserBloc>().add(OnSingOutRequired()),
                   ),
                 ],
               ),

@@ -15,15 +15,13 @@ class SectionHeaderSliver extends StatelessWidget {
         pinned: true,
         delegate: StickyHeaderDelegate(
           minHeight: fontSizeH3 * 1.5,
-          maxHeight: fontSizeH3 * 2,
+          maxHeight: fontSizeH3 * 2.2,
           child: Container(
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.shadow.withOpacity(1 / 8),
             child: Center(
               child: Text(
                 title,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    fontSize: fontSizeH3),
+                style: const TextStyle(fontSize: fontSizeH3),
               ),
             ),
           ),

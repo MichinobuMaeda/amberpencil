@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../blocs/time_ticker_bloc.dart';
-import '../../blocs/my_account_bloc.dart';
-import '../../config/theme.dart';
 import '../../blocs/auth_bloc.dart';
+import '../../blocs/time_ticker_bloc.dart';
+import '../../blocs/user_bloc.dart';
+import '../../config/theme.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/box_sliver.dart';
 import '../theme_widgets/wrapped_row.dart';
 
@@ -38,7 +38,7 @@ class EmailVerifySliver extends StatelessWidget {
                     width: fieldWidth,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.emailVerificationRequired,
+                        L10n.of(context)!.emailVerificationRequired,
                       ),
                     ],
                   ),
@@ -53,7 +53,7 @@ class EmailVerifySliver extends StatelessWidget {
                           context.read<SendCubit>().set(true);
                           context.read<TimeTickerBloc>().activate();
                         },
-                        label: Text(AppLocalizations.of(context)!.send),
+                        label: Text(L10n.of(context)!.send),
                         icon: const Icon(Icons.send),
                       ),
                     ],
@@ -62,7 +62,7 @@ class EmailVerifySliver extends StatelessWidget {
                     WrappedRow(
                       width: fieldWidth,
                       children: [
-                        Text(AppLocalizations.of(context)!.sentUrlToVerify),
+                        Text(L10n.of(context)!.sentUrlToVerify),
                       ],
                     ),
                   if (context.watch<SendCubit>().state)
@@ -71,24 +71,23 @@ class EmailVerifySliver extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           onPressed: authUserReload(context),
-                          child: Text(AppLocalizations.of(context)!.update),
+                          child: Text(L10n.of(context)!.update),
                         ),
                       ],
                     ),
                   WrappedRow(
                     width: fieldWidth,
                     children: [
-                      Text(AppLocalizations.of(context)!.sighOutForRetry),
+                      Text(L10n.of(context)!.signOutForRetry),
                     ],
                   ),
                   WrappedRow(
                     width: fieldWidth,
                     children: [
                       ElevatedButton(
-                        onPressed: () => context
-                            .read<MyAccountBloc>()
-                            .add(OnSingOutRequired()),
-                        child: Text(AppLocalizations.of(context)!.signOut),
+                        onPressed: () =>
+                            context.read<UserBloc>().add(OnSingOutRequired()),
+                        child: Text(L10n.of(context)!.signOut),
                       ),
                     ],
                   ),

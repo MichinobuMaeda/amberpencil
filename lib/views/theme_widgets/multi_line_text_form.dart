@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../../blocs/repository_request_delegate_bloc.dart';
+import '../../config/l10n.dart';
 import '../helpers/single_field_form_bloc.dart';
 import 'text_form.dart';
 import 'wrapped_row.dart';
@@ -12,20 +12,20 @@ typedef _Bloc = SingleFieldFormBloc<String>;
 
 class MultiLineTextForm extends TextForm {
   final int inputMaxLines;
-  final TextFormOnSave _onSave;
   final bool markdown;
+  final bool editable;
   final MarkdownStyleSheet? markdownStyleSheet;
 
   const MultiLineTextForm({
     Key? key,
     required String label,
-    required TextFormOnSave onSave,
+    required Future<void> Function() Function(String) onSave,
     TextStyle? style,
     this.inputMaxLines = 12,
     this.markdown = false,
+    this.editable = false,
     this.markdownStyleSheet,
-  })  : _onSave = onSave,
-        super(
+  }) : super(
           key: key,
           label: label,
           onSave: onSave,
@@ -60,26 +60,24 @@ class MultiLineTextForm extends TextForm {
                       maxLines: 12,
                     ),
                     ElevatedButton.icon(
-                      onPressed: context.watch<_Bloc>().state.buttonEnabled
-                          ? () {
-                              context.read<_Bloc>().add(
-                                    SingleFieldFormSave(
-                                      _onSave,
-                                      onError(context),
-                                    ),
-                                  );
-                            }
+                      onPressed: context.watch<_Bloc>().state.ready &&
+                              !context.watch<RepositoryRequestBloc>().state
+                          ? () => context.read<RepositoryRequestBloc>().add(
+                                RepositoryRequest(
+                                  request: onSave(
+                                    context.read<_Bloc>().state.value,
+                                  ),
+                                ),
+                              )
                           : null,
-                      label: Text(AppLocalizations.of(context)!.save),
+                      label: Text(L10n.of(context)!.save),
                       icon: const Icon(Icons.save_alt),
                     ),
                     ElevatedButton.icon(
                       onPressed: () {
-                        context.read<_Bloc>().controller.text =
-                            context.read<_Bloc>().state.initialValue;
                         context.read<_Bloc>().add(SingleFieldFormReset());
                       },
-                      label: Text(AppLocalizations.of(context)!.cancel),
+                      label: Text(L10n.of(context)!.cancel),
                       icon: const Icon(Icons.cancel),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(
@@ -109,7 +107,7 @@ class MultiLineTextForm extends TextForm {
                       style: style,
                     ),
               Visibility(
-                visible: !context.watch<_Bloc>().state.editMode,
+                visible: editable && !context.watch<_Bloc>().state.editMode,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

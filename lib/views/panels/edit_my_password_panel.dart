@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../blocs/auth_bloc.dart';
+import '../../config/l10n.dart';
 import '../theme_widgets/text_form.dart';
 import '../helpers/single_field_form_bloc.dart';
 
@@ -20,19 +20,15 @@ class EditMyPasswordPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: AppLocalizations.of(context)!.password,
+            label: L10n.of(context)!.password,
+            itemName: L10n.of(context)!.password,
             password: true,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-            onSave: onSave(context.read<AuthBloc>()),
+            onSave: (value) => () async {
+              await context.read<AuthBloc>().updateMyPassword(value);
+            },
+            resetOnSave: true,
           ),
         ),
       );
-
-  Future<void> Function(String, VoidCallback) onSave(AuthBloc authRepository) =>
-      (
-        String value,
-        VoidCallback onError,
-      ) async {
-        await authRepository.updateMyPassword(value, onError);
-      };
 }

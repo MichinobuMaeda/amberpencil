@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-// import '../theme_widgets/box_sliver.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/accounts_bloc.dart';
 
 class AccountsSliver extends StatelessWidget {
   const AccountsSliver({Key? key}) : super(key: key);
@@ -7,17 +8,16 @@ class AccountsSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SliverList(
         delegate: SliverChildListDelegate(
-          [
-            Container(height: 48.0),
-            Container(color: Colors.grey, height: 48.0),
-            Container(height: 48.0),
-            Container(color: Colors.grey, height: 48.0),
-            Container(height: 48.0),
-            Container(color: Colors.grey, height: 48.0),
-            Container(height: 48.0),
-            Container(color: Colors.grey, height: 48.0),
-            Container(height: 48.0),
-          ],
+          context
+              .watch<AccountsBloc>()
+              .state
+              .map(
+                (account) => SizedBox(
+                  height: 32.0,
+                  child: Text(account.name),
+                ),
+              )
+              .toList(),
         ),
       );
 }

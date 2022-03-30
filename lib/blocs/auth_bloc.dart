@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/auth_user.dart';
 import 'platform_bloc.dart';
-import 'route_bloc.dart';
+import 'user_bloc.dart';
 
 abstract class AuthEvent {}
 
@@ -13,10 +13,10 @@ class AuthListenStart extends AuthEvent {
   AuthListenStart(this.context);
 }
 
-class AuthUserChanged extends AuthEvent {
-  final AuthUser? authUser;
+class _AuthUserChanged extends AuthEvent {
+  final User? user;
 
-  AuthUserChanged(this.authUser);
+  _AuthUserChanged(this.user);
 }
 
 class AuthUserReloaded extends AuthEvent {}
@@ -38,30 +38,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthUser?> {
     FirebaseAuth? auth,
   })  : _auth = auth ?? FirebaseAuth.instance,
         super(null) {
-    on<AuthListenStart>((event, emit) {
+    on<AuthListenStart>((event, emit) async {
       _platformBloc = event.context.read<PlatformBloc>();
 
       // Handle deeplink
       if (_auth.isSignInWithEmailLink(_platformBloc.state.deepLink)) {
         final String? email = _platformBloc.state.email;
         if (email != null) {
-          signInWithEmailLink(
+          await _auth.signInWithEmailLink(
             email: email,
             emailLink: _platformBloc.state.deepLink,
           );
+          _platformBloc.add(SignedInAtChanged());
         }
       }
 
       // Listen auth status
       _auth.authStateChanges().listen((User? user) {
-        event.context.read<RouteBloc>().add(OnAuthStateChecked());
-        add(AuthUserChanged(user == null ? null : AuthUser(user)));
+        event.context.read<UserBloc>().add(OnAuthStateChecked());
+        add(_AuthUserChanged(user));
       });
     });
 
-    on<AuthUserChanged>((event, emit) {
-      emit(event.authUser);
-    });
+    on<_AuthUserChanged>((event, emit) =>
+        emit(event.user == null ? null : AuthUser(event.user!)));
 
     on<AuthUserReloaded>((event, emit) async {
       await _auth.currentUser?.reload();
@@ -73,61 +73,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthUser?> {
     });
   }
 
-  Future<void> signInWithEmailLink({
-    required String email,
-    required String emailLink,
-  }) async {
-    await _auth.signInWithEmailLink(
-      email: email,
-      emailLink: emailLink,
-    );
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
     _platformBloc.add(SignedInAtChanged());
   }
 
-  Future<void> signInWithEmailAndPassword(
-    String email,
-    String password,
-    VoidCallback onError,
-  ) async {
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      _platformBloc.add(SignedInAtChanged());
-    } catch (e, s) {
-      debugPrint('\n$runtimeType:signInWithEmailAndPassword\n$e\n$s\n');
-      onError();
-    }
+  Future<void> sendSignInLinkToEmail(String email) async {
+    await _auth.sendSignInLinkToEmail(
+      email: email,
+      actionCodeSettings: ActionCodeSettings(
+        url: _url!,
+        handleCodeInApp: true,
+      ),
+    );
+    _platformBloc.add(SignInEmailChanged(email));
   }
 
-  Future<void> sendSignInLinkToEmail(
-    String email,
-    VoidCallback onError,
-  ) async {
-    try {
-      await _auth.sendSignInLinkToEmail(
-        email: email,
-        actionCodeSettings: ActionCodeSettings(
-          url: _url!,
-          handleCodeInApp: true,
-        ),
-      );
-      _platformBloc.add(SignInEmailChanged(email));
-    } catch (e, s) {
-      debugPrint('\n$runtimeType:sendSignInLinkToEmail\n$e\n$s\n');
-      onError();
-    }
-  }
-
-  Future<void> sendEmailVerification() async {
-    await _auth.currentUser!.sendEmailVerification();
-  }
+  Future<void> sendEmailVerification() =>
+      _auth.currentUser!.sendEmailVerification();
 
   Future<void> reauthenticateWithEmail() async {
     final String email = _auth.currentUser!.email!;
     await _auth.sendSignInLinkToEmail(
-      email: email,
+      email: _auth.currentUser!.email!,
       actionCodeSettings: ActionCodeSettings(
         url: '$_url$reauthenticateParam',
         handleCodeInApp: true,
@@ -136,37 +104,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthUser?> {
     _platformBloc.add(SignInEmailChanged(email));
   }
 
-  Future<void> reauthenticateWithPassword(
-    String password,
-    VoidCallback onError,
-  ) async {
-    try {
-      final credential = EmailAuthProvider.credential(
+  Future<void> reauthenticateWithPassword(String password) async {
+    await _auth.currentUser!.reauthenticateWithCredential(
+      EmailAuthProvider.credential(
         email: _auth.currentUser!.email!,
         password: password,
-      );
-      await _auth.currentUser!.reauthenticateWithCredential(credential);
-      _platformBloc.add(SignedInAtChanged());
-    } catch (e, s) {
-      debugPrint('\n$runtimeType:reauthenticateWithPassword\n$e\n$s\n');
-      onError();
-    }
+      ),
+    );
+    _platformBloc.add(SignedInAtChanged());
   }
 
-  Future<void> updateMyPassword(
-    String password,
-    VoidCallback onError,
-  ) async {
-    try {
-      await _auth.currentUser!.updatePassword(password);
-    } catch (e, s) {
-      debugPrint('\n$runtimeType:updateMyPassword\n$e\n$s\n');
-      onError();
-    }
-  }
+  Future<void> updateMyEmail(String email) =>
+      _auth.currentUser!.updateEmail(email);
+
+  Future<void> updateMyPassword(String password) =>
+      _auth.currentUser!.updatePassword(password);
 
   Future<void> signOut() async {
-    debugPrint('$runtimeType:signOut');
     if (_auth.currentUser != null) {
       await _auth.signOut();
     }

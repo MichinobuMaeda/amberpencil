@@ -1,9 +1,10 @@
+import 'package:amberpencil/blocs/auth_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../config/theme.dart';
 import '../../config/validators.dart';
 import '../../blocs/accounts_bloc.dart';
+import '../../config/l10n.dart';
 import '../../models/account.dart';
 import '../theme_widgets/text_form.dart';
 import '../helpers/single_field_form_bloc.dart';
@@ -21,22 +22,19 @@ class EditMyEmailPanel extends StatelessWidget {
         ),
         child: Builder(
           builder: (context) => TextForm(
-            label: AppLocalizations.of(context)!.email,
+            label: L10n.of(context)!.email,
+            itemName: L10n.of(context)!.email,
             style: const TextStyle(fontFamily: fontFamilyMonoSpace),
-            onSave: onSaveEmail(
-              context.read<AccountsBloc>(),
-            ),
+            onSave: (value) => () async {
+              final AuthBloc authBloc = context.read<AuthBloc>();
+              authBloc.updateMyEmail(value);
+              await context.read<AccountsBloc>().updateMyAccount(
+                {Account.fieldEmail: value},
+              );
+              authBloc.add(AuthUserReloaded());
+            },
+            resetOnSave: true,
           ),
         ),
       );
 }
-
-TextFormOnSave onSaveEmail(
-  AccountsBloc accountsBloc,
-) =>
-    (
-      String value,
-      VoidCallback onError,
-    ) async {
-      accountsBloc.add(MyAccountChanged(Account.fieldEmail, value, onError));
-    };
