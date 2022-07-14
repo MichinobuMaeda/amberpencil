@@ -2,16 +2,28 @@
 
 ## Getting Started
 
+```
+$ git clone git@github.com:MichinobuMaeda/amberpencil.git
+$ cd amberpencil
+$ cp NotoSansJP-Regular.otf ./fonts/
+$ nvm use
+$ npm --prefix functions install
+$ npm install
+$ fvm flutter pub get
+$ npm test
+$ npm start
+```
+
 ### Prerequisites for development
 
 - git
 - fvm
 - nvm
-- curl
 
 ## Crete this project
 
 https://console.firebase.google.com/project/amberpencil-test/overview
+
 - Project settings
     - Project name: amberpencil
     - Environment type: Unspecified
@@ -110,6 +122,10 @@ thentication Emulator, Functions Emulator, Firestore Emulator, Storage Emulator
 $ npx firebase login:ci
 ```
 
-Set firebase token to GitHub Setting : Secrets : Acrions : `FIREBASE_TOKEN_AMBERPENCIL_TEST`
+https://github.com/MichinobuMaeda/amberpencil
 
-Set firebase Web API Key to GitHub Setting : Secrets : Acrions : `FIREBASE_API_KEY_AMBERPENCIL_TEST`
+- Settings
+    - Secrets
+        - Acrions
+            - `FIREBASE_TOKEN_AMBERPENCIL_TEST`: firebase token
+            - `FIREBASE_API_KEY_AMBERPENCIL_TEST`: firebase Web API Key

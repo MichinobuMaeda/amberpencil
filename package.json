@@ -2,13 +2,9 @@
   "name": "amberpencil",
   "version": "0.1.0",
   "description": "Amber Pencil",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx firebase emulators:exec --only auth,functions,firestore,storage \"fvm flutter run -d chrome \"",
+    "test": "npx firebase emulators:exec --only auth,functions,firestore,storage \"npm --prefix functions test\""
   },
   "repository": {
     "type": "git",
@@ -20,7 +16,7 @@
     "url": "https://github.com/MichinobuMaeda/amberpencil/issues"
   },
   "homepage": "https://github.com/MichinobuMaeda/amberpencil#readme",
-  "dependencies": {
+  "devDependencies": {
     "firebase-tools": "^11.2.2"
   }
 }
