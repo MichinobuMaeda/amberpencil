@@ -1,10 +1,23 @@
 {
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "functions": {
     "predeploy": [
-      "yarn --cwd \"$RESOURCE_DIR\" lint",
-      "yarn --cwd \"$RESOURCE_DIR\" build"
-    ],
-    "source": "functions"
+      "npm --prefix \"$RESOURCE_DIR\" run lint"
+    ]
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "emulators": {
     "auth": {
@@ -23,20 +36,5 @@
       "enabled": true,
       "port": 4040
     }
-  },
-  "storage": {
-    "rules": "storage.rules"
-  },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "build/web",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
   }
 }

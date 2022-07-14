@@ -1,12 +1,14 @@
 {
   "name": "amberpencil",
-  "version": "1.0.0",
-  "description": "Amber pencil",
+  "version": "0.1.0",
+  "description": "Amber Pencil",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
   "scripts": {
-    "test:setup": "curl http://localhost:5001/amberpencil/asia-northeast1/api/setup",
-    "start": "yarn --cwd functions build && firebase emulators:exec --only auth,functions,firestore,storage --ui \"yarn test:setup && flutter run -d chrome --web-port 5000\"",
-    "deploy": "firebase deploy",
-    "functions:config:set": "firebase functions:config:set"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,7 @@
     "url": "https://github.com/MichinobuMaeda/amberpencil/issues"
   },
   "homepage": "https://github.com/MichinobuMaeda/amberpencil#readme",
-  "devDependencies": {
-    "firebase-tools": "^10.0.1"
+  "dependencies": {
+    "firebase-tools": "^11.2.2"
   }
 }

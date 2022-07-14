@@ -1,12 +1,12 @@
 {
-    "name": "Amber Pencil",
-    "short_name": "Amber Pencil",
+    "name": "amberpencil",
+    "short_name": "amberpencil",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#795548",
-    "theme_color": "#795548",
-    "description": "Amber Pencil",
-    "orientation": "any",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "A new Flutter project.",
+    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
