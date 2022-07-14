@@ -1,9 +1,22 @@
-const functions = require("firebase-functions");
+// const {
+//   deployment,
+//   onCreateAccount,
+//   onUpdateAccount,
+//   invite,
+//   getToken,
+// } = require("./admin");
+const {
+  setTestData,
+  clearAll,
+} = require("./testutils");
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// admin
+// exports.deployment = deployment;
+// exports.onCreateAccount = onCreateAccount;
+// exports.onUpdateAccount = onUpdateAccount;
+// exports.invite = invite;
+// exports.getToken = getToken;
+
+// test
+exports.setTestData = setTestData;
+exports.clearAll = clearAll;

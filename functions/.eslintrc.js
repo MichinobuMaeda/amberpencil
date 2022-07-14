@@ -1,8 +1,9 @@
 module.exports = {
   root: true,
   env: {
-    es6: true,
+    es2020: true,
     node: true,
+    commonjs: true,
   },
   extends: [
     "eslint:recommended",
@@ -11,4 +12,15 @@ module.exports = {
   rules: {
     quotes: ["error", "double"],
   },
+  overrides: [
+    {
+      files: [
+        "**/*.test.js",
+      ],
+      env: {
+        "jest/globals": true,
+      },
+      plugins: ["jest"],
+    },
+  ],
 };
