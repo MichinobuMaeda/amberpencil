@@ -1,11 +1,21 @@
 # amberpencil
 
+## Prerequisites
+
+- git
+- fvm
+- nvm
+
+```
+$ nvm install v16.14.2
+$ fvm install 3.0.4
+```
+
 ## Getting Started
 
 ```
 $ git clone git@github.com:MichinobuMaeda/amberpencil.git
 $ cd amberpencil
-$ cp NotoSansJP-Regular.otf ./fonts/
 $ nvm use
 $ npm --prefix functions install
 $ npm install
@@ -13,12 +23,6 @@ $ fvm flutter pub get
 $ npm test
 $ npm start
 ```
-
-### Prerequisites for development
-
-- git
-- fvm
-- nvm
 
 ## Crete this project
 
@@ -43,8 +47,6 @@ https://console.firebase.google.com/project/amberpencil-test/overview
         - Template language: Japanese
 
 ```
-$ nvm install v16.14.2
-$ fvm install 3.0.4
 $ fvm global 3.0.4
 $ fvm flutter create amberpencil --template=app --platforms=web
 $ cd amberpencil
