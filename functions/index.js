@@ -1,8 +1,10 @@
 const functions = require("firebase-functions");
-const firebase = require("./firebase");
+const admin = require("firebase-admin");
 const deployment = require("./deployment");
 const {requireAdminAccount} = require("./guard");
 const accounts = require("./accounts");
+
+const firebase = admin.initializeApp();
 
 exports.deployment = functions.region(functions.config().region)
     .firestore.document("service/deployment")
