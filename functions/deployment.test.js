@@ -1,165 +1,163 @@
-const test = require("firebase-functions-test");
-const firebase = require("./firebase");
-const {clearAll} = require("./testutils");
+const {
+  createFirestoreDocSnapMock,
+  createMockFirebase,
+} = require("./testutils");
 const deployment = require("./deployment");
+
+const {
+  mockAuth,
+  mockDoc,
+  mockCollection,
+  mockBatch,
+  firebase,
+} = createMockFirebase(jest);
+
+const deleted = createFirestoreDocSnapMock(jest, "deployment");
+
+const config = {
+  initial: {
+    url: "http://localhost:5000/",
+    email: "primary@example.com",
+    password: "primarypassword",
+  },
+};
+
+const newVersion = 1;
 
 afterEach(async function() {
   jest.clearAllMocks();
-  await clearAll();
 });
 
-const primaryAccount = {
-  email: "primary@example.com",
-  valid: true,
-  admin: true,
-  tester: true,
-  createdBy: "system",
-  updatedBy: "system",
-};
+describe("deployment", function() {
+  it("restore deployment version," +
+  " and sets initial data and sets deployment version 1" +
+  " if previous version is 0", async function() {
+    const {url, email, password} = config.initial;
+    const displayName = "Primary user";
+    deleted.data.mockReturnValueOnce({version: 0});
+    mockDoc
+        .mockReturnValueOnce({path: "service/conf"})
+        .mockReturnValueOnce({path: "accounts/new"});
+    mockAuth.createUser.mockResolvedValue({displayName, email});
+    await deployment(firebase, config, deleted);
 
-const initialConf = {
-  version: "1.0.0+0",
-  url: "http://localhost:5000/",
-  createdBy: "system",
-  updatedBy: "system",
-};
+    expect(deleted.ref.set.mock.calls).toEqual([
+      [{version: 0}],
+    ]);
+    expect(mockBatch.set.mock.calls).toEqual([
+      [{path: "service/conf"}, {
+        version: "1.0.0+0",
+        url,
+        seed: expect.any(String),
+        invExp: 10 * 24 * 3600 * 1000,
+        policy: expect.any(String),
+        createdAt: expect.any(Date),
+        createdBy: "system",
+        updatedAt: expect.any(Date),
+        updatedBy: "system",
+      }],
+      [deleted.ref, {version: newVersion, updatedAt: expect.any(Date)}],
+    ]);
+    expect(mockAuth.createUser.mock.calls).toEqual([
+      [{
+        displayName,
+        email,
+        emailVerified: true,
+        password,
+      }],
+    ]);
+    expect(mockBatch.create.mock.calls).toEqual([
+      [{path: "accounts/new"}, {
+        name: displayName,
+        email,
+        valid: true,
+        admin: true,
+        tester: true,
+        createdAt: expect.any(Date),
+        createdBy: "system",
+        updatedAt: expect.any(Date),
+        updatedBy: "system",
+      }],
+    ]);
+    expect(mockCollection.mock.calls).toEqual([
+      ["service"],
+      ["accounts"],
+    ]);
+    expect(mockDoc.mock.calls).toEqual([
+      ["conf"],
+      [],
+    ]);
+    expect(mockBatch.commit.mock.calls).toEqual([
+      [],
+    ]);
+  });
 
-describe("deployment", () => {
-  it("set deployment version 1," +
+  it("restore deployment version 0," +
+  " and sets initial data and sets deployment version 1" +
+  " if previous version is null", async function() {
+    const {email} = config.initial;
+    const displayName = "Primary user";
+    deleted.data.mockReturnValueOnce({version: null});
+    mockDoc
+        .mockReturnValueOnce({path: "service/conf"})
+        .mockReturnValueOnce({path: "accounts/new"});
+    mockAuth.createUser.mockResolvedValue({displayName, email});
+    await deployment(firebase, config, deleted);
+
+    expect(deleted.ref.set.mock.calls).toEqual([
+      [{version: 0}],
+    ]);
+    expect(mockBatch.set.mock.calls[1]).toEqual(
+        [deleted.ref, {version: newVersion, updatedAt: expect.any(Date)}],
+    );
+  });
+
+  it("sets deployment version 0," +
+    " and sets initial data and sets deployment version 1" +
     " if previous version is undefined", async function() {
-    await deployment(
-        firebase,
-        test().firestore.makeDocumentSnapshot(
-            {},
-            "service/deployment",
-        ),
+    const {email} = config.initial;
+    const displayName = "Primary user";
+    mockDoc
+        .mockReturnValueOnce({path: "service/conf"})
+        .mockReturnValueOnce({path: "accouns/new"});
+    mockAuth.createUser.mockResolvedValue({displayName, email});
+    await deployment(firebase, config, deleted);
+
+    expect(deleted.ref.set.mock.calls).toEqual([
+      [{version: 0}],
+    ]);
+    expect(mockBatch.set.mock.calls[1]).toEqual(
+        [deleted.ref, {version: newVersion, updatedAt: expect.any(Date)}],
     );
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userList = await auth.listUsers();
-    expect(userList.users).toHaveLength(1);
-    expect(userList.users[0].email).toEqual("primary@example.com");
-
-    const accounts = await db.collection("accounts").get();
-    expect(accounts.docs).toHaveLength(1);
-    expect(accounts.docs[0].data()).toMatchObject(primaryAccount);
-
-    const conf = await db.collection("service").doc("conf").get();
-    expect(conf.data()).toMatchObject(initialConf);
-
-    const doc = await db.collection("service").doc("deployment").get();
-    expect(doc.get("version")).toEqual(1);
   });
 
-  it("set deployment version 1," +
-    " if previous version is null", async function() {
-    await deployment(
-        firebase,
-        test().firestore.makeDocumentSnapshot(
-            {version: null, updatedAt: new Date()},
-            "service/deployment",
-        ),
-    );
+  it("sets deployment version (newVersion)," +
+  " and do nothing" +
+  " if previous version is (newVersion)", async function() {
+    deleted.data.mockReturnValueOnce({version: newVersion});
+    await deployment(firebase, config, deleted);
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userList = await auth.listUsers();
-    expect(userList.users).toHaveLength(1);
-    expect(userList.users[0].email).toEqual("primary@example.com");
-
-    const accounts = await db.collection("accounts").get();
-    expect(accounts.docs).toHaveLength(1);
-    expect(accounts.docs[0].data()).toMatchObject(primaryAccount);
-
-    const conf = await db.collection("service").doc("conf").get();
-    expect(conf.data()).toMatchObject(initialConf);
-
-    const doc = await db.collection("service").doc("deployment").get();
-    expect(doc.get("version")).toEqual(1);
+    expect(deleted.ref.set.mock.calls).toEqual([
+      [{version: 1}],
+    ]);
+    expect(mockBatch.create.mock.calls).toEqual([]);
+    expect(mockBatch.set.mock.calls).toEqual([]);
+    expect(mockBatch.update.mock.calls).toEqual([]);
+    expect(mockBatch.commit.mock.calls).toEqual([]);
   });
 
-  it("set deployment version 1," +
-    " if previous version is 0", async function() {
-    await deployment(
-        firebase,
-        test().firestore.makeDocumentSnapshot(
-            {version: 0, updatedAt: new Date()},
-            "service/deployment",
-        ),
-    );
+  it("sets deployment version (newVersion + 1)," +
+  " and do nothing" +
+  " if previous version is (newVersion + 1)", async function() {
+    deleted.data.mockReturnValueOnce({version: newVersion + 1});
+    await deployment(firebase, config, deleted);
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userList = await auth.listUsers();
-    expect(userList.users).toHaveLength(1);
-    expect(userList.users[0].email).toEqual("primary@example.com");
-
-    const accounts = await db.collection("accounts").get();
-    expect(accounts.docs).toHaveLength(1);
-    expect(accounts.docs[0].data()).toMatchObject(primaryAccount);
-    await accounts.docs[0].ref.delete();
-
-    const conf = await db.collection("service").doc("conf").get();
-    expect(conf.data()).toMatchObject(initialConf);
-    expect(conf.get("seed")).toHaveLength(256);
-
-    const doc = await db.collection("service").doc("deployment").get();
-    expect(doc.get("version")).toEqual(1);
-  });
-
-  it("set deployment version 1," +
-    " if previous version is 1", async function() {
-    await deployment(
-        firebase,
-        test().firestore.makeDocumentSnapshot(
-            {version: 1, updatedAt: new Date()},
-            "service/deployment",
-        ),
-    );
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userList = await auth.listUsers();
-    expect(userList.users).toHaveLength(0);
-
-    const accounts = await db.collection("accounts").get();
-    expect(accounts.docs).toHaveLength(0);
-
-    const conf = await db.collection("service").doc("conf").get();
-    expect(conf.exists).toBeFalsy();
-
-    const doc = await db.collection("service").doc("deployment").get();
-    expect(doc.get("version")).toEqual(1);
-  });
-
-  it("set deployment version 2," +
-    " if previous version is 2", async function() {
-    await deployment(
-        firebase,
-        test().firestore.makeDocumentSnapshot(
-            {version: 2, updatedAt: new Date()},
-            "service/deployment",
-        ),
-    );
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const userList = await auth.listUsers();
-    expect(userList.users).toHaveLength(0);
-
-    const accounts = await db.collection("accounts").get();
-    expect(accounts.docs).toHaveLength(0);
-
-    const conf = await db.collection("service").doc("conf").get();
-    expect(conf.exists).toBeFalsy();
-
-    const doc = await db.collection("service").doc("deployment").get();
-    expect(doc.get("version")).toEqual(2);
+    expect(deleted.ref.set.mock.calls).toEqual([
+      [{version: 2}],
+    ]);
+    expect(mockBatch.create.mock.calls).toEqual([]);
+    expect(mockBatch.set.mock.calls).toEqual([]);
+    expect(mockBatch.update.mock.calls).toEqual([]);
+    expect(mockBatch.commit.mock.calls).toEqual([]);
   });
 });

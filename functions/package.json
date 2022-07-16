@@ -23,10 +23,8 @@
   "jest": {
     "collectCoverage": true,
     "coveragePathIgnorePatterns": [
-      "index.js",
       "testutils.js"
-    ],
-    "maxWorkers": 1
+    ]
   },
   "private": true
 }

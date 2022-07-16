@@ -1,16 +1,17 @@
-const {config, logger} = require("firebase-functions");
+const {logger} = require("firebase-functions");
 
 /**
- * Set initial data for deployment.
+ * Update data on deployment.
  * @param {object} firebase Firebase API
+ * @param {object} config config of functions
  * @param {object} snap deleted doc
  * @return {Promise} void
  */
-async function deployment(firebase, snap) {
+async function deployment(firebase, config, snap) {
   const deleted = snap.data();
-  const current = deleted?.version ?? 0;
+  const current = deleted?.version || 0;
   logger.info(`Get version: ${current}`);
-  await snap.ref.set(deleted || {});
+  await snap.ref.set({version: current});
 
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -33,7 +34,7 @@ async function deployment(firebase, snap) {
         {
           ...docInfo,
           version: "1.0.0+0",
-          url: config().initial.url,
+          url: config.initial.url,
           seed: randomBytes(128).toString("hex"),
           invExp: 10 * 24 * 3600 * 1000,
           policy: `
@@ -69,19 +70,22 @@ code block 4
 
     const user = await auth.createUser({
       displayName: "Primary user",
-      email: config().initial.email,
+      email: config.initial.email,
       emailVerified: true,
-      password: config().initial.password,
+      password: config.initial.password,
     });
 
-    await db.collection("accounts").add({
-      ...docInfo,
-      name: user.displayName,
-      email: user.email,
-      valid: true,
-      admin: true,
-      tester: true,
-    });
+    batch.create(
+        db.collection("accounts").doc(),
+        {
+          ...docInfo,
+          name: user.displayName,
+          email: user.email,
+          valid: true,
+          admin: true,
+          tester: true,
+        },
+    );
 
     batch.set(snap.ref, {version, updatedAt: new Date()});
     await batch.commit();
