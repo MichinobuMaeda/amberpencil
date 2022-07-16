@@ -9,7 +9,6 @@ const {
   invite,
   getToken,
 } = require("./accounts");
-const {EMPTY_EMAIL} = require("./utils");
 
 const conf = createFirestoreDocSnapMock(jest, "conf");
 const doc1 = createFirestoreDocSnapMock(jest, "user01id");
@@ -22,6 +21,8 @@ const {
   mockCollection,
   firebase,
 } = createMockFirebase(jest);
+
+const EMPTY_EMAIL = "unknown@domain.invalid";
 
 afterEach(async function() {
   jest.clearAllMocks();

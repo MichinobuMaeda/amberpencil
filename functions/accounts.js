@@ -1,4 +1,4 @@
-const {EMPTY_EMAIL} = require("./utils");
+const EMPTY_EMAIL = "unknown@domain.invalid";
 
 /**
  * Handle firestore event: created doc of collection 'accoutns'.
