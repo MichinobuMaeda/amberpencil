@@ -4,7 +4,9 @@
   "description": "Amber Pencil",
   "scripts": {
     "deploy:data": "npx firebase firestore:delete -f service/deployment",
-    "start": "npx firebase emulators:exec --only auth,functions,firestore,storage --ui --import test/init/firebase \"npm run deploy:data && fvm flutter run -d chrome\"",
+    "start:ui": "fvm flutter run -d chrome",
+    "start:emu": "npx firebase emulators:exec --only auth,functions,firestore,storage --ui --import test/init/firebase",
+    "start": "npm run start:emu -- \"npm run deploy:data && npm run start:ui\"",
     "test:functions": "npm --prefix functions run lint && npm --prefix functions test -- --silent",
     "test:ui": "echo fvm flutter test",
     "test": "npm run test:functions && npm run test:ui"
