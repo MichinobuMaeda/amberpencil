@@ -8,6 +8,9 @@ const {
 } = require("./guard");
 
 const doc1 = createFirestoreDocSnapMock(jest, "user01id");
+const doc2 = createFirestoreDocSnapMock(jest, "adminid");
+const doc3 = createFirestoreDocSnapMock(jest, "admins");
+doc3.data.mockReturnValue({members: ["adminid"]});
 const {
   mockDocRef,
   firebase,
@@ -62,7 +65,7 @@ describe("requireValidAccount", function() {
   });
 
   it("call cb() for valid user.", async function() {
-    doc1.data.mockReturnValue({valid: true, admin: false});
+    doc1.data.mockReturnValue({valid: true});
     mockDocRef.get.mockResolvedValue(doc1);
 
     const ret = await requireValidAccount(firebase, doc1.id, mockCb);
@@ -71,7 +74,7 @@ describe("requireValidAccount", function() {
   });
 
   it("call cb() for admin user.", async function() {
-    doc1.data.mockReturnValue({valid: true, admin: true});
+    doc1.data.mockReturnValue({valid: true});
     mockDocRef.get.mockResolvedValue(doc1);
 
     const ret = await requireValidAccount(firebase, doc1.id, mockCb);
@@ -93,47 +96,51 @@ describe("requireAdminAccount", function() {
     mockDocRef.get.mockResolvedValue({exists: false});
 
     expect(
-        () => requireAdminAccount(firebase, doc1.id, mockCb),
-    ).rejects.toThrow(`uid: ${doc1.id}, exists: false`);
+        () => requireAdminAccount(firebase, doc2.id, mockCb),
+    ).rejects.toThrow(`uid: ${doc2.id}, exists: false`);
   });
 
   it("throw error," +
     " if the account is invalid.", async function() {
-    doc1.data.mockReturnValue({valid: false});
-    mockDocRef.get.mockResolvedValue(doc1);
+    doc2.data.mockReturnValue({valid: false});
+    mockDocRef.get.mockResolvedValue(doc2);
 
     await expect(
-        () => requireAdminAccount(firebase, doc1.id, mockCb),
-    ).rejects.toThrow(`uid: ${doc1.id}, valid: false`);
+        () => requireAdminAccount(firebase, doc2.id, mockCb),
+    ).rejects.toThrow(`uid: ${doc2.id}, valid: false`);
   });
 
   it("throw error," +
     " if the account is deleted.", async function() {
-    doc1.data.mockReturnValue({valid: true, deletedAt: new Date()});
-    mockDocRef.get.mockResolvedValue(doc1);
+    doc2.data.mockReturnValue({valid: true, deletedAt: new Date()});
+    mockDocRef.get.mockResolvedValue(doc2);
 
     await expect(
-        () => requireAdminAccount(firebase, doc1.id, mockCb),
+        () => requireAdminAccount(firebase, doc2.id, mockCb),
     ).rejects.toThrow(expect.objectContaining({
-      message: expect.stringContaining(`uid: ${doc1.id}, deletedAt:`),
+      message: expect.stringContaining(`uid: ${doc2.id}, deletedAt:`),
     }));
   });
 
   it("call cb() for valid user.", async function() {
-    doc1.data.mockReturnValue({valid: true, admin: false});
-    mockDocRef.get.mockResolvedValue(doc1);
+    doc1.data.mockReturnValue({valid: true});
+    mockDocRef.get
+        .mockResolvedValueOnce(doc1)
+        .mockResolvedValueOnce(doc3);
 
     await expect(
-        () => requireAdminAccount(firebase, "user01", mockCb),
-    ).rejects.toThrow("uid: user01, admin: false");
+        () => requireAdminAccount(firebase, doc1.id, mockCb),
+    ).rejects.toThrow(`uid: ${doc1.id} is not admin`);
   });
 
   it("call cb() for admin user.", async function() {
-    doc1.data.mockReturnValue({valid: true, admin: true});
-    mockDocRef.get.mockResolvedValue(doc1);
+    doc2.data.mockReturnValue({valid: true});
+    mockDocRef.get
+        .mockResolvedValueOnce(doc2)
+        .mockResolvedValueOnce(doc3);
 
-    const ret = await requireAdminAccount(firebase, doc1.id, mockCb);
-    expect(mockCb.mock.calls).toEqual([[firebase, doc1.id]]);
+    const ret = await requireAdminAccount(firebase, doc2.id, mockCb);
+    expect(mockCb.mock.calls).toEqual([[firebase, doc2.id]]);
     expect(ret).toEqual(mockCbReturnValue);
   });
 });

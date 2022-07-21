@@ -46,10 +46,13 @@ async function requireValidAccount(firebase, uid, cb) {
  * @return {Promise} the return value of the call back function.
  */
 async function requireAdminAccount(firebase, uid, cb) {
-  const account = await isValidAccount(firebase, uid);
+  await isValidAccount(firebase, uid);
 
-  if (account.get("admin") !== true) {
-    throw Error(`uid: ${uid}, admin: ${account.get("admin")}`);
+  const db = firebase.firestore();
+  const admins = await db.collection("groups").doc("admins").get();
+
+  if (!admins.get("members")?.includes(uid)) {
+    throw Error(`uid: ${uid} is not admin`);
   }
 
   return cb(firebase, uid);

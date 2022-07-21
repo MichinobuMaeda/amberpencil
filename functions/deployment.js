@@ -75,15 +75,30 @@ code block 4
       password: config.initial.password,
     });
 
-    batch.create(
-        db.collection("accounts").doc(),
+    batch.set(
+        db.collection("accounts").doc(user.uid),
         {
           ...docInfo,
           name: user.displayName,
-          email: user.email,
           valid: true,
-          admin: true,
-          tester: true,
+        },
+    );
+
+    batch.set(
+        db.collection("groups").doc("admins"),
+        {
+          ...docInfo,
+          name: "System admin",
+          members: [user.uid],
+        },
+    );
+
+    batch.set(
+        db.collection("groups").doc("testers"),
+        {
+          ...docInfo,
+          name: "Tester",
+          members: [user.uid],
         },
     );
 

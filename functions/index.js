@@ -28,6 +28,26 @@ exports.onUpdateAccount = functions.region(functions.config().region)
         },
     );
 
+exports.updateUserEmail = functions.region(functions.config().region)
+    .https.onCall(
+        function(data, context) {
+          return requireAdminAccount(
+              firebase,
+              context.auth?.uid,
+              accounts.updateUserEmail(data),
+          );
+        });
+
+exports.updateUserPassword = functions.region(functions.config().region)
+    .https.onCall(
+        function(data, context) {
+          return requireAdminAccount(
+              firebase,
+              context.auth?.uid,
+              accounts.updateUserPassword(data),
+          );
+        });
+
 exports.invite = functions.region(functions.config().region)
     .https.onCall(
         function(data, context) {

@@ -6,6 +6,9 @@ const {
   onCreateAccount,
   onUpdateAccount,
   hashInvitation,
+  generateRandomePassword,
+  updateUserEmail,
+  updateUserPassword,
   invite,
   getToken,
 } = require("./accounts");
@@ -29,63 +32,67 @@ afterEach(async function() {
 });
 
 describe("onCreateAccount", function() {
-  it("connects auth user" +
-    "with same email and set display name.", async function() {
+  it("do nothing with same display name.", async function() {
     const uid = doc1.id;
     const displayName = "User 01";
-    const name = displayName;
-    const email = "user01@example.com";
-    const user = {uid, displayName, email};
-    doc1.data.mockReturnValue({name, email});
-    mockAuth.getUserByEmail.mockResolvedValue(user);
-
-    await onCreateAccount(firebase, doc1);
-
-    expect(mockAuth.getUserByEmail.mock.calls).toEqual([[email]]);
-    expect(mockAuth.updateUser.mock.calls).toEqual([[uid, {displayName}]]);
-    expect(mockAuth.createUser.mock.calls).toEqual([]);
-    expect(doc1.ref.update.mock.calls).toEqual([
-      [{uid, updatedAt: expect.any(Date)}],
-    ]);
-  });
-
-  it("creates auth user with email.", async function() {
-    const uid = doc1.id;
-    const displayName = "User 01";
-    const name = displayName;
-    const email = "user01@example.com";
-    const user = {uid, displayName, email};
-    doc1.data.mockReturnValue({name, email});
-    mockAuth.getUserByEmail.mockRejectedValue(new Error("test"));
-    mockAuth.createUser.mockResolvedValue(user);
-
-    await onCreateAccount(firebase, doc1);
-
-    expect(mockAuth.getUserByEmail.mock.calls).toEqual([[email]]);
-    expect(mockAuth.updateUser.mock.calls).toEqual([]);
-    expect(mockAuth.createUser.mock.calls).toEqual([[user]]);
-    expect(doc1.ref.update.mock.calls).toEqual([
-      [{uid, updatedAt: expect.any(Date)}],
-    ]);
-  });
-
-  it("creates auth user without email.", async function() {
-    const uid = doc1.id;
-    const displayName = "";
     const name = displayName;
     const user = {uid, displayName};
     doc1.data.mockReturnValue({name});
-    mockAuth.getUserByEmail.mockRejectedValue(new Error("test"));
+    mockAuth.getUser.mockResolvedValue(user);
+
+    await onCreateAccount(firebase, doc1);
+
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
+    expect(mockAuth.updateUser.mock.calls).toHaveLength(0);
+    expect(mockAuth.createUser.mock.calls).toHaveLength(0);
+  });
+
+  it("update user with different display name.", async function() {
+    const uid = doc1.id;
+    const displayName = "User 01";
+    const name = displayName;
+    const user = {uid, displayName: "org"};
+    doc1.data.mockReturnValue({name});
+    mockAuth.getUser.mockResolvedValue(user);
+
+    await onCreateAccount(firebase, doc1);
+
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
+    expect(mockAuth.updateUser.mock.calls).toEqual([[uid, {displayName}]]);
+    expect(mockAuth.createUser.mock.calls).toHaveLength(0);
+  });
+
+  it("creates auth user" +
+  "if user is not exists.", async function() {
+    const uid = doc1.id;
+    const displayName = "User 01";
+    const name = displayName;
+    const user = {uid, displayName};
+    doc1.data.mockReturnValue({name});
+    mockAuth.getUser.mockRejectedValue(new Error("test"));
     mockAuth.createUser.mockResolvedValue(user);
 
     await onCreateAccount(firebase, doc1);
 
-    expect(mockAuth.getUserByEmail.mock.calls).toEqual([]);
-    expect(mockAuth.updateUser.mock.calls).toEqual([]);
-    expect(mockAuth.createUser.mock.calls).toEqual([[user]]);
-    expect(doc1.ref.update.mock.calls).toEqual([
-      [{uid, updatedAt: expect.any(Date)}],
-    ]);
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
+    expect(mockAuth.updateUser.mock.calls).toHaveLength(0);
+    expect(mockAuth.createUser.mock.calls).toEqual([[{uid, displayName}]]);
+  });
+
+  it("creates auth user with empty namme" +
+  " if user is not exists.", async function() {
+    const uid = doc1.id;
+    const displayName = "";
+    const user = {uid, displayName};
+    doc1.data.mockReturnValue({});
+    mockAuth.getUser.mockRejectedValue(new Error("test"));
+    mockAuth.createUser.mockResolvedValue(user);
+
+    await onCreateAccount(firebase, doc1);
+
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
+    expect(mockAuth.updateUser.mock.calls).toHaveLength(0);
+    expect(mockAuth.createUser.mock.calls).toEqual([[{uid, displayName}]]);
   });
 });
 
@@ -94,10 +101,9 @@ describe("onUpdateAccount", function() {
     const uid = doc1.id;
     const displayName = "User 01";
     const name = displayName;
-    const email = "user01@example.com";
-    const user = {uid, displayName, email};
-    doc1.data.mockReturnValue({name, email});
-    mockAuth.getUserByEmail.mockRejectedValue(new Error("test"));
+    const user = {uid, displayName};
+    doc1.data.mockReturnValue({name});
+    mockAuth.getUser.mockRejectedValueOnce(new Error("test"));
     mockAuth.createUser.mockResolvedValue(user);
 
     await onUpdateAccount(firebase, {
@@ -105,21 +111,17 @@ describe("onUpdateAccount", function() {
       after: doc1,
     });
 
-    expect(mockAuth.getUserByEmail.mock.calls).toEqual([[email]]);
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid], [uid]]);
     expect(mockAuth.updateUser.mock.calls).toEqual([]);
     expect(mockAuth.createUser.mock.calls).toEqual([[user]]);
-    expect(doc1.ref.update.mock.calls).toEqual([
-      [{uid, updatedAt: expect.any(Date)}],
-    ]);
   });
 
   it("sets name of auth user with old name.", async function() {
     const uid = doc1.id;
     const displayName = "old name";
     const name = "new name";
-    const email = "user01@example.com";
-    const user = {uid, displayName, email};
-    doc1.data.mockReturnValue({uid, name, email});
+    const user = {uid, displayName};
+    doc1.data.mockReturnValue({name});
     mockAuth.getUser.mockResolvedValue(user);
 
     await onUpdateAccount(firebase, {
@@ -127,6 +129,7 @@ describe("onUpdateAccount", function() {
       after: doc1,
     });
 
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
     expect(mockAuth.updateUser.mock.calls).toEqual([
       [uid, {displayName: name}],
     ]);
@@ -135,9 +138,8 @@ describe("onUpdateAccount", function() {
   it("sets name of auth user without name.", async function() {
     const uid = doc1.id;
     const name = "new name";
-    const email = "user01@example.com";
-    const user = {uid, email};
-    doc1.data.mockReturnValue({uid, name, email});
+    const user = {uid};
+    doc1.data.mockReturnValue({name});
     mockAuth.getUser.mockResolvedValue(user);
 
     await onUpdateAccount(firebase, {
@@ -145,6 +147,7 @@ describe("onUpdateAccount", function() {
       after: doc1,
     });
 
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
     expect(mockAuth.updateUser.mock.calls).toEqual([
       [uid, {displayName: name}],
     ]);
@@ -153,9 +156,8 @@ describe("onUpdateAccount", function() {
   it("resets name of auth user for empty name.", async function() {
     const uid = doc1.id;
     const displayName = "old name";
-    const email = "user01@example.com";
-    const user = {uid, displayName, email};
-    doc1.data.mockReturnValue({uid, email});
+    const user = {uid, displayName};
+    doc1.data.mockReturnValue({});
     mockAuth.getUser.mockResolvedValue(user);
 
     await onUpdateAccount(firebase, {
@@ -163,19 +165,18 @@ describe("onUpdateAccount", function() {
       after: doc1,
     });
 
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
     expect(mockAuth.updateUser.mock.calls).toEqual([
       [uid, {displayName: ""}],
     ]);
   });
 
-  it("sets email of auth user without email.", async function() {
+  it("do nothing for same name.", async function() {
     const uid = doc1.id;
     const displayName = "User 01";
     const name = displayName;
-    const email = "user01@example.com";
-    const emailVerified = false;
     const user = {uid, displayName};
-    doc1.data.mockReturnValue({uid, name, email});
+    doc1.data.mockReturnValue({name});
     mockAuth.getUser.mockResolvedValue(user);
 
     await onUpdateAccount(firebase, {
@@ -183,69 +184,65 @@ describe("onUpdateAccount", function() {
       after: doc1,
     });
 
-    expect(mockAuth.updateUser.mock.calls).toEqual([
-      [uid, {email, emailVerified}],
-    ]);
+    expect(mockAuth.getUser.mock.calls).toEqual([[uid]]);
+    expect(mockAuth.updateUser.mock.calls).toHaveLength(0);
   });
+});
 
-  it("sets email of auth user with old email.", async function() {
-    const uid = doc1.id;
-    const displayName = "User 01";
-    const name = displayName;
+describe("generateRandomePassword", function() {
+  it("return randome string.", async function() {
+    const ret = await generateRandomePassword("user01id");
+
+    expect(ret).toHaveLength(64);
+  });
+});
+
+describe("updateUserEmail", function() {
+  it("set email to given user.", async function() {
+    const uid = "admin";
+    const id = "user01id";
     const email = "user01@example.com";
-    const emailVerified = false;
-    const user = {uid, displayName, email: "old@example.com"};
-    doc1.data.mockReturnValue({uid, name, email});
-    mockAuth.getUser.mockResolvedValue(user);
 
-    await onUpdateAccount(firebase, {
-      before: {/* not used */},
-      after: doc1,
-    });
+    await updateUserEmail({id, email})(firebase, uid);
 
     expect(mockAuth.updateUser.mock.calls).toEqual([
-      [uid, {email, emailVerified}],
+      [id, {email}],
     ]);
   });
 
-  it("sets email of auth user without email.", async function() {
-    const uid = doc1.id;
-    const displayName = "User 01";
-    const name = displayName;
-    const email = "user01@example.com";
-    const emailVerified = false;
-    const user = {uid, displayName, email: "old@example.com"};
-    doc1.data.mockReturnValue({uid, name, email});
-    mockAuth.getUser.mockResolvedValue(user);
+  it("set empty email to given user.", async function() {
+    const uid = "admin";
+    const id = "user01id";
 
-    await onUpdateAccount(firebase, {
-      before: {/* not used */},
-      after: doc1,
-    });
+    await updateUserEmail({id})(firebase, uid);
 
     expect(mockAuth.updateUser.mock.calls).toEqual([
-      [uid, {email, emailVerified}],
+      [id, {email: EMPTY_EMAIL}],
+    ]);
+  });
+});
+
+describe("updateUserPassword", function() {
+  it("set password to given user.", async function() {
+    const uid = "admin";
+    const id = "user01id";
+    const password = "user01password";
+
+    await updateUserPassword({id, password})(firebase, uid);
+
+    expect(mockAuth.updateUser.mock.calls).toEqual([
+      [id, {password}],
     ]);
   });
 
-  it("resets email of auth user for empty email.", async function() {
-    const uid = doc1.id;
-    const displayName = "User 01";
-    const name = displayName;
-    // Firebase auth has no method to remove email of users.
-    const email = EMPTY_EMAIL;
-    const emailVerified = false;
-    const user = {uid, displayName, email: "old@example.com"};
-    doc1.data.mockReturnValue({uid, name});
-    mockAuth.getUser.mockResolvedValue(user);
+  it("set empty email to given user.", async function() {
+    const uid = "admin";
+    const id = "user01id";
 
-    await onUpdateAccount(firebase, {
-      before: {/* not used */},
-      after: doc1,
-    });
+    await updateUserPassword({id})(firebase, uid);
 
     expect(mockAuth.updateUser.mock.calls).toEqual([
-      [uid, {email, emailVerified}],
+      [id, {password: expect.any(String)}],
     ]);
   });
 });
@@ -372,60 +369,15 @@ describe("getToken", function() {
     expect(doc1.ref.update.mock.calls).toEqual([]);
   });
 
-  it("rejects account without uid.", async function() {
-    const seed = "test";
-    const code = "dummy";
-    const invExp = 1000000;
-    conf.data.mockReturnValue({seed, invExp});
-    const invitation = await hashInvitation(seed, code);
-    const uid = null;
-    const invitedAt = {
-      toMillis: function() {
-        return new Date().getTime() - invExp;
-      },
-    };
-    const invitedBy = "admin";
-    doc1.data.mockReturnValue({invitation, uid, invitedAt, invitedBy});
-    mockQueryRef.get.mockResolvedValue({docs: [doc1]});
-
-    await expect(
-        () => getToken(firebase, {code}),
-    ).rejects.toThrow(`Invalid status: ${doc1.id} uid`);
-
-    expect(mockCollection.mock.calls).toEqual([
-      ["service"],
-      ["accounts"],
-    ]);
-    expect(mockDoc.mock.calls).toEqual([
-      ["conf"],
-    ]);
-    expect(mockDocRef.get.mock.calls).toEqual([
-      [],
-    ]);
-    expect(mockCollectionRef.where.mock.calls).toEqual([
-      ["invitation", "==", expect.any(String)],
-    ]);
-    expect(doc1.ref.update.mock.calls).toEqual([
-      [{
-        invitation: null,
-        invitedBy: null,
-        invitedAt: null,
-        updatedBy: "system",
-        updatedAt: expect.any(Date),
-      }],
-    ]);
-  });
-
   it("rejects account without the timestamp of invitation.", async function() {
     const seed = "test";
     const code = "dummy";
     const invExp = 1000000;
     conf.data.mockReturnValue({seed, invExp});
     const invitation = await hashInvitation(seed, code);
-    const uid = doc1.id;
     const invitedAt = null;
     const invitedBy = "admin";
-    doc1.data.mockReturnValue({invitation, uid, invitedAt, invitedBy});
+    doc1.data.mockReturnValue({invitation, invitedAt, invitedBy});
     mockQueryRef.get.mockResolvedValue({docs: [doc1]});
 
     await expect(
@@ -462,14 +414,13 @@ describe("getToken", function() {
     const invExp = 1000000;
     conf.data.mockReturnValue({seed, invExp});
     const invitation = await hashInvitation(seed, code);
-    const uid = doc1.id;
     const invitedAt = {
       toMillis: function() {
         return new Date().getTime() - invExp;
       },
     };
     const invitedBy = null;
-    doc1.data.mockReturnValue({invitation, uid, invitedAt, invitedBy});
+    doc1.data.mockReturnValue({invitation, invitedAt, invitedBy});
     mockQueryRef.get.mockResolvedValue({docs: [doc1]});
 
     await expect(
@@ -506,19 +457,17 @@ describe("getToken", function() {
     const invExp = 1000000;
     conf.data.mockReturnValue({seed, invExp});
     const invitation = await hashInvitation(seed, code);
-    const uid = doc1.id;
     const invitedAt = {
       toMillis: function() {
         return new Date().getTime() - invExp - 1;
       },
     };
     const invitedBy = "admin";
-    doc1.data.mockReturnValue({invitation, uid, invitedAt, invitedBy});
+    doc1.data.mockReturnValue({invitation, invitedAt, invitedBy});
     mockQueryRef.get.mockResolvedValue({docs: [doc1]});
 
-    await expect(
-        () => getToken(firebase, {code}),
-    ).rejects.toThrow(`Expired: ${doc1.id}`);
+    await expect(() => getToken(firebase, {code}))
+        .rejects.toThrow(`Expired: ${doc1.id}`);
 
     expect(mockCollection.mock.calls).toEqual([
       ["service"],
@@ -550,14 +499,13 @@ describe("getToken", function() {
     const invExp = 1000000;
     conf.data.mockReturnValue({seed, invExp});
     const invitation = await hashInvitation(seed, code);
-    const uid = doc1.id;
     const invitedAt = {
       toMillis: function() {
         return new Date().getTime() - invExp;
       },
     };
     const invitedBy = "admin";
-    doc1.data.mockReturnValue({invitation, uid, invitedAt, invitedBy});
+    doc1.data.mockReturnValue({invitation, invitedAt, invitedBy});
     mockQueryRef.get.mockResolvedValue({docs: [doc1]});
     const token = "test token";
     mockAuth.createCustomToken.mockResolvedValue(token);

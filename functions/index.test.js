@@ -8,6 +8,14 @@ jest.mock("./deployment");
 jest.mock("./guard");
 jest.mock("./accounts");
 
+accounts.updateUserEmail = jest.fn(function() {
+  return function() {};
+});
+
+accounts.updateUserPassword = jest.fn(function() {
+  return function() {};
+});
+
 accounts.invite = jest.fn(function() {
   return function() {
     return "test";
@@ -58,8 +66,49 @@ describe("onUpdateAccount", function() {
   });
 });
 
+describe("updateUserEmail", function() {
+  it("calls requireAdminAccount()" +
+  "with callback updateUserEmail().", function() {
+    const wrapped = test.wrap(index.updateUserEmail);
+    const id = "user01id";
+    const email ="user01@example.com";
+    wrapped({id, email}, {auth: {uid: "adminid"}});
+    expect(guard.requireAdminAccount.mock.calls).toEqual([
+      [
+        expect.any(Object), // FirebaseApp
+        "adminid",
+        expect.any(Function),
+      ],
+    ]);
+    expect(accounts.updateUserEmail.mock.calls).toEqual([
+      [{id, email}],
+    ]);
+  });
+});
+
+describe("updateUserPassword", function() {
+  it("calls requireAdminAccount()" +
+  "with callback updateUserPassword().", function() {
+    const wrapped = test.wrap(index.updateUserPassword);
+    const id = "user01id";
+    const password ="user01password";
+    wrapped({id, password}, {auth: {uid: "adminid"}});
+    expect(guard.requireAdminAccount.mock.calls).toEqual([
+      [
+        expect.any(Object), // FirebaseApp
+        "adminid",
+        expect.any(Function),
+      ],
+    ]);
+    expect(accounts.updateUserPassword.mock.calls).toEqual([
+      [{id, password}],
+    ]);
+  });
+});
+
 describe("invite", function() {
-  it("calls requireAdminAccount() with callback invite().", function() {
+  it("calls requireAdminAccount()" +
+  "with callback invite().", function() {
     const wrapped = test.wrap(index.invite);
     wrapped({invitee: "user01id"}, {auth: {uid: "adminid"}});
     expect(guard.requireAdminAccount.mock.calls).toEqual([

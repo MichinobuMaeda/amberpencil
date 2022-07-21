@@ -1,3 +1,5 @@
+const {logger} = require("firebase-functions");
+
 const EMPTY_EMAIL = "unknown@domain.invalid";
 
 /**
@@ -8,26 +10,18 @@ const EMPTY_EMAIL = "unknown@domain.invalid";
  */
 async function onCreateAccount(firebase, doc) {
   const displayName = doc.get("name") || "";
-  const email = doc.get("email");
 
   const auth = firebase.auth();
   let user;
 
-  if (email) {
-    try {
-      user = await auth.getUserByEmail(email);
+  try {
+    user = await auth.getUser(doc.id);
+    if (user.displayName !== displayName) {
       await auth.updateUser(user.uid, {displayName});
-    } catch (e) {
-      user = await auth.createUser({uid: doc.id, displayName, email});
     }
-  } else {
+  } catch (e) {
     user = await auth.createUser({uid: doc.id, displayName});
   }
-
-  await doc.ref.update({
-    uid: user.uid,
-    updatedAt: new Date(),
-  });
 }
 
 /**
@@ -37,27 +31,59 @@ async function onCreateAccount(firebase, doc) {
  * @return {Promise} void
  */
 const onUpdateAccount = async (firebase, {after}) => {
-  const uid = after.get("uid");
-
-  if (uid) {
+  try {
     const auth = firebase.auth();
-    const user = await auth.getUser(uid);
-
-    // Firebase auth has no method to remove email of users.
-    if ((user.email || EMPTY_EMAIL) !== (after.get("email") || EMPTY_EMAIL)) {
-      await auth.updateUser(uid, {
-        email: after.get("email") || EMPTY_EMAIL,
-        emailVerified: false,
-      });
-    }
+    const user = await auth.getUser(after.id);
 
     if ((user.displayName || "") !== (after.get("name") || "")) {
-      await auth.updateUser(uid, {displayName: after.get("name") || ""});
+      await auth.updateUser(after.id, {displayName: after.get("name") || ""});
     }
-  } else {
+  } catch (e) {
     await onCreateAccount(firebase, after);
   }
 };
+
+/**
+ * Generate randome password.
+ * @param {string} seed the seed for hash
+ * @return {striing} hashed invitation code
+ */
+async function generateRandomePassword(seed) {
+  const {createHash} = await require("node:crypto");
+  const hash = createHash("sha256");
+  hash.update(seed);
+  hash.update(new Date().toISOString());
+  return hash.digest("hex");
+}
+
+/**
+ * Update the email of the given user.
+ * @param {object} request the request parameter: invited user id
+ * @return {function} the function for invited user
+ */
+function updateUserEmail({id, email}) {
+  return async function(firebase, uid) {
+    logger.info(`update email: ${email} of ${id} by ${uid}`);
+    const auth = firebase.auth();
+    await auth.updateUser(id, {email: email || EMPTY_EMAIL});
+  };
+}
+
+/**
+ * Update the password of the given user.
+ * @param {object} request the request parameter: invited user id
+ * @return {function} the function for invited user
+ */
+function updateUserPassword({id, password}) {
+  return async function(firebase, uid) {
+    logger.info(`update password of ${id} by ${uid}`);
+    const auth = firebase.auth();
+    await auth.updateUser(
+        id,
+        {password: password || await generateRandomePassword(id)},
+    );
+  };
+}
 
 /**
  * Get hash of the invitation code with seed.
@@ -129,7 +155,7 @@ async function getToken(firebase, {code}) {
     updatedAt: new Date(),
   };
 
-  const empties = ["uid", "invitedAt", "invitedBy"].filter(
+  const empties = ["invitedAt", "invitedBy"].filter(
       (key) => !account.get(key),
   );
 
@@ -146,12 +172,15 @@ async function getToken(firebase, {code}) {
     throw new Error(`Expired: ${account.id}`);
   }
 
-  return firebase.auth().createCustomToken(account.get("uid"));
+  return firebase.auth().createCustomToken(account.id);
 }
 
 module.exports = {
   onCreateAccount,
   onUpdateAccount,
+  updateUserEmail,
+  generateRandomePassword,
+  updateUserPassword,
   hashInvitation,
   invite,
   getToken,
