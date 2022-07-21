@@ -1,157 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
+import 'config/app_info.dart';
+import 'config/firebase_options.dart';
+import 'config/l10n.dart';
 import 'config/theme.dart';
-import 'providers/ui.dart';
+import 'services/auth_repository.dart';
+import 'services/conf_repository.dart';
+import 'services/providers.dart';
+import 'routs.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MyApp()));
-}
+void main() async {
+  debugPrint('${DateTime.now().toIso8601String()} ensureInitialized()');
+  WidgetsFlutterBinding.ensureInitialized();
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('google_fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      home: const MyHomePage(),
-    );
+  debugPrint('${DateTime.now().toIso8601String()} Firebase.initializeApp()');
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  if (version.contains('test')) {
+    debugPrint('${DateTime.now().toIso8601String()} Use emulators.');
+    try {
+      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+      await firebase_storage.FirebaseStorage.instance
+          .useStorageEmulator('localhost', 9199);
+    } catch (e) {
+      debugPrint('Firebase has been started.');
+    }
   }
+
+  debugPrint('${DateTime.now().toIso8601String()} runApp()');
+  runApp(ProviderScope(child: MyApp()));
 }
 
-class MyHomePage extends ConsumerWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class MyApp extends ConsumerWidget {
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final menuState = ref.watch(menuStateProvider.notifier);
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: false,
-            snap: true,
-            floating: true,
-            expandedHeight: 160.0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'SliverAppBar',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              ),
-              background: Image(
-                image:
-                    Theme.of(context).colorScheme.brightness == Brightness.light
-                        ? const AssetImage('images/logo_small.png')
-                        : const AssetImage('images/logo_dark_small.png'),
-                alignment: MediaQuery.of(context).size.width < 480.0
-                    ? Alignment.topLeft
-                    : Alignment.topCenter,
-                colorBlendMode: BlendMode.darken,
-              ),
-            ),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                tooltip: 'Go back',
-                onPressed: () => menuState.state = Menu.back,
-              ),
-              IconButton(
-                icon: const Icon(Icons.add),
-                tooltip: 'Add',
-                onPressed: () => menuState.state = Menu.add,
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                tooltip: 'Edit',
-                onPressed: () => menuState.state = Menu.edit,
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                tooltip: 'Search',
-                onPressed: () => menuState.state = Menu.search,
-              ),
-              PopupMenuButton<Menu>(
-                icon: const Icon(Icons.more_horiz),
-                position: PopupMenuPosition.under,
-                initialValue: Menu.none,
-                onSelected: (Menu item) => menuState.state = item,
-                itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<Menu>(
-                    value: Menu.profile,
-                    child: ListTile(
-                      leading: Icon(Icons.account_circle),
-                      title: Text('Profile'),
-                    ),
-                  ),
-                  const PopupMenuItem<Menu>(
-                    value: Menu.preferences,
-                    child: ListTile(
-                      leading: Icon(Icons.settings),
-                      title: Text('Preferences'),
-                    ),
-                  ),
-                  const PopupMenuItem<Menu>(
-                    value: Menu.about,
-                    child: ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('About this app'),
-                    ),
-                  ),
-                  const PopupMenuItem<Menu>(
-                    value: Menu.development,
-                    child: ListTile(
-                      leading: Icon(Icons.memory),
-                      title: Text('Development'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            backgroundColor: Theme.of(context).colorScheme.background,
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 20,
-              child: Center(
-                child: Text(ref.watch(menuStateProvider).name),
-              ),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Container(
-                  color: listItemColor(context, index),
-                  height: 100.0,
-                  child: Center(
-                    child: index == 0
-                        ? ElevatedButton(
-                            onPressed: () {},
-                            style: filledButtonStyle(context),
-                            child: const Text('Filled'),
-                          )
-                        : index == 1
-                            ? ElevatedButton(
-                                onPressed: () {},
-                                child: const Text('Elevated'),
-                              )
-                            : index == 2
-                                ? OutlinedButton(
-                                    onPressed: () {},
-                                    child: const Text('Outlined'),
-                                  )
-                                : Text('$index', textScaleFactor: 5),
-                  ),
-                );
-              },
-              childCount: 20,
-            ),
-          ),
-        ],
+    AuthRepo().listen(ref);
+    ConfRepo().listen(ref);
+
+    debugPrint('${DateTime.now().toIso8601String()} MaterialApp');
+    return MaterialApp.router(
+      title: ref.watch(appTitileProvider),
+      theme: ThemeData(
+        colorSchemeSeed: colorSchemeSeed,
+        brightness: Brightness.light,
+        fontFamily: fontFamilySansSerif,
+        useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: colorSchemeSeed,
+        brightness: Brightness.dark,
+        fontFamily: fontFamilySansSerif,
+        useMaterial3: true,
+      ),
+      localizationsDelegates: L10n.localizationsDelegates,
+      supportedLocales: L10n.supportedLocales,
+      locale: const Locale('ja', 'JP'),
+      routeInformationProvider: _router.routeInformationProvider,
+      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: _router.routerDelegate,
     );
   }
+
+  final _router = GoRouter(
+    routes: routes,
+    errorBuilder: routeErrorBuilder,
+  );
 }

@@ -1,7 +1,7 @@
 {
   "name": "amberpencil",
   "version": "0.1.0",
-  "description": "Amber Pencil",
+  "description": "Amber pencil",
   "scripts": {
     "deploy:data": "npx firebase firestore:delete -f service/deployment",
     "start:ui": "fvm flutter run -d chrome",
