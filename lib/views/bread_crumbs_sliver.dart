@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../config/l10n.dart';
 import '../config/theme.dart';
-import '../models/route_names.dart';
+import '../models/client_status.dart';
+import '../services/providers.dart';
 
 class BreadCrumbsSliver extends ConsumerWidget {
   final GoRouterState routerState;
@@ -25,28 +26,66 @@ class BreadCrumbsSliver extends ConsumerWidget {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
-              TextButton.icon(
-                onPressed: routerState.name == RouteNames.home.name
-                    ? null
-                    : () => router.goNamed(RouteNames.home.name),
-                icon: const Icon(Icons.home),
-                label: Text(L10n.of(context)!.home),
-              ),
-              if (routerState.name != RouteNames.home.name) const Text('»'),
-              if (routerState.name == RouteNames.me.name)
-                TextButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.account_circle),
-                  label: Text(L10n.of(context)!.settings),
-                ),
-              if (routerState.name == RouteNames.about.name)
-                TextButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.info),
-                  label: Text(L10n.of(context)!.aboutApp),
-                ),
-            ],
+            children:
+                [Authz.user, Authz.admin].contains(ref.watch(authzProvider))
+                    ? [
+                        TextButton.icon(
+                          onPressed: routerState.name == RouteName.home.name
+                              ? null
+                              : () => router.goNamed(RouteName.home.name),
+                          icon: const Icon(Icons.home),
+                          label: Text(L10n.of(context)!.home),
+                        ),
+                        if (routerState.name != RouteName.home.name)
+                          const Text('»'),
+                        if (routerState.name == RouteName.me.name)
+                          TextButton.icon(
+                            onPressed: null,
+                            icon: const Icon(Icons.account_circle),
+                            label: Text(L10n.of(context)!.settings),
+                          ),
+                        if (routerState.name == RouteName.about.name)
+                          TextButton.icon(
+                            onPressed: null,
+                            icon: const Icon(Icons.info),
+                            label: Text(L10n.of(context)!.aboutApp),
+                          ),
+                      ]
+                    : [
+                        if (ref.watch(authzProvider) == Authz.guest)
+                          TextButton.icon(
+                            onPressed: routerState.name == RouteName.home.name
+                                ? null
+                                : () => router.goNamed(RouteName.home.name),
+                            icon: const Icon(Icons.login),
+                            label: Text(L10n.of(context)!.signIn),
+                          ),
+                        if (ref.watch(authzProvider) == Authz.notVerified)
+                          TextButton.icon(
+                            onPressed: routerState.name == RouteName.home.name
+                                ? null
+                                : () => router.goNamed(RouteName.home.name),
+                            icon: const Icon(Icons.mark_email_read),
+                            label: Text(L10n.of(context)!.verifyEmail),
+                          ),
+                        if (![Authz.guest, Authz.notVerified]
+                            .contains(ref.watch(authzProvider)))
+                          TextButton.icon(
+                            onPressed: routerState.name == RouteName.home.name
+                                ? null
+                                : () => router.goNamed(RouteName.home.name),
+                            icon: const Icon(Icons.home),
+                            label: Text(L10n.of(context)!.home),
+                          ),
+                        const Text('|'),
+                        TextButton.icon(
+                          onPressed: routerState.name == RouteName.about.name
+                              ? null
+                              : () => router.goNamed(RouteName.about.name),
+                          icon: const Icon(Icons.info),
+                          label: Text(L10n.of(context)!.aboutApp),
+                        ),
+                      ],
           ),
         ),
       ),

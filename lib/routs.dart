@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'models/route_names.dart';
+import 'models/client_status.dart';
 import 'views/scaffold.dart';
 import 'views/home_sliver.dart';
 import 'views/about_sliver.dart';
@@ -11,7 +11,7 @@ import 'views/unknown_sliver.dart';
 
 final List<GoRoute> routes = [
   GoRoute(
-    name: RouteNames.home.name,
+    name: RouteName.home.name,
     path: '/',
     builder: (context, state) => MyScaffold(
       routerState: state,
@@ -21,7 +21,7 @@ final List<GoRoute> routes = [
     ),
   ),
   GoRoute(
-    name: RouteNames.about.name,
+    name: RouteName.about.name,
     path: '/about',
     builder: (context, state) => MyScaffold(
       routerState: state,
@@ -32,7 +32,7 @@ final List<GoRoute> routes = [
     ),
   ),
   GoRoute(
-    name: RouteNames.me.name,
+    name: RouteName.me.name,
     path: '/me',
     builder: (context, state) => MyScaffold(
       routerState: state,

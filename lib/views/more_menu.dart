@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../config/l10n.dart';
-import '../models/route_names.dart';
+import '../models/client_status.dart';
 
 enum Menu { none, preferences, about, development }
 
@@ -26,10 +26,10 @@ class MoreMenu extends ConsumerWidget {
       onSelected: (Menu item) {
         switch (item) {
           case Menu.preferences:
-            router.goNamed(RouteNames.me.name);
+            router.goNamed(RouteName.me.name);
             break;
           case Menu.about:
-            router.goNamed(RouteNames.about.name);
+            router.goNamed(RouteName.about.name);
             break;
           default:
             break;
@@ -37,7 +37,7 @@ class MoreMenu extends ConsumerWidget {
       },
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<Menu>(
-          enabled: routerState.name != RouteNames.me.name,
+          enabled: routerState.name != RouteName.me.name,
           value: Menu.preferences,
           child: ListTile(
             leading: const Icon(Icons.account_circle),
@@ -45,7 +45,7 @@ class MoreMenu extends ConsumerWidget {
           ),
         ),
         PopupMenuItem<Menu>(
-          enabled: routerState.name != RouteNames.about.name,
+          enabled: routerState.name != RouteName.about.name,
           value: Menu.about,
           child: ListTile(
             leading: const Icon(Icons.info),
