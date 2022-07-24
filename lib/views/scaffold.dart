@@ -39,7 +39,8 @@ class MyScaffold extends ConsumerWidget {
             pinned: false,
             snap: true,
             floating: true,
-            expandedHeight: 152.0 + (updateAvailable ? 48.0 : 0),
+            expandedHeight:
+                menuBarHeight(context) + (updateAvailable ? 48.0 : 0),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.only(
                 bottom: updateAvailable ? 48.0 : 8.0,

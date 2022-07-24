@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 
 import '../config/l10n.dart';
+import '../config/theme.dart';
 
 class PreferencesSliver extends ConsumerWidget {
   const PreferencesSliver({super.key});
@@ -11,7 +12,7 @@ class PreferencesSliver extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bodyHeight = min<double>(
       max(
-        MediaQuery.of(context).size.height - 192.0,
+        MediaQuery.of(context).size.height - menuBarHeight(context) - 40,
         96.0,
       ),
       320.0,

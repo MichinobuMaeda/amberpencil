@@ -10,7 +10,8 @@ class AboutSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logoSize = MediaQuery.of(context).size.width < 480
+    final logoSize = MediaQuery.of(context).size.width < 480 ||
+            MediaQuery.of(context).size.height < 480
         ? MediaQuery.of(context).size.width / 8
         : 96.0;
 
