@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
-      return request.auth.uid in get(/databases/$(database)/documents/groups/admins).data.members;
+      return request.auth.uid in get(/databases/$(database)/documents/groups/admins).data.accounts;
     }
     function selectedGroup() {
       return get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data.group
@@ -11,19 +11,19 @@ service cloud.firestore {
       allow read, update: if isAdmin();
       allow read: if true;
     }
-    match /accounts/{account} {
+    match /accounts/{accountId} {
       allow read, write: if isAdmin();
-      allow read, update: if request.auth.uid == account;
+      allow read, update: if request.auth.uid == accountId;
     }
-    match /groups/{group} {
+    match /groups/{groupId} {
       allow read, write: if isAdmin();
       allow read, update: if request.auth.uid in resource.data.accounts;
     }
-    match /people/{person} {
+    match /people/{personId} {
       allow read, write: if selectedGroup() in resource.data.groups;
     }
-    match /people/{person}/{path=**} {
-      allow read, write: if selectedGroup() in get(/databases/$(database)/documents/people/$(person)).data.groups;
+    match /people/{personId}/{path=**} {
+      allow read, write: if selectedGroup() in get(/databases/$(database)/documents/people/$(personId)).data.groups;
     }
     match /{document=**} {
       allow read, write: if false;

@@ -10,7 +10,7 @@ const {
 const doc1 = createFirestoreDocSnapMock(jest, "user01id");
 const doc2 = createFirestoreDocSnapMock(jest, "adminid");
 const doc3 = createFirestoreDocSnapMock(jest, "admins");
-doc3.data.mockReturnValue({members: ["adminid"]});
+doc3.data.mockReturnValue({accounts: ["adminid"]});
 const {
   mockDocRef,
   firebase,

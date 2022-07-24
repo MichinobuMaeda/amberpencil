@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
@@ -44,6 +45,13 @@ abstract class FirestoreModel extends Equatable {
   T castValue<T>(dynamic val, T defaultValue) {
     if (T == NullableDateTime) {
       return val is Timestamp ? (val.toDate() as T) : defaultValue;
+    } else if (T == List<String>) {
+      try {
+        return val.map<String>((item) => item is String ? item : '').toList();
+      } catch (e) {
+        debugPrint('${DateTime.now().toIso8601String()} castValue $e');
+        return defaultValue;
+      }
     } else {
       return val is T ? val : defaultValue;
     }

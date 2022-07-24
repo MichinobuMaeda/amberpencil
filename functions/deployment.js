@@ -71,7 +71,7 @@ code block 4
     const user = await auth.createUser({
       displayName: "Primary user",
       email: config.initial.email,
-      emailVerified: true,
+      emailVerified: false,
       password: config.initial.password,
     });
 
@@ -89,7 +89,7 @@ code block 4
         {
           ...docInfo,
           name: "System admin",
-          members: [user.uid],
+          accounts: [user.uid],
         },
     );
 
@@ -98,7 +98,7 @@ code block 4
         {
           ...docInfo,
           name: "Tester",
-          members: [user.uid],
+          accounts: [user.uid],
         },
     );
 

@@ -51,7 +51,7 @@ async function requireAdminAccount(firebase, uid, cb) {
   const db = firebase.firestore();
   const admins = await db.collection("groups").doc("admins").get();
 
-  if (!admins.get("members")?.includes(uid)) {
+  if (!admins.get("accounts")?.includes(uid)) {
     throw Error(`uid: ${uid} is not admin`);
   }
 

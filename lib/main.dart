@@ -14,8 +14,10 @@ import 'config/firebase_options.dart';
 import 'config/l10n.dart';
 import 'config/theme.dart';
 import 'services/auth_repository.dart';
-import 'services/conf_repository.dart';
+import 'services/firestore_repository.dart';
+import 'services/observer.dart';
 import 'services/providers.dart';
+import 'services/web.dart';
 import 'routs.dart';
 
 void main() async {
@@ -45,8 +47,20 @@ void main() async {
     }
   }
 
+  AuthRepo().handleDeepLink(await deepLink());
+
   debugPrint('${DateTime.now().toIso8601String()} runApp()');
-  runApp(ProviderScope(child: MyApp()));
+  runApp(
+    ProviderScope(
+      observers: [
+        MyObserver(
+          AuthRepo(),
+          FirestoreRepo(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -54,10 +68,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AuthRepo().listen(ref);
-    ConfRepo().listen(ref);
-
     debugPrint('${DateTime.now().toIso8601String()} MaterialApp');
+
     return MaterialApp.router(
       title: ref.watch(appTitileProvider),
       theme: ThemeData(

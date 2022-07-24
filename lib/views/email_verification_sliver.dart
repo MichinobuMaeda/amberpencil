@@ -1,29 +1,48 @@
+import 'package:amberpencil/services/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../config/l10n.dart';
+import '../config/theme.dart';
+import '../models/auth_user.dart';
+import '../services/auth_repository.dart';
 
 class EmailVerification extends ConsumerWidget {
   const EmailVerification({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bodyHeight = min<double>(
-      max(
-        MediaQuery.of(context).size.height - 192.0,
-        96.0,
-      ),
-      320.0,
-    );
-
     return SliverToBoxAdapter(
       child: SizedBox(
-        height: bodyHeight,
+        height: 240.0,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Flexible(child: Text(L10n.of(context)!.verifyEmail)),
+            Flexible(child: Text(L10n.of(context)!.emailVerificationRequired)),
+            const SizedBox(height: 8.0),
+            ElevatedButton(
+              onPressed: AuthRepo().sendEmailVerification,
+              style: filledButtonStyle(context),
+              child: Text(L10n.of(context)!.send),
+            ),
+            const SizedBox(height: 8.0),
+            ElevatedButton(
+              onPressed: () async {
+                final User? user = await AuthRepo().reloadUser();
+                ref.watch(authnProvider.notifier).state =
+                    AuthUser.fromUser(user);
+              },
+              style: filledButtonStyle(context),
+              child: Text(L10n.of(context)!.confirm),
+            ),
+            const SizedBox(height: 8.0),
+            Flexible(child: Text(L10n.of(context)!.signOutForRetry)),
+            const SizedBox(height: 8.0),
+            ElevatedButton(
+              onPressed: AuthRepo().signOutIfSignedIn,
+              style: filledButtonStyle(context),
+              child: Text(L10n.of(context)!.signOut),
+            ),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'firestore_model.dart';
 
 class Conf extends FirestoreModel {

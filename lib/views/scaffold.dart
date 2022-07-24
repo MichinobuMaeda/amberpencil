@@ -10,6 +10,8 @@ import '../services/web.dart';
 import '../views/loading_sliver.dart';
 import '../views/email_verification_sliver.dart';
 import '../views/sign_in_sliver.dart';
+import '../views/test_sign_in_sliver.dart';
+import '../views/test_sign_out_sliver.dart';
 import 'bread_crumbs_sliver.dart';
 import 'more_menu.dart';
 
@@ -95,12 +97,24 @@ class MyScaffold extends ConsumerWidget {
           ...(routerState.name == RouteName.about.name)
               ? children
               : ref.watch(authzProvider) == Authz.loading
-                  ? [const LoadingSliver()]
+                  ? [
+                      const LoadingSliver(),
+                    ]
                   : ref.watch(authzProvider) == Authz.guest
-                      ? [const SignInSliver()]
+                      ? [
+                          const SignInSliver(),
+                          if (ref.watch(testModeProvider))
+                            const TestSignInSliver(),
+                        ]
                       : ref.watch(authzProvider) == Authz.notVerified
-                          ? [const EmailVerification()]
-                          : children,
+                          ? [
+                              const EmailVerification(),
+                            ]
+                          : [
+                              ...children,
+                              if (ref.watch(testModeProvider))
+                                const TestSignOutSliver(),
+                            ],
         ],
       ),
     );

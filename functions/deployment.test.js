@@ -88,7 +88,7 @@ describe("deployment", function() {
       {path: "groups/admins"},
       {
         name: expect.any(String),
-        members: [uid],
+        accounts: [uid],
         createdAt: expect.any(Date),
         createdBy: "system",
         updatedAt: expect.any(Date),
@@ -101,7 +101,7 @@ describe("deployment", function() {
       {path: "groups/testers"},
       {
         name: "Tester",
-        members: [uid],
+        accounts: [uid],
         createdAt: expect.any(Date),
         createdBy: "system",
         updatedAt: expect.any(Date),
